@@ -1,4 +1,6 @@
-﻿namespace J_RPG;
+﻿using System.Security.Cryptography;
+
+namespace J_RPG;
 
 public class Character
 {
@@ -11,6 +13,18 @@ public class Character
     public int DodgeChance { get; set; }
     public int ParadeChance { get; set; }
     public int ChanceSpellResistance { get; set; }
+    
+    public Character(string name, int currentHitPoints, int maxHitPoints, int physicalAttackPower, int magicAttackPower, int dodgeChance, int paradeChance, int chanceSpellResistance)
+    {
+        Name = name;
+        CurrentHitPoints = currentHitPoints;
+        MaxHitPoints = maxHitPoints;
+        PhysicalAttackPower = physicalAttackPower;
+        MagicAttackPower = magicAttackPower;
+        DodgeChance = dodgeChance;
+        ParadeChance = paradeChance;
+        ChanceSpellResistance = chanceSpellResistance;
+    }
 
     public void Tackle(Character target)
     {
