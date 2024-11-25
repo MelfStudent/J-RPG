@@ -11,6 +11,7 @@ public class Character
     public int DodgeChance { get; set; }
     public int ParadeChance { get; set; }
     public int ChanceSpellResistance { get; set; }
+    public bool IsDead { get; set; }
     
     public Character(string name, int currentHitPoints, int maxHitPoints, int physicalAttackPower, int magicAttackPower, int dodgeChance, int paradeChance, int chanceSpellResistance)
     {
@@ -22,6 +23,7 @@ public class Character
         DodgeChance = dodgeChance;
         ParadeChance = paradeChance;
         ChanceSpellResistance = chanceSpellResistance;
+        IsDead = false;
     }
 
     public void Tackle(Character target)
@@ -53,6 +55,13 @@ public class Character
             {
                 damage = GetArmorResistance(TypeOfArmor.Leather, typeOfAttttack, damage);
             }
+        }
+        
+        if ((CurrentHitPoints -= damage) <= 0)
+        {
+            CurrentHitPoints = 0;
+            IsDead = true;
+            return;
         }
         
         CurrentHitPoints -= damage;
