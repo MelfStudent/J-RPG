@@ -1,6 +1,6 @@
 ﻿namespace J_RPG;
 
-public class Character
+public abstract class Character
 {
     public string Name { get; set; }
     public int CurrentHitPoints { get; set; }
@@ -77,7 +77,7 @@ public class Character
 
     public void Heal()
     {
-        
+        CurrentHitPoints = MaxHitPoints;
     }
 
     private bool LuckTest(int percentage)
@@ -164,4 +164,6 @@ public class Character
 
         return newDamage;
     }
+
+    public abstract void ChoiceAction();
 }
