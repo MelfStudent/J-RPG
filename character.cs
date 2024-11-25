@@ -77,7 +77,7 @@ public abstract class Character
 
     public void Heal()
     {
-        
+        CurrentHitPoints = MaxHitPoints;
     }
 
     private bool LuckTest(int percentage)
