@@ -31,8 +31,14 @@ public abstract class Character
 
     public void Tackle(Attack attack)
     {
-        Console.WriteLine($"The {attack.AttackingCharacter.Name} character attacks the {attack.TargetCharacter.Name} person with a {attack.TypeOfDamage} called {attack.Name} of {attack.Damage} damage\n");
+        Console.WriteLine("\n========== ATTACK PHASE ==========");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"[{attack.AttackingCharacter.Name.ToUpper()}] attacks [{attack.TargetCharacter.Name.ToUpper()}]");
+        Console.WriteLine($"Attack Type: {attack.TypeOfDamage}");
+        Console.WriteLine($"Damage: {attack.Damage}");
+        Console.ResetColor();
         attack.TargetCharacter.Defend(attack.TypeOfDamage, attack.Damage);
+        Console.WriteLine("===================================\n");
     }
 
     public virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
