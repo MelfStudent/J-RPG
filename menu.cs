@@ -56,6 +56,7 @@ public class Menu
         switch (chosenClass)
         {
             case 1: return new Warrior(chosenName);
+            case 2: return new Mage(chosenName);
             default: throw new ArgumentException("Invalid class choice");
         }
     }
@@ -77,8 +78,8 @@ public class Menu
         Player2 = CreatePlayer(choiceCharacterName2, choiceCharacterClass2);
         
         Console.WriteLine($"\nYou have chosen class {Player1.GetType().Name} for player 1 and class {Player2.GetType().Name} for player 2");
-        CharacterWhoAttacks = Player1;
-        CharacterWhoDefends = Player2;
+        CharacterWhoAttacks = Player2;
+        CharacterWhoDefends = Player1;
         StartGame();
     }
 
