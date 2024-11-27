@@ -7,13 +7,13 @@ public class Warrior : Character
         Name = name;
     }
     
-    public void HeroicStrike(Character target)
+    public void HeroicStrike()
     {
         Attack attack = new Attack("Heroic Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
         Tackle(attack);
     }
 
-    public void BattleCry(Character target)
+    public void BattleCry()
     {
         Attack attack = new Attack("Battle Cry", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
         Tackle(attack);
@@ -31,10 +31,10 @@ public class Warrior : Character
         switch (Choise)
         {
             case 1:
-                HeroicStrike(Menu.CharacterWhoDefends);
+                HeroicStrike();
                 break;
             case 2:
-                BattleCry(Menu.CharacterWhoDefends);
+                BattleCry();
                 break;
             
         }
