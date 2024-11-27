@@ -6,7 +6,7 @@ public class Utils
     {
         int result;
         bool isPromptValid;
-        string[] existingCharacterClass = { "Warrior", "Mage", "Thief", "Paladin\n" };
+        string[] existingCharacterClass = { "Warrior", "Mage", "Paladin", "Thief\n" };
 
         do
         {
