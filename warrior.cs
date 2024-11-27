@@ -6,6 +6,22 @@ public class Warrior : Character
     {
         Name = name;
     }
+
+    public override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    {
+        int lifeBeforeDefense = CurrentHitPoints;
+        base.Defend(typeOfAttack, attackPower);
+        int lifeAfterDefense = CurrentHitPoints;
+        if (typeOfAttack == Attack.TypeDamage.Physical)
+        {
+            if (LuckTest(25))
+            {
+                int damageReceived = lifeBeforeDefense - lifeAfterDefense;
+                Attack attack = new Attack("Heroic Strike", Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks, damageReceived / 2, Attack.TypeDamage.Physical );
+                CounterAttack(attack);
+            }
+        }
+    }
     
     public void HeroicStrike()
     {
@@ -38,5 +54,17 @@ public class Warrior : Character
                 break;
             
         }
+    }
+
+    private void CounterAttack(Attack attack)
+    {
+        if (attack.AttackingCharacter.CurrentHitPoints - attack.Damage > 0)
+        {
+            attack.AttackingCharacter.CurrentHitPoints -= attack.Damage;
+            Console.WriteLine($"{attack.TargetCharacter.Name} counterattacked by inflicting {attack.Damage} damage to candy with a physical attack");
+            return;
+        }
+        Console.WriteLine($"{attack.AttackingCharacter.Name} died following a deadly counterattack from {attack.TargetCharacter.Name}");
+        attack.AttackingCharacter.IsDead = true;
     }
 }
