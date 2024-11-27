@@ -29,16 +29,16 @@ public abstract class Character
         IsDead = false;
     }
 
-    public void Tackle(Character target, string attackName, int amountOfDamage, string typeOfAttack)
+    public void Tackle(Attack attack)
     {
-        Console.WriteLine($"The {Name} character attacks the {target.Name} person with a {typeOfAttack} called {attackName} of {amountOfDamage} damage\n");
-        target.Defend(typeOfAttack, amountOfDamage);
+        Console.WriteLine($"The {attack.AttackingCharacter.Name} character attacks the {attack.TargetCharacter.Name} person with a {attack.TypeOfDamage} called {attack.Name} of {attack.Damage} damage\n");
+        attack.TargetCharacter.Defend(attack.TypeOfDamage, attack.Damage);
     }
 
-    public void Defend(string typeOfAttack, int attackPower)
+    public void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
         int damage = attackPower;
-        if (typeOfAttack == "PhysicalAttack")
+        if (typeOfAttack == Attack.TypeDamage.Physical)
         {
             if (LuckTest(DodgeChance))
             {
@@ -51,7 +51,7 @@ public abstract class Character
                 damage = attackPower / 2;
                 //damage = GetArmorResistance(Armor, typeOfAttack, damage);
             }
-        } else if (typeOfAttack == "MagicAttack")
+        } else if (typeOfAttack == Attack.TypeDamage.Magic)
         {
             if (LuckTest(ChanceSpellResistance))
             {
@@ -114,11 +114,11 @@ public abstract class Character
         return values;
     }
 
-    private int GetArmorResistance(TypeOfArmor armure, string typeOfAttttack ,int damageReceived)
+    private int GetArmorResistance(TypeOfArmor armure, Attack.TypeDamage typeOfAttttack ,int damageReceived)
     {
         double newDamage = 1.0;
         
-        if (typeOfAttttack == "PhysicalAttack")
+        if (typeOfAttttack == Attack.TypeDamage.Physical)
         {
             switch (armure)
             {
@@ -132,7 +132,7 @@ public abstract class Character
                     newDamage = 0.55;
                     break;
             }
-        } else if (typeOfAttttack == "MagicAttack")
+        } else if (typeOfAttttack == Attack.TypeDamage.Magic)
         {
             switch (armure)
             {
