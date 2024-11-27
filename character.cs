@@ -15,11 +15,10 @@ public abstract class Character
     
     public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
     
-    public Character(string name, int currentHitPoints, int maxHitPoints, int physicalAttackPower,
+    public Character(int maxHitPoints, int physicalAttackPower,
                         int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance)
     {
-        Name = name;
-        CurrentHitPoints = currentHitPoints;
+        CurrentHitPoints = maxHitPoints;
         MaxHitPoints = maxHitPoints;
         PhysicalAttackPower = physicalAttackPower;
         MagicAttackPower = magicAttackPower;
@@ -32,13 +31,13 @@ public abstract class Character
 
     public void Tackle(Character target, string attackName, int amountOfDamage, string typeOfAttack)
     {
-        Console.WriteLine($"The {Name} character attacks the {target.Name} person with a {typeOfAttack} called {attackName} of {amountOfDamage} damage");
+        Console.WriteLine($"The {Name} character attacks the {target.Name} person with a {typeOfAttack} called {attackName} of {amountOfDamage} damage\n");
         target.Defend(typeOfAttack, amountOfDamage);
     }
 
     public void Defend(string typeOfAttack, int attackPower)
     {
-        int damage = 0;
+        int damage = attackPower;
         if (typeOfAttack == "PhysicalAttack")
         {
             if (LuckTest(DodgeChance))
@@ -50,7 +49,7 @@ public abstract class Character
             {
                 Console.WriteLine($"The {Name} character parried the attack!");
                 damage = attackPower / 2;
-                damage = GetArmorResistance(Armor, typeOfAttack, damage);
+                //damage = GetArmorResistance(Armor, typeOfAttack, damage);
             }
         } else if (typeOfAttack == "MagicAttack")
         {
@@ -71,7 +70,6 @@ public abstract class Character
             return;
         }
         
-        CurrentHitPoints -= damage;
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
@@ -118,22 +116,20 @@ public abstract class Character
 
     private int GetArmorResistance(TypeOfArmor armure, string typeOfAttttack ,int damageReceived)
     {
-        int newDamage;
+        double newDamage = 1.0;
+        
         if (typeOfAttttack == "PhysicalAttack")
         {
             switch (armure)
             {
                 case TypeOfArmor.Leather:
-                    newDamage = (damageReceived / 100) * 85;
+                    newDamage = 0.85;
                     break;
                 case TypeOfArmor.Mesh:
-                    newDamage = (damageReceived / 100) * 70;
+                    newDamage = 0.70;
                     break;
                 case TypeOfArmor.Plates:
-                    newDamage = (damageReceived / 100) * 55;
-                    break;
-                default:
-                    newDamage = damageReceived;
+                    newDamage = 0.55;
                     break;
             }
         } else if (typeOfAttttack == "MagicAttack")
@@ -141,28 +137,17 @@ public abstract class Character
             switch (armure)
             {
                 case TypeOfArmor.Fabric:
-                    newDamage = (damageReceived / 100) * 70;
+                    newDamage = 0.70;
                     break;
                 case TypeOfArmor.Leather:
-                    newDamage = (damageReceived / 100) * 80;
+                    newDamage = 0.80;
                     break;
                 case TypeOfArmor.Mesh:
-                    newDamage = (damageReceived / 100) * 90;
-                    break;
-                case TypeOfArmor.Plates:
-                    newDamage = damageReceived;
-                    break;
-                default:
-                    newDamage = damageReceived;
+                    newDamage = 0.90;
                     break;
             }
         }
-        else
-        {
-            newDamage = damageReceived;
-        }
-
-        return newDamage;
+        return (int)(damageReceived * newDamage);
     }
 
     public abstract void ChoiceAction();

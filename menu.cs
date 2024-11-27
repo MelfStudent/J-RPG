@@ -2,8 +2,10 @@
 
 public class Menu
 {
-    public static string Player1 { get; set; }
-    public static string Player2 { get; set; }
+    public static Character Player1 { get; set; }
+    public static Character Player2 { get; set; }
+    public static Character CharacterWhoAttacks { get; set; }
+    public static Character CharacterWhoDefends { get; set; }
     
     public static void PrintGameLaunch()
     {
@@ -31,7 +33,7 @@ public class Menu
     {
         Console.WriteLine("1. Started a game");
         Console.WriteLine("2. Quit the game");
-        Console.WriteLine("Choice: ");
+        Console.Write("Choice: ");
         
         string enter = Console.ReadLine();
         
@@ -47,22 +49,81 @@ public class Menu
         }
     }
     
+    public static Character CreatePlayer(string chosenName, int chosenClass)
+    {
+        switch (chosenClass)
+        {
+            case 1: return new Warrior(chosenName);
+            default: throw new ArgumentException("Invalid class choice");
+        }
+    }
+    
     public static void PrintClassChoiceMenu()
     {
-        Console.WriteLine("\nChoose a class for the player 1");
-        Player1 = Utils.PromptClassChoice();
+        Console.WriteLine("\nChoose the name of the first character: ");
+        string choiceCharacterName1 = Console.ReadLine();
         
-        Console.WriteLine("Choose a class for the player 2");
-        Player2 = Utils.PromptClassChoice();
+        Console.Write("Choose a class for the player 1: ");
+        int choiceCharacterClass1 = Utils.PromptClassChoice();
+        Player1 = CreatePlayer(choiceCharacterName1, choiceCharacterClass1);
         
-        Console.WriteLine($"You have chosen class {Player1} for player 1 and class {Player2} for player 2");
-
+        Console.WriteLine("\nChoose the name of the second character: ");
+        string choiceCharacterName2 = Console.ReadLine();
+        
+        Console.Write("Choose a class for the player 2: ");
+        int choiceCharacterClass2 = Utils.PromptClassChoice();
+        Player2 = CreatePlayer(choiceCharacterName2, choiceCharacterClass2);
+        
+        Console.WriteLine($"\nYou have chosen class {Player1.GetType().Name} for player 1 and class {Player2.GetType().Name} for player 2");
+        CharacterWhoAttacks = Player1;
+        CharacterWhoDefends = Player2;
         StartGame();
     }
 
+    public static void SwitchPlayers()
+    {
+        Character temp = CharacterWhoAttacks;
+        CharacterWhoAttacks = CharacterWhoDefends;
+        CharacterWhoDefends = temp;
+    }
+
+    public static void EndGame()
+    {
+        Console.WriteLine(@$"
+        ****************************************************
+        *                                                  *
+        *      CONGRATULATIONS, {CharacterWhoAttacks.Name.ToUpper()} !         *
+        *                                                  *
+        *        YOU HAVE EMERGED VICTORIOUS!              *
+        *                                                  *
+        ****************************************************
+
+                    O  
+                   /|\ 
+                   / \ 
+            ---------------------
+           /                     \
+          /    VICTORY IS YOURS!  \
+         /_________________________\
+        ");
+        for (int i = 10; i > 0; i--)
+        {
+            Console.Write("\rContinued in {0}Secondes", i);
+            Thread.Sleep(1000);
+        }
+
+        PrintNavigationMenu();
+    }
+    
     public static void StartGame()
     {
-        Console.Clear();
-        
+        //Console.Clear();
+        while (Player1.IsDead == false && Player2.IsDead == false)
+        {
+            CharacterWhoAttacks.ChoiceAction();
+            SwitchPlayers();
+        }
+
+        EndGame();
     }
 }
