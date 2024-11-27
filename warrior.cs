@@ -15,8 +15,8 @@ public class Warrior : Character
 
     public void BattleCry()
     {
-        Attack attack = new Attack("Battle Cry", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        PhysicalAttackPower *= 2;
+        Console.WriteLine($"{Name} now deals {PhysicalAttackPower} damage, because his damage has just been multiplied by two for the next hits.");
     }
 
     public override void ChoiceAction()
