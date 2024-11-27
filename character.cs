@@ -1,6 +1,6 @@
 ﻿namespace J_RPG;
 
-public class Character
+public abstract class Character
 {
     public string Name { get; set; }
     public int CurrentHitPoints { get; set; }
@@ -15,11 +15,10 @@ public class Character
     
     public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
     
-    public Character(string name, int currentHitPoints, int maxHitPoints, int physicalAttackPower,
+    public Character(int maxHitPoints, int physicalAttackPower,
                         int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance)
     {
-        Name = name;
-        CurrentHitPoints = currentHitPoints;
+        CurrentHitPoints = maxHitPoints;
         MaxHitPoints = maxHitPoints;
         PhysicalAttackPower = physicalAttackPower;
         MagicAttackPower = magicAttackPower;
@@ -30,16 +29,16 @@ public class Character
         IsDead = false;
     }
 
-    public void Tackle(Character target, string attackName, int amountOfDamage, string typeOfAttack)
+    public void Tackle(Attack attack)
     {
-        Console.WriteLine($"The {Name} character attacks the {target.Name} person with a {typeOfAttack} called {attackName} of {amountOfDamage} damage");
-        target.Defend(typeOfAttack, amountOfDamage);
+        Console.WriteLine($"The {attack.AttackingCharacter.Name} character attacks the {attack.TargetCharacter.Name} person with a {attack.TypeOfDamage} called {attack.Name} of {attack.Damage} damage\n");
+        attack.TargetCharacter.Defend(attack.TypeOfDamage, attack.Damage);
     }
 
-    public void Defend(string typeOfAttack, int attackPower)
+    public virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
-        int damage = 0;
-        if (typeOfAttack == "PhysicalAttack")
+        int damage = attackPower;
+        if (typeOfAttack == Attack.TypeDamage.Physical)
         {
             if (LuckTest(DodgeChance))
             {
@@ -50,9 +49,8 @@ public class Character
             {
                 Console.WriteLine($"The {Name} character parried the attack!");
                 damage = attackPower / 2;
-                damage = GetArmorResistance(Armor, typeOfAttack, damage);
             }
-        } else if (typeOfAttack == "MagicAttack")
+        } else if (typeOfAttack == Attack.TypeDamage.Magic)
         {
             if (LuckTest(ChanceSpellResistance))
             {
@@ -71,16 +69,15 @@ public class Character
             return;
         }
         
-        CurrentHitPoints -= damage;
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
     public void Heal()
     {
-        
+        CurrentHitPoints = MaxHitPoints;
     }
 
-    private bool LuckTest(int percentage)
+    protected bool LuckTest(int percentage)
     {
         int toFind = rand.Next(1, 100);
         int[] test1 = new int[100];
@@ -116,52 +113,41 @@ public class Character
         return values;
     }
 
-    private int GetArmorResistance(TypeOfArmor armure, string typeOfAttttack ,int damageReceived)
+    private int GetArmorResistance(TypeOfArmor armure, Attack.TypeDamage typeOfAttttack ,int damageReceived)
     {
-        int newDamage;
-        if (typeOfAttttack == "PhysicalAttack")
+        double newDamage = 1.0;
+        
+        if (typeOfAttttack == Attack.TypeDamage.Physical)
         {
             switch (armure)
             {
                 case TypeOfArmor.Leather:
-                    newDamage = (damageReceived / 100) * 85;
+                    newDamage = 0.85;
                     break;
                 case TypeOfArmor.Mesh:
-                    newDamage = (damageReceived / 100) * 70;
+                    newDamage = 0.70;
                     break;
                 case TypeOfArmor.Plates:
-                    newDamage = (damageReceived / 100) * 55;
-                    break;
-                default:
-                    newDamage = damageReceived;
+                    newDamage = 0.55;
                     break;
             }
-        } else if (typeOfAttttack == "MagicAttack")
+        } else if (typeOfAttttack == Attack.TypeDamage.Magic)
         {
             switch (armure)
             {
                 case TypeOfArmor.Fabric:
-                    newDamage = (damageReceived / 100) * 70;
+                    newDamage = 0.70;
                     break;
                 case TypeOfArmor.Leather:
-                    newDamage = (damageReceived / 100) * 80;
+                    newDamage = 0.80;
                     break;
                 case TypeOfArmor.Mesh:
-                    newDamage = (damageReceived / 100) * 90;
-                    break;
-                case TypeOfArmor.Plates:
-                    newDamage = damageReceived;
-                    break;
-                default:
-                    newDamage = damageReceived;
+                    newDamage = 0.90;
                     break;
             }
         }
-        else
-        {
-            newDamage = damageReceived;
-        }
-
-        return newDamage;
+        return (int)(damageReceived * newDamage);
     }
+
+    public abstract void ChoiceAction();
 }
