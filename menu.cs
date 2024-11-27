@@ -10,6 +10,7 @@ public class Menu
     public static void PrintGameLaunch()
     {
         Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(@"
                           _______________
                          |###############|
@@ -27,6 +28,7 @@ public class Menu
        |___________|                       |____________|
                   ");
         Console.WriteLine("Prepare for an epic battle!");
+        Console.ResetColor();
     }
 
     public static void PrintNavigationMenu()
@@ -89,6 +91,8 @@ public class Menu
 
     public static void EndGame()
     {
+        Console.WriteLine("\n========== GAME OVER ==========");
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine(@$"
         ****************************************************
         *                                                  *
@@ -106,12 +110,15 @@ public class Menu
           /    VICTORY IS YOURS!  \
          /_________________________\
         ");
+        Console.ResetColor();
+        
+        Console.WriteLine("Returning to main menu in...");
         for (int i = 10; i > 0; i--)
         {
-            Console.Write("\rContinued in {0}Secondes", i);
+            Console.Write($"\r{i} seconds remaining");
             Thread.Sleep(1000);
         }
-
+        Console.WriteLine();
         PrintNavigationMenu();
     }
     
