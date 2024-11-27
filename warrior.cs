@@ -6,17 +6,33 @@ public class Warrior : Character
     {
         Name = name;
     }
+
+    public override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    {
+        int lifeBeforeDefense = CurrentHitPoints;
+        base.Defend(typeOfAttack, attackPower);
+        int lifeAfterDefense = CurrentHitPoints;
+        if (typeOfAttack == Attack.TypeDamage.Physical)
+        {
+            if (LuckTest(25))
+            {
+                int damageReceived = lifeBeforeDefense - lifeAfterDefense;
+                Attack attack = new Attack("Heroic Strike", Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks, damageReceived / 2, Attack.TypeDamage.Physical );
+                CounterAttack(attack);
+            }
+        }
+    }
     
-    public void HeroicStrike(Character target)
+    public void HeroicStrike()
     {
         Attack attack = new Attack("Heroic Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
         Tackle(attack);
     }
 
-    public void BattleCry(Character target)
+    public void BattleCry()
     {
-        Attack attack = new Attack("Battle Cry", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        PhysicalAttackPower *= 2;
+        Console.WriteLine($"{Name} now deals {PhysicalAttackPower} damage, because his damage has just been multiplied by two for the next hits.");
     }
 
     public override void ChoiceAction()
@@ -31,12 +47,24 @@ public class Warrior : Character
         switch (Choise)
         {
             case 1:
-                HeroicStrike(Menu.CharacterWhoDefends);
+                HeroicStrike();
                 break;
             case 2:
-                BattleCry(Menu.CharacterWhoDefends);
+                BattleCry();
                 break;
             
         }
+    }
+
+    private void CounterAttack(Attack attack)
+    {
+        if (attack.AttackingCharacter.CurrentHitPoints - attack.Damage > 0)
+        {
+            attack.AttackingCharacter.CurrentHitPoints -= attack.Damage;
+            Console.WriteLine($"{attack.TargetCharacter.Name} counterattacked by inflicting {attack.Damage} damage to candy with a physical attack");
+            return;
+        }
+        Console.WriteLine($"{attack.AttackingCharacter.Name} died following a deadly counterattack from {attack.TargetCharacter.Name}");
+        attack.AttackingCharacter.IsDead = true;
     }
 }

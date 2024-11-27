@@ -35,7 +35,7 @@ public abstract class Character
         attack.TargetCharacter.Defend(attack.TypeOfDamage, attack.Damage);
     }
 
-    public void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    public virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
         int damage = attackPower;
         if (typeOfAttack == Attack.TypeDamage.Physical)
@@ -49,7 +49,6 @@ public abstract class Character
             {
                 Console.WriteLine($"The {Name} character parried the attack!");
                 damage = attackPower / 2;
-                //damage = GetArmorResistance(Armor, typeOfAttack, damage);
             }
         } else if (typeOfAttack == Attack.TypeDamage.Magic)
         {
@@ -78,7 +77,7 @@ public abstract class Character
         CurrentHitPoints = MaxHitPoints;
     }
 
-    private bool LuckTest(int percentage)
+    protected bool LuckTest(int percentage)
     {
         int toFind = rand.Next(1, 100);
         int[] test1 = new int[100];
