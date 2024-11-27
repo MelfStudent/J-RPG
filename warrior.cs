@@ -8,13 +8,15 @@ public class Warrior : Character
     }
     
     public void HeroicStrike(Character target)
-    { 
-        Tackle(target, "Heroic Strike", PhysicalAttackPower, "PhysicalAttack");
+    {
+        Attack attack = new Attack("Heroic Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
+        Tackle(attack);
     }
 
     public void BattleCry(Character target)
     {
-        Tackle(target, "Battle Cry", PhysicalAttackPower, "PhysicalAttack");
+        Attack attack = new Attack("Battle Cry", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
+        Tackle(attack);
     }
 
     public override void ChoiceAction()
