@@ -27,7 +27,7 @@ public class Warrior : Character
                 Console.ResetColor();
                 
                 Attack attack = new Attack("Heroic Strike", Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks, damageReceived / 2, Attack.TypeDamage.Physical );
-                CounterAttack(attack);
+                Tackle(attack);
             }
         }
     }
@@ -76,17 +76,5 @@ public class Warrior : Character
                 BattleCry();
                 break;
         }
-    }
-
-    private void CounterAttack(Attack attack)
-    {
-        if (attack.AttackingCharacter.CurrentHitPoints - attack.Damage > 0)
-        {
-            attack.AttackingCharacter.CurrentHitPoints -= attack.Damage;
-            Console.WriteLine($"{attack.TargetCharacter.Name} counterattacked by inflicting {attack.Damage} damage to candy with a physical attack");
-            return;
-        }
-        Console.WriteLine($"{attack.AttackingCharacter.Name} died following a deadly counterattack from {attack.TargetCharacter.Name}");
-        attack.AttackingCharacter.IsDead = true;
     }
 }
