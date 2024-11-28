@@ -53,6 +53,7 @@ public class Paladin : Character
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: PALADIN)");
+        Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
         Console.WriteLine("Choose an action:");
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("1. Crusader Strike (a physical attack that deals 100% of physical attack power to the target)");
@@ -61,7 +62,7 @@ public class Paladin : Character
         Console.ResetColor();
         
         string[] options = { "Crusader Strike", "Judgement", "Bright flash" };
-        int Choise = Utils.PromptChoice(options);
+        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
         switch (Choise)
         {

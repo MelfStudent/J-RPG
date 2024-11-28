@@ -60,6 +60,7 @@ public class Thief : Character
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: THIEF)");
+        Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
         Console.WriteLine("Choose an action:");
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("1. Low Blow ()");
@@ -67,7 +68,7 @@ public class Thief : Character
         Console.ResetColor();
         
         string[] options = { "Low Blow", "Escape" };
-        int Choise = Utils.PromptChoice(options);
+        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
         switch (Choise)
         {
