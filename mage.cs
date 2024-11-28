@@ -71,7 +71,7 @@ public class Mage : Character
         Console.ResetColor();
         
         string[] options = { "Frostbolt", "Frost barrier" };
-        int Choise = Utils.PromptChoice(options);
+        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
         switch (Choise)
         {

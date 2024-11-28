@@ -34,16 +34,11 @@ public class Menu
     public static void PrintNavigationMenu()
     {
         Console.WriteLine("\n========== WELCOME TO JRPG! ==========");
-        Console.WriteLine("Choose an option to begin:");
-        Console.WriteLine("1. Start a new game");
-        Console.WriteLine("2. Quit the game");
+        string[] existingoptions = { "Start a new game", "Quit the game\n"};
+        int enter = Utils.PromptChoice(existingoptions, "Choose an option to begin:");
         Console.WriteLine("=======================================");
-        Console.Write("Your choice: ");
         
-        string enter = Console.ReadLine();
-        
-        int enter2 = int.Parse(enter);
-        switch (enter2)
+        switch (enter)
         {
             case 1:
                 PrintClassChoiceMenu();
@@ -69,18 +64,19 @@ public class Menu
     public static void PrintClassChoiceMenu()
     {
         Console.WriteLine("\n========== CHARACTER CREATION ==========");
-        Console.WriteLine("\nEnter the name of the first character: ");
-        string choiceCharacterName1 = Console.ReadLine();
+        string choiceCharacterName1 = Utils.PromptName("\nEnter the name of the first character: ");
+        
+        string[] existingCharacterClass = { "Warrior", "Mage", "Paladin", "Thief\n" };
         
         Console.Write("Choose a class for the player 1: ");
-        int choiceCharacterClass1 = Utils.PromptClassChoice();
+        int choiceCharacterClass1 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
         Player1 = CreatePlayer(choiceCharacterName1, choiceCharacterClass1);
         
         Console.WriteLine("\nEnter the name of the second character: ");
-        string choiceCharacterName2 = Console.ReadLine();
+        string choiceCharacterName2 = Utils.PromptName("\nEnter the name of the first character: ");
         
         Console.Write("Choose a class for the player 2: ");
-        int choiceCharacterClass2 = Utils.PromptClassChoice();
+        int choiceCharacterClass2 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
         Player2 = CreatePlayer(choiceCharacterName2, choiceCharacterClass2);
         
         Console.ForegroundColor = ConsoleColor.Green;

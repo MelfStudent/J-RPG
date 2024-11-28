@@ -66,7 +66,7 @@ public class Warrior : Character
         Console.ResetColor();
         
         string[] options = { "Heroic Strike", "Battle Cry" };
-        int Choise = Utils.PromptChoice(options);
+        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
         switch (Choise)
         {

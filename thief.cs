@@ -68,7 +68,7 @@ public class Thief : Character
         Console.ResetColor();
         
         string[] options = { "Low Blow", "Escape" };
-        int Choise = Utils.PromptChoice(options);
+        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
         switch (Choise)
         {

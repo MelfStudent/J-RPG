@@ -62,7 +62,7 @@ public class Paladin : Character
         Console.ResetColor();
         
         string[] options = { "Crusader Strike", "Judgement", "Bright flash" };
-        int Choise = Utils.PromptChoice(options);
+        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
         switch (Choise)
         {
