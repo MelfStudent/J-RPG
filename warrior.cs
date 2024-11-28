@@ -7,7 +7,7 @@ public class Warrior : Character
         Name = name;
     }
 
-    public override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
@@ -32,7 +32,7 @@ public class Warrior : Character
         }
     }
     
-    public void HeroicStrike()
+    private void HeroicStrike()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -43,7 +43,7 @@ public class Warrior : Character
         Tackle(attack);
     }
 
-    public void BattleCry()
+    private void BattleCry()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Yellow;

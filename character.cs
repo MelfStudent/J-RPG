@@ -2,20 +2,20 @@
 
 public abstract class Character
 {
-    public string Name { get; set; }
-    public int CurrentHitPoints { get; set; }
-    public int MaxHitPoints { get; set; }
-    public int PhysicalAttackPower  { get; set; }
-    public int MagicAttackPower  { get; set; }
-    public TypeOfArmor Armor { get; set; }
-    public int DodgeChance { get; set; }
-    public int ParadeChance { get; set; }
-    public int ChanceSpellResistance { get; set; }
-    public bool IsDead { get; set; }
+    public string Name { get; protected set; }
+    public int CurrentHitPoints { get; protected set; }
+    public int MaxHitPoints { get; private set; }
+    public int PhysicalAttackPower  { get; protected set; }
+    public int MagicAttackPower  { get; private set; }
+    public TypeOfArmor Armor { get; private set; }
+    public int DodgeChance { get; protected set; }
+    public int ParadeChance { get; private set; }
+    public int ChanceSpellResistance { get; protected set; }
+    public bool IsDead { get; private set; }
     
     public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
     
-    public Character(int maxHitPoints, int physicalAttackPower,
+    protected Character(int maxHitPoints, int physicalAttackPower,
                         int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance)
     {
         CurrentHitPoints = maxHitPoints;
@@ -29,7 +29,7 @@ public abstract class Character
         IsDead = false;
     }
 
-    public void Tackle(Attack attack)
+    protected void Tackle(Attack attack)
     {
         Console.WriteLine("\n========== ATTACK PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Red;
@@ -41,7 +41,7 @@ public abstract class Character
         Console.WriteLine("===================================\n");
     }
 
-    public virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
         int damage = attackPower;
         if (typeOfAttack == Attack.TypeDamage.Physical)
@@ -82,7 +82,7 @@ public abstract class Character
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
-    public void Heal(int extraLife)
+    protected void Heal(int extraLife)
     {
         if (CurrentHitPoints + extraLife <= MaxHitPoints)
         {

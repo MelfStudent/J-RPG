@@ -10,14 +10,14 @@ public class Thief : Character
         AttackReductionNumber = 0;
     }
     
-    public override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
         base.Defend(typeOfAttack, attackPower);
     }
     
-    public void LowBlow()
+    private void LowBlow()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -35,7 +35,7 @@ public class Thief : Character
         Tackle(attack);
     }
 
-    public void Escape()
+    private void Escape()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
