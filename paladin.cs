@@ -10,14 +10,14 @@ public class Paladin : Character
         AttackReductionNumber = 0;
     }
     
-    public override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
         base.Defend(typeOfAttack, attackPower);
     }
     
-    public void CrusaderStrike()
+    private void CrusaderStrike()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -28,7 +28,7 @@ public class Paladin : Character
         Tackle(attack);
     }
 
-    public void Judgement()
+    private void Judgement()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -39,7 +39,7 @@ public class Paladin : Character
         Tackle(attack);
     }
     
-    public void BrightFlash()
+    private void BrightFlash()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;

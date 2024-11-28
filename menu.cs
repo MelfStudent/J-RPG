@@ -2,10 +2,10 @@
 
 public class Menu
 {
-    public static Character Player1 { get; set; }
-    public static Character Player2 { get; set; }
-    public static Character CharacterWhoAttacks { get; set; }
-    public static Character CharacterWhoDefends { get; set; }
+    private static Character Player1 { get; set; }
+    private static Character Player2 { get; set; }
+    public static Character CharacterWhoAttacks { get; private set; }
+    public static Character CharacterWhoDefends { get; private set; }
     
     public static void PrintGameLaunch()
     {
@@ -49,7 +49,7 @@ public class Menu
         }
     }
     
-    public static Character CreatePlayer(string chosenName, int chosenClass)
+    private static Character CreatePlayer(string chosenName, int chosenClass)
     {
         switch (chosenClass)
         {
@@ -61,7 +61,7 @@ public class Menu
         }
     }
     
-    public static void PrintClassChoiceMenu()
+    private static void PrintClassChoiceMenu()
     {
         Console.WriteLine("\n========== CHARACTER CREATION ==========");
         string choiceCharacterName1 = Utils.PromptName("\nEnter the name of the first character: ");
@@ -98,7 +98,7 @@ public class Menu
         StartGame();
     }
     
-    public static void DisplayCharacterStats(Character character)
+    private static void DisplayCharacterStats(Character character)
     {
         Console.WriteLine("----------------------------------------");
         Console.WriteLine($"Name: {character.Name}");
@@ -113,7 +113,7 @@ public class Menu
         Console.WriteLine("----------------------------------------");
     }
     
-    public static string GetArmorPercentage(Character.TypeOfArmor armor)
+    private static string GetArmorPercentage(Character.TypeOfArmor armor)
     {
         return armor switch
         {
@@ -125,14 +125,14 @@ public class Menu
         };
     }
 
-    public static void SwitchPlayers()
+    private static void SwitchPlayers()
     {
         Character temp = CharacterWhoAttacks;
         CharacterWhoAttacks = CharacterWhoDefends;
         CharacterWhoDefends = temp;
     }
 
-    public static void EndGame()
+    private static void EndGame()
     {
         Console.WriteLine("\n========== GAME OVER ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -165,7 +165,7 @@ public class Menu
         PrintNavigationMenu();
     }
     
-    public static void StartGame()
+    private static void StartGame()
     {
         //Console.Clear();
         while (Player1.IsDead == false && Player2.IsDead == false)

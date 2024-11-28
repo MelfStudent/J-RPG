@@ -10,7 +10,7 @@ public class Mage : Character
         AttackReductionNumber = 0;
     }
     
-    public override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
@@ -35,7 +35,7 @@ public class Mage : Character
         base.Defend(typeOfAttack, attackPower);
     }
     
-    public void Frostbolt()
+    private void Frostbolt()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -46,7 +46,7 @@ public class Mage : Character
         Tackle(attack);
     }
 
-    public void FrostBarrier()
+    private void FrostBarrier()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Yellow;
