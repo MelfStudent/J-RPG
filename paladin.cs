@@ -14,24 +14,6 @@ public class Paladin : Character
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
-
-        if (AttackReductionNumber > 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"{Name} is protected by FROST BARRIER!");
-            Console.ResetColor();
-
-            if (typeOfAttack == Attack.TypeDamage.Physical)
-            {
-                attackPower = (int)(attackPower * 0.40);
-            } else if (typeOfAttack == Attack.TypeDamage.Magic)
-            {
-                attackPower = (int)(attackPower * 0.50);
-            }
-
-            AttackReductionNumber--;
-        }
-        
         base.Defend(typeOfAttack, attackPower);
     }
     
