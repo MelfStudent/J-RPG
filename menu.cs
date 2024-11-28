@@ -33,9 +33,12 @@ public class Menu
 
     public static void PrintNavigationMenu()
     {
-        Console.WriteLine("1. Started a game");
+        Console.WriteLine("\n========== WELCOME TO JRPG! ==========");
+        Console.WriteLine("Choose an option to begin:");
+        Console.WriteLine("1. Start a new game");
         Console.WriteLine("2. Quit the game");
-        Console.Write("Choice: ");
+        Console.WriteLine("=======================================");
+        Console.Write("Your choice: ");
         
         string enter = Console.ReadLine();
         
@@ -65,24 +68,65 @@ public class Menu
     
     public static void PrintClassChoiceMenu()
     {
-        Console.WriteLine("\nChoose the name of the first character: ");
+        Console.WriteLine("\n========== CHARACTER CREATION ==========");
+        Console.WriteLine("\nEnter the name of the first character: ");
         string choiceCharacterName1 = Console.ReadLine();
         
         Console.Write("Choose a class for the player 1: ");
         int choiceCharacterClass1 = Utils.PromptClassChoice();
         Player1 = CreatePlayer(choiceCharacterName1, choiceCharacterClass1);
         
-        Console.WriteLine("\nChoose the name of the second character: ");
+        Console.WriteLine("\nEnter the name of the second character: ");
         string choiceCharacterName2 = Console.ReadLine();
         
         Console.Write("Choose a class for the player 2: ");
         int choiceCharacterClass2 = Utils.PromptClassChoice();
         Player2 = CreatePlayer(choiceCharacterName2, choiceCharacterClass2);
         
-        Console.WriteLine($"\nYou have chosen class {Player1.GetType().Name} for player 1 and class {Player2.GetType().Name} for player 2");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("\n========== CHARACTERS READY ==========");
+        Console.WriteLine($"Player 1: {Player1.Name} ({Player1.GetType().Name})");
+        DisplayCharacterStats(Player1);
+
+        Console.WriteLine($"\nPlayer 2: {Player2.Name} ({Player2.GetType().Name})");
+        DisplayCharacterStats(Player2);
+        Console.ResetColor();
+        
+        //Console.WriteLine($"\nYou have chosen class {Player1.GetType().Name} for player 1 and class {Player2.GetType().Name} for player 2");
         CharacterWhoAttacks = Player1;
         CharacterWhoDefends = Player2;
+        
+        Console.WriteLine("\n========================================");
+        Console.WriteLine("Press any key to start the battle...");
+        Console.ReadKey();
         StartGame();
+    }
+    
+    public static void DisplayCharacterStats(Character character)
+    {
+        Console.WriteLine("----------------------------------------");
+        Console.WriteLine($"Name: {character.Name}");
+        Console.WriteLine($"Class: {character.GetType().Name}");
+        Console.WriteLine($"HP: {character.CurrentHitPoints}/{character.MaxHitPoints}");
+        Console.WriteLine($"Physical Attack: {character.PhysicalAttackPower}");
+        Console.WriteLine($"Magical Attack: {character.MagicAttackPower}");
+        Console.WriteLine($"Dodge Chance: {character.DodgeChance}%");
+        Console.WriteLine($"Parade Chance: {character.ParadeChance}%");
+        Console.WriteLine($"Spell Resistance Chance: {character.ChanceSpellResistance}%");
+        Console.WriteLine($"Armor Type: {character.Armor} (Resistance: {GetArmorPercentage(character.Armor)})");
+        Console.WriteLine("----------------------------------------");
+    }
+    
+    public static string GetArmorPercentage(Character.TypeOfArmor armor)
+    {
+        return armor switch
+        {
+            Character.TypeOfArmor.Fabric => "30% vs Magic",
+            Character.TypeOfArmor.Leather => "15% vs Physical, 20% vs Magic",
+            Character.TypeOfArmor.Mesh => "30% vs Physical, 10% vs Magic",
+            Character.TypeOfArmor.Plates => "45% vs Physical",
+            _ => "No resistance"
+        };
     }
 
     public static void SwitchPlayers()

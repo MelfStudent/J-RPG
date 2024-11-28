@@ -63,6 +63,7 @@ public class Mage : Character
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: MAGE)");
+        Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
         Console.WriteLine("Choose an action:");
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("1. Frostbolt (a magical attack that deals 100% of magical attack power to the target)");

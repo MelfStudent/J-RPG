@@ -60,6 +60,7 @@ public class Thief : Character
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: THIEF)");
+        Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
         Console.WriteLine("Choose an action:");
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("1. Low Blow ()");
