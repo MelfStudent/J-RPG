@@ -31,8 +31,14 @@ public abstract class Character
 
     public void Tackle(Attack attack)
     {
-        Console.WriteLine($"The {attack.AttackingCharacter.Name} character attacks the {attack.TargetCharacter.Name} person with a {attack.TypeOfDamage} called {attack.Name} of {attack.Damage} damage\n");
+        Console.WriteLine("\n========== ATTACK PHASE ==========");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"[{attack.AttackingCharacter.Name.ToUpper()}] attacks [{attack.TargetCharacter.Name.ToUpper()}]");
+        Console.WriteLine($"Attack Type: {attack.TypeOfDamage}");
+        Console.WriteLine($"Damage: {attack.Damage}");
+        Console.ResetColor();
         attack.TargetCharacter.Defend(attack.TypeOfDamage, attack.Damage);
+        Console.WriteLine("===================================\n");
     }
 
     public virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
@@ -69,12 +75,24 @@ public abstract class Character
             return;
         }
         
+        if (Menu.CharacterWhoAttacks.GetType().Name == "Paladin")
+        {
+            Menu.CharacterWhoAttacks.Heal((int)(damage * 0.50));
+        }
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
-    public void Heal()
+    public void Heal(int extraLife)
     {
+        if (CurrentHitPoints + extraLife <= MaxHitPoints)
+        {
+            CurrentHitPoints += extraLife;
+            Console.WriteLine(
+                $"{Menu.CharacterWhoAttacks.Name} regenerated {extraLife} hp. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
+            return;
+        }
         CurrentHitPoints = MaxHitPoints;
+        Console.WriteLine($"{Menu.CharacterWhoAttacks.Name} has regenerated life. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
     }
 
     protected bool LuckTest(int percentage)
