@@ -1,23 +1,28 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Models;
+
+using Services;
 
 public abstract class Character
 {
-    public string Name { get; set; }
-    public int CurrentHitPoints { get; set; }
-    public int MaxHitPoints { get; set; }
-    public int PhysicalAttackPower  { get; set; }
-    public int MagicAttackPower  { get; set; }
-    public TypeOfArmor Armor { get; set; }
-    public int DodgeChance { get; set; }
-    public int ParadeChance { get; set; }
-    public int ChanceSpellResistance { get; set; }
-    public bool IsDead { get; set; }
+    public string Name { get; protected set; }
+    public int CurrentHitPoints { get; private set; }
+    public int MaxHitPoints { get; private set; }
+    public int PhysicalAttackPower  { get; protected set; }
+    public int MagicAttackPower  { get; private set; }
+    public TypeOfArmor Armor { get; private set; }
+    public int DodgeChance { get; protected set; }
+    public int ParadeChance { get; private set; }
+    public int ChanceSpellResistance { get; protected set; }
+    public int Speed { get; protected set; }
+    public bool IsDead { get; private set; }
     
+    private Random Rand { get; set; } = new Random();
     public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
     
-    public Character(int maxHitPoints, int physicalAttackPower,
-                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance)
+    protected Character(string name, int maxHitPoints, int physicalAttackPower,
+                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed)
     {
+        Name = name;
         CurrentHitPoints = maxHitPoints;
         MaxHitPoints = maxHitPoints;
         PhysicalAttackPower = physicalAttackPower;
@@ -26,10 +31,11 @@ public abstract class Character
         DodgeChance = dodgeChance;
         ParadeChance = paradeChance;
         ChanceSpellResistance = chanceSpellResistance;
+        Speed = speed;
         IsDead = false;
     }
 
-    public void Tackle(Attack attack)
+    protected static void Tackle(Attack attack)
     {
         Console.WriteLine("\n========== ATTACK PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Red;
@@ -41,9 +47,9 @@ public abstract class Character
         Console.WriteLine("===================================\n");
     }
 
-    public virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
-        int damage = attackPower;
+        var damage = attackPower;
         if (typeOfAttack == Attack.TypeDamage.Physical)
         {
             if (LuckTest(DodgeChance))
@@ -51,7 +57,7 @@ public abstract class Character
                 Console.WriteLine($"The {Name} character dodged the attack !");
                 return;
             }
-            else if (LuckTest(ParadeChance))
+            if (LuckTest(ParadeChance))
             {
                 Console.WriteLine($"The {Name} character parried the attack!");
                 damage = attackPower / 2;
@@ -82,7 +88,7 @@ public abstract class Character
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
-    public void Heal(int extraLife)
+    protected void Heal(int extraLife)
     {
         if (CurrentHitPoints + extraLife <= MaxHitPoints)
         {
@@ -97,16 +103,16 @@ public abstract class Character
 
     protected bool LuckTest(int percentage)
     {
-        int toFind = rand.Next(1, 100);
-        int[] test1 = new int[100];
-        for (int i = 1; i < test1.Length; i++)
+        var toFind = Rand.Next(1, 100);
+        var test1 = new int[100];
+        for (var i = 1; i < test1.Length; i++)
         {
             test1[i-1] = i;
         }
 
         test1 = Shuffle(test1);
             
-        for (int j = 0; j < percentage; j++)
+        for (var j = 0; j < percentage; j++)
         {
             if (test1[j] == toFind)
             {
@@ -117,54 +123,38 @@ public abstract class Character
         return false;
     }
     
-    private Random rand = new Random();
-    
     private int[] Shuffle(int[] values)
     {
-        for (int i = values.Length - 1; i > 0; i--) {
-            int k = rand.Next(i + 1);
-            int value = values[k];
-            values[k] = values[i];
-            values[i] = value;
+        for (var i = values.Length - 1; i > 0; i--) {
+            var k = Rand.Next(i + 1);
+            (values[k], values[i]) = (values[i], values[k]);
         }
 
         return values;
     }
 
-    private int GetArmorResistance(TypeOfArmor armure, Attack.TypeDamage typeOfAttttack ,int damageReceived)
+    private static int GetArmorResistance(TypeOfArmor armor, Attack.TypeDamage typeOfAttack ,int damageReceived)
     {
-        double newDamage = 1.0;
-        
-        if (typeOfAttttack == Attack.TypeDamage.Physical)
+        var reductionFactor = typeOfAttack switch
         {
-            switch (armure)
+            Attack.TypeDamage.Physical => armor switch
             {
-                case TypeOfArmor.Leather:
-                    newDamage = 0.85;
-                    break;
-                case TypeOfArmor.Mesh:
-                    newDamage = 0.70;
-                    break;
-                case TypeOfArmor.Plates:
-                    newDamage = 0.55;
-                    break;
-            }
-        } else if (typeOfAttttack == Attack.TypeDamage.Magic)
-        {
-            switch (armure)
+                TypeOfArmor.Leather => 0.85,
+                TypeOfArmor.Mesh => 0.70,
+                TypeOfArmor.Plates => 0.55,
+                _ => 1.0
+            },
+            Attack.TypeDamage.Magic => armor switch
             {
-                case TypeOfArmor.Fabric:
-                    newDamage = 0.70;
-                    break;
-                case TypeOfArmor.Leather:
-                    newDamage = 0.80;
-                    break;
-                case TypeOfArmor.Mesh:
-                    newDamage = 0.90;
-                    break;
-            }
-        }
-        return (int)(damageReceived * newDamage);
+                TypeOfArmor.Fabric => 0.70,
+                TypeOfArmor.Leather => .80,
+                TypeOfArmor.Mesh => 0.90,
+                _ => 1.0
+            },
+            _ => 1.0
+        };
+            
+        return (int)(damageReceived * reductionFactor);
     }
 
     public abstract void ChoiceAction();
