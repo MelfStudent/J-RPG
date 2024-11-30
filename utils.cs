@@ -1,8 +1,8 @@
 ﻿namespace J_RPG;
 
-public class Utils
+public static class Utils
 {
-    public static int PromptChoice(string[] options, string titled)
+    public static int PromptChoice(List<string> options, string titled)
     {
         int result;
         bool isPromptValid;
@@ -10,13 +10,13 @@ public class Utils
         do
         {
             Console.WriteLine(titled);
-            for (int i = 1; i < options.Length+1; i++)
+            for (var i = 1; i < options.Count+1; i++)
             {
                 Console.Write($"{i} - {options[i-1]}\n");
             }
 
             Console.Write("Choose: ");
-            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result < options.Length+1;
+            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result < options.Count+1;
 
             if (!isPromptValid)
             {
@@ -29,7 +29,7 @@ public class Utils
     
     public static string PromptName(string titled)
     {
-        string result;
+        string? result;
         bool isPromptValid;
 
         do
@@ -45,6 +45,6 @@ public class Utils
             }
         } while (!isPromptValid);
 
-        return result; 
+        return result ?? ""; 
     }
 }
