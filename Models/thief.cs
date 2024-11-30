@@ -6,7 +6,7 @@ public class Thief : Character
 {
     private int AttackReductionNumber { get; set; }
     
-    public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25)
+    public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100)
     {
         AttackReductionNumber = 0;
     }
