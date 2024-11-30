@@ -82,21 +82,11 @@ public static class Menu
         foreach (var character in characters)
         {
             Console.WriteLine($"Player 1: {character.Name} ({character.GetType().Name})");
-            Console.WriteLine("----------------------------------------");
-            Console.WriteLine($"Name: {character.Name}");
-            Console.WriteLine($"Class: {character.GetType().Name}");
-            Console.WriteLine($"HP: {character.CurrentHitPoints}/{character.MaxHitPoints}");
-            Console.WriteLine($"Physical Attack: {character.PhysicalAttackPower}");
-            Console.WriteLine($"Magical Attack: {character.MagicAttackPower}");
-            Console.WriteLine($"Dodge Chance: {character.DodgeChance}%");
-            Console.WriteLine($"Parade Chance: {character.ParadeChance}%");
-            Console.WriteLine($"Spell Resistance Chance: {character.ChanceSpellResistance}%");
-            Console.WriteLine($"Armor Type: {character.Armor} (Resistance: {GetArmorPercentage(character.Armor)})");
-            Console.WriteLine("----------------------------------------");
+            Console.WriteLine(character.ToString());
         }
     }
     
-    private static string GetArmorPercentage(Character.TypeOfArmor armor)
+    public static string GetArmorPercentage(Character.TypeOfArmor armor)
     {
         return armor switch
         {
