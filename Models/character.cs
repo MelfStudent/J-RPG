@@ -158,4 +158,28 @@ public abstract class Character
     }
 
     public abstract void ChoiceAction();
+
+    public override string ToString()
+    {
+        var result = 
+            "----------------------------------------\n" +
+            $"Name: {Name}\n" +
+            $"Class: {GetType().Name}\n" +
+            $"HP: {CurrentHitPoints}/{MaxHitPoints}\n" +
+            $"Physical Attack: {PhysicalAttackPower}\n" +
+            $"Magical Attack: {MagicAttackPower}\n" +
+            $"Dodge Chance: {DodgeChance}%\n" +
+            $"Parade Chance: {ParadeChance}%\n" +
+            $"Spell Resistance Chance: {ChanceSpellResistance}%\n" +
+            $"Speed : {Speed}\n" +
+            $"Armor Type: {Armor} (Resistance: {Menu.GetArmorPercentage(Armor)})\n";
+            if (GetType().GetProperty("ManaPoints") is not null)
+            {
+                var manaPoints = (int)GetType().GetProperty("ManaPoints")?.GetValue(this)!;
+                result += $"Mana Points: {manaPoints}\n";
+            }
+        result += "----------------------------------------";
+        
+        return result;
+    }
 }
