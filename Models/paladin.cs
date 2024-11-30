@@ -4,10 +4,12 @@ using Services;
 
 public class Paladin : Character
 {
+    private int ManaPoints { get; set; }
     private int AttackReductionNumber { get; set; }
     
-    public Paladin(string name) : base(name, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20)
+    public Paladin(string name, int manaPoints) : base(name, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20, 75)
     {
+        ManaPoints = manaPoints;
         AttackReductionNumber = 0;
     }
     
