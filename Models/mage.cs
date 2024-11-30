@@ -4,10 +4,12 @@ using Services;
 
 public class Mage : Character
 {
+    private int ManaPoints { get; set; }
     private int AttackReductionNumber { get; set; }
     
-    public Mage(string name) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25)
+    public Mage(string name, int manaPoints) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75)
     {
+        ManaPoints = manaPoints;
         AttackReductionNumber = 0;
     }
     
