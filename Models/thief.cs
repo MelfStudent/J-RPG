@@ -1,12 +1,13 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Models;
+
+using Services;
 
 public class Thief : Character
 {
     private int AttackReductionNumber { get; set; }
     
-    public Thief(string name) : base(80, 55, 0, TypeOfArmor.Leather, 15, 25, 25)
+    public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25)
     {
-        Name = name;
         AttackReductionNumber = 0;
     }
     
@@ -31,7 +32,7 @@ public class Thief : Character
             newPhysicalAttackPower = (int)(PhysicalAttackPower * 1.50);
         }
         
-        Attack attack = new Attack("Low Blow", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, newPhysicalAttackPower, Attack.TypeDamage.Physical );
+        var attack = new Attack("Low Blow", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, newPhysicalAttackPower, Attack.TypeDamage.Physical );
         Tackle(attack);
     }
 
@@ -67,10 +68,10 @@ public class Thief : Character
         Console.WriteLine("2. Escape ()");
         Console.ResetColor();
         
-        string[] options = { "Low Blow", "Escape" };
-        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
+        List<string> options = new() { "Low Blow", "Escape" };
+        var choice = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
-        switch (Choise)
+        switch (choice)
         {
             case 1:
                 LowBlow();

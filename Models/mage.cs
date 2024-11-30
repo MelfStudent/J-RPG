@@ -1,12 +1,13 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Models;
+
+using Services;
 
 public class Mage : Character
 {
     private int AttackReductionNumber { get; set; }
     
-    public Mage(string name) : base(60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25)
+    public Mage(string name) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25)
     {
-        Name = name;
         AttackReductionNumber = 0;
     }
     
@@ -28,6 +29,13 @@ public class Mage : Character
             {
                 attackPower = (int)(attackPower * 0.50);
             }
+            
+            attackPower = typeOfAttack switch
+            {
+                Attack.TypeDamage.Physical => (int)(attackPower * 0.40),
+                Attack.TypeDamage.Magic => (int)(attackPower * 0.50),
+                _ => attackPower
+            };
 
             AttackReductionNumber--;
         }
@@ -35,14 +43,14 @@ public class Mage : Character
         base.Defend(typeOfAttack, attackPower);
     }
     
-    private void Frostbolt()
+    private void FrostBolt()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses FROST BOLT!");
         Console.ResetColor();
         
-        Attack attack = new Attack("Frostbolt", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, MagicAttackPower, Attack.TypeDamage.Magic );
+        var attack = new Attack("FrostBolt", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, MagicAttackPower, Attack.TypeDamage.Magic );
         Tackle(attack);
     }
 
@@ -66,17 +74,17 @@ public class Mage : Character
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
         Console.WriteLine("Choose an action:");
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("1. Frostbolt (a magical attack that deals 100% of magical attack power to the target)");
+        Console.WriteLine("1. Frost bolt (a magical attack that deals 100% of magical attack power to the target)");
         Console.WriteLine("2. Frost barrier (reduces damage from the next two attacks received)");
         Console.ResetColor();
         
-        string[] options = { "Frostbolt", "Frost barrier" };
-        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
+        List<string> options = new() { "Frost bolt", "Frost barrier" };
+        var choice = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
-        switch (Choise)
+        switch (choice)
         {
             case 1:
-                Frostbolt();
+                FrostBolt();
                 break;
             case 2:
                 FrostBarrier();

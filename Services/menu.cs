@@ -1,11 +1,13 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Services;
 
-public class Menu
+using Models;
+
+public static class Menu
 {
-    private static Character Player1 { get; set; }
-    private static Character Player2 { get; set; }
-    public static Character CharacterWhoAttacks { get; private set; }
-    public static Character CharacterWhoDefends { get; private set; }
+    public static Character? Player1 { get; private set; }
+    public static Character? Player2 { get; private set; }
+    public static Character? CharacterWhoAttacks { get; set; }
+    public static Character? CharacterWhoDefends { get; set; }
     
     public static void PrintGameLaunch()
     {
@@ -34,8 +36,8 @@ public class Menu
     public static void PrintNavigationMenu()
     {
         Console.WriteLine("\n========== WELCOME TO JRPG! ==========");
-        string[] existingoptions = { "Start a new game", "Quit the game\n"};
-        int enter = Utils.PromptChoice(existingoptions, "Choose an option to begin:");
+        List<string> existingOptions = new() { "Start a new game", "Quit the game\n"};
+        var enter = Utils.PromptChoice(existingOptions, "Choose an option to begin:");
         Console.WriteLine("=======================================");
         
         switch (enter)
@@ -49,35 +51,22 @@ public class Menu
         }
     }
     
-    private static Character CreatePlayer(string chosenName, int chosenClass)
-    {
-        switch (chosenClass)
-        {
-            case 1: return new Warrior(chosenName);
-            case 2: return new Mage(chosenName);
-            case 3: return new Paladin(chosenName);
-            case 4: return new Thief(chosenName);
-            default: throw new ArgumentException("Invalid class choice");
-        }
-    }
-    
     private static void PrintClassChoiceMenu()
     {
         Console.WriteLine("\n========== CHARACTER CREATION ==========");
-        string choiceCharacterName1 = Utils.PromptName("\nEnter the name of the first character: ");
+        var choiceCharacterName1 = Utils.PromptName("\nEnter the name of the first character: ");
         
-        string[] existingCharacterClass = { "Warrior", "Mage", "Paladin", "Thief\n" };
+        List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief\n" };
         
         Console.Write("Choose a class for the player 1: ");
-        int choiceCharacterClass1 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
-        Player1 = CreatePlayer(choiceCharacterName1, choiceCharacterClass1);
+        var choiceCharacterClass1 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
+        Player1 = Utils.CreatePlayer(choiceCharacterName1, choiceCharacterClass1);
         
-        Console.WriteLine("\nEnter the name of the second character: ");
-        string choiceCharacterName2 = Utils.PromptName("\nEnter the name of the first character: ");
+        var choiceCharacterName2 = Utils.PromptName("\nEnter the name of the second character: ");
         
         Console.Write("Choose a class for the player 2: ");
-        int choiceCharacterClass2 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
-        Player2 = CreatePlayer(choiceCharacterName2, choiceCharacterClass2);
+        var choiceCharacterClass2 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
+        Player2 = Utils.CreatePlayer(choiceCharacterName2, choiceCharacterClass2);
         
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("\n========== CHARACTERS READY ==========");
@@ -88,14 +77,13 @@ public class Menu
         DisplayCharacterStats(Player2);
         Console.ResetColor();
         
-        //Console.WriteLine($"\nYou have chosen class {Player1.GetType().Name} for player 1 and class {Player2.GetType().Name} for player 2");
         CharacterWhoAttacks = Player1;
         CharacterWhoDefends = Player2;
         
         Console.WriteLine("\n========================================");
         Console.WriteLine("Press any key to start the battle...");
         Console.ReadKey();
-        StartGame();
+        Utils.StartGame();
     }
     
     private static void DisplayCharacterStats(Character character)
@@ -125,14 +113,7 @@ public class Menu
         };
     }
 
-    private static void SwitchPlayers()
-    {
-        Character temp = CharacterWhoAttacks;
-        CharacterWhoAttacks = CharacterWhoDefends;
-        CharacterWhoDefends = temp;
-    }
-
-    private static void EndGame()
+    public static void EndGame()
     {
         Console.WriteLine("\n========== GAME OVER ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -156,24 +137,12 @@ public class Menu
         Console.ResetColor();
         
         Console.WriteLine("Returning to main menu in...");
-        for (int i = 10; i > 0; i--)
+        for (var i = 10; i > 0; i--)
         {
             Console.Write($"\r{i} seconds remaining");
             Thread.Sleep(1000);
         }
         Console.WriteLine();
         PrintNavigationMenu();
-    }
-    
-    private static void StartGame()
-    {
-        //Console.Clear();
-        while (Player1.IsDead == false && Player2.IsDead == false)
-        {
-            CharacterWhoAttacks.ChoiceAction();
-            SwitchPlayers();
-        }
-
-        EndGame();
     }
 }

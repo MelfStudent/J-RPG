@@ -1,12 +1,13 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Models;
+
+using Services;
 
 public class Paladin : Character
 {
     private int AttackReductionNumber { get; set; }
     
-    public Paladin(string name) : base(95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20)
+    public Paladin(string name) : base(name, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20)
     {
-        Name = name;
         AttackReductionNumber = 0;
     }
     
@@ -61,10 +62,10 @@ public class Paladin : Character
         Console.WriteLine("3. Bright flash (heals for 125% of your magic attack power)");
         Console.ResetColor();
         
-        string[] options = { "Crusader Strike", "Judgement", "Bright flash" };
-        int Choise = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
+        List<string> options = new() { "Crusader Strike", "Judgement", "Bright flash" };
+        var choice = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
         
-        switch (Choise)
+        switch (choice)
         {
             case 1:
                 CrusaderStrike();
