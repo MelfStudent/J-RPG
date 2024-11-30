@@ -4,6 +4,8 @@ using Models;
 
 public static class Utils
 {
+    private static HashSet<string> UsedNames = new();
+    
     public static int PromptChoice(List<string> options, string titled)
     {
         int result;
@@ -29,7 +31,7 @@ public static class Utils
         return result; 
     }
     
-    public static string PromptName(string titled)
+    private static string PromptName(string titled)
     {
         string? result;
         bool isPromptValid;
@@ -39,18 +41,44 @@ public static class Utils
             Console.WriteLine(titled);
             Console.Write("Choose: ");
             result = Console.ReadLine()?.Trim();
-            isPromptValid = !string.IsNullOrEmpty(result);
-
-            if (!isPromptValid)
+            if (string.IsNullOrEmpty(result))
             {
-                Console.WriteLine("Invalid entry, please try again");
+                Console.WriteLine("Invalid name. Please try again.");
+                isPromptValid = false;
+            }
+            else if (UsedNames.Contains(result))
+            {
+                Console.WriteLine($"The name '{result}' is already used.");
+                isPromptValid = false;
+            }
+            else
+            {
+                isPromptValid = true;
             }
         } while (!isPromptValid);
 
-        return result ?? ""; 
+        UsedNames.Add(result!);
+        return result!; 
     }
     
-    public static Character CreatePlayer(string chosenName, int chosenClass)
+    public static List<Character> PromptTeam(string titled)
+    {
+        var result = new List<Character>();
+        List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief\n" };
+
+        Console.WriteLine(titled);
+        for (var i = 1; i < 4; i++)
+        {
+            var choiceCharacterName = PromptName($"\nEnter the character name n°{i} :");
+            Console.Write($"\nChoose a class for the player {i}: \n");
+            var choiceCharacterClass = PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
+            result.Add(CreatePlayer(choiceCharacterName, choiceCharacterClass));
+        }
+        
+        return result;
+    }
+    
+    private static Character CreatePlayer(string chosenName, int chosenClass)
     {
         switch (chosenClass)
         {
@@ -62,14 +90,14 @@ public static class Utils
         }
     }
     
-    public static void SwitchPlayers()
+    private static void SwitchPlayers()
     {
         (Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks) = (Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends);
     }
     
     public static void StartGame()
     {
-        while (Menu.Player1.IsDead == false && Menu.Player2.IsDead == false)
+        while (true)
         {
             Menu.CharacterWhoAttacks.ChoiceAction();
             Utils.SwitchPlayers();
