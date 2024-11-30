@@ -161,7 +161,7 @@ public abstract class Character
 
     public override string ToString()
     {
-        return 
+        var result = 
             "----------------------------------------\n" +
             $"Name: {Name}\n" +
             $"Class: {GetType().Name}\n" +
@@ -172,7 +172,14 @@ public abstract class Character
             $"Parade Chance: {ParadeChance}%\n" +
             $"Spell Resistance Chance: {ChanceSpellResistance}%\n" +
             $"Speed : {Speed}\n" +
-            $"Armor Type: {Armor} (Resistance: {Menu.GetArmorPercentage(Armor)})\n" +
-            "----------------------------------------";
+            $"Armor Type: {Armor} (Resistance: {Menu.GetArmorPercentage(Armor)})\n";
+            if (GetType().GetProperty("ManaPoints") is not null)
+            {
+                var manaPoints = (int)GetType().GetProperty("ManaPoints")?.GetValue(this)!;
+                result += $"Mana Points: {manaPoints}\n";
+            }
+        result += "----------------------------------------";
+        
+        return result;
     }
 }

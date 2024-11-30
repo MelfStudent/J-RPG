@@ -4,7 +4,7 @@ using Services;
 
 public class Mage : Character
 {
-    private int ManaPoints { get; set; }
+    public int ManaPoints { get; private set; }
     private int AttackReductionNumber { get; set; }
     
     public Mage(string name, int manaPoints) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75)
@@ -93,4 +93,6 @@ public class Mage : Character
                 break;
         }
     }
+    
+    
 }
