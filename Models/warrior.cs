@@ -4,7 +4,7 @@ using Services;
 
 public class Warrior : Character
 {
-    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10) {}
+    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50) {}
 
     protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {

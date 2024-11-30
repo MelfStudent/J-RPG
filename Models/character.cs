@@ -13,13 +13,14 @@ public abstract class Character
     public int DodgeChance { get; protected set; }
     public int ParadeChance { get; private set; }
     public int ChanceSpellResistance { get; protected set; }
+    public int Speed { get; protected set; }
     public bool IsDead { get; private set; }
     
     private Random Rand { get; set; } = new Random();
     public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
     
     protected Character(string name, int maxHitPoints, int physicalAttackPower,
-                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance)
+                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed)
     {
         Name = name;
         CurrentHitPoints = maxHitPoints;
@@ -30,6 +31,7 @@ public abstract class Character
         DodgeChance = dodgeChance;
         ParadeChance = paradeChance;
         ChanceSpellResistance = chanceSpellResistance;
+        Speed = speed;
         IsDead = false;
     }
 
