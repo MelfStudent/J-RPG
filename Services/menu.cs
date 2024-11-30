@@ -61,11 +61,11 @@ public static class Menu
 
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("\n========== READY CHARACTERS TEAM 1 ==========");
-        DisplayCharacterStats(Player1);
+        DisplayCharacterStats(Player1, "Player 1");
         
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("\n========== READY CHARACTERS TEAM 2 ==========");
-        DisplayCharacterStats(Player2);
+        DisplayCharacterStats(Player2, "Player 2");
         Console.ResetColor();
         
         //CharacterWhoAttacks = Player1;
@@ -77,11 +77,11 @@ public static class Menu
         Utils.StartGame();
     }
     
-    private static void DisplayCharacterStats(List<Character> characters)
+    private static void DisplayCharacterStats(List<Character> characters, string playerName)
     {
         foreach (var character in characters)
         {
-            Console.WriteLine($"Player 1: {character.Name} ({character.GetType().Name})");
+            Console.WriteLine($"{playerName}: {character.Name} ({character.GetType().Name})");
             Console.WriteLine(character.ToString());
         }
     }
