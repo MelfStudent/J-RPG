@@ -1,4 +1,4 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Models;
 
 public class Attack
 {

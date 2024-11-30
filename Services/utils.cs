@@ -1,4 +1,6 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Services;
+
+using Models;
 
 public static class Utils
 {
@@ -46,5 +48,33 @@ public static class Utils
         } while (!isPromptValid);
 
         return result ?? ""; 
+    }
+    
+    public static Character CreatePlayer(string chosenName, int chosenClass)
+    {
+        switch (chosenClass)
+        {
+            case 1: return new Warrior(chosenName);
+            case 2: return new Mage(chosenName);
+            case 3: return new Paladin(chosenName);
+            case 4: return new Thief(chosenName);
+            default: throw new ArgumentException("Invalid class choice");
+        }
+    }
+    
+    public static void SwitchPlayers()
+    {
+        (Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks) = (Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends);
+    }
+    
+    public static void StartGame()
+    {
+        while (Menu.Player1.IsDead == false && Menu.Player2.IsDead == false)
+        {
+            Menu.CharacterWhoAttacks.ChoiceAction();
+            Utils.SwitchPlayers();
+        }
+
+        Menu.EndGame();
     }
 }

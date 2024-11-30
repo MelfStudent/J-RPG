@@ -1,4 +1,6 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Models;
+
+using Services;
 
 public class Warrior : Character
 {
