@@ -22,24 +22,24 @@ public class Paladin : Character
     
     private void CrusaderStrike()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses CRUSADER STRIKE!");
         Console.ResetColor();
         
         Attack attack = new Attack("Crusader Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        Tackle(attack);*/
     }
 
     private void Judgement()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses JUDGEMENT!");
         Console.ResetColor();
         
         Attack attack = new Attack("Judgement", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, MagicAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        Tackle(attack);*/
     }
     
     private void BrightFlash()

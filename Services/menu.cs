@@ -6,8 +6,10 @@ public static class Menu
 {
     public static List<Character>? Player1 { get; private set; }
     public static List<Character>? Player2 { get; private set; }
-    public static Character? CharacterWhoAttacks { get; set; }
-    public static Character? CharacterWhoDefends { get; set; }
+    public static List<SkillUsage> SkillsTourCurrent { get; set; } = new List<SkillUsage>();
+    public static Team? TeamThatAttacks { get; set; }
+    public static Team? TeamThatDefends { get; set; }
+    public static List<Team> Teams { get; set; } = new List<Team>();
     
     public static void PrintGameLaunch()
     {
@@ -56,8 +58,22 @@ public static class Menu
         Console.WriteLine("\n========== CHARACTER CREATION ==========");
         Console.ForegroundColor = ConsoleColor.Blue;
         Player1 = Utils.PromptTeam("\n\n\nCharacter selection team n°1");
+        var team1 = new Team("Player 1");
+        foreach (var player in Player1)
+        {
+            team1.AddMember(player);
+        }
+        
         Console.ForegroundColor = ConsoleColor.Yellow;
         Player2 = Utils.PromptTeam("\n\n\nCharacter selection team n°2");
+        var team2 = new Team("Player 2");
+        foreach (var player in Player2)
+        {
+            team2.AddMember(player);
+        }
+        
+        Teams.Add(team1);
+        Teams.Add(team2);
 
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("\n========== READY CHARACTERS TEAM 1 ==========");
@@ -68,8 +84,9 @@ public static class Menu
         DisplayCharacterStats(Player2, "Player 2");
         Console.ResetColor();
         
-        //CharacterWhoAttacks = Player1;
-        //CharacterWhoDefends = Player2;
+        TeamThatAttacks = Teams[0];;
+        TeamThatDefends = Teams[1];;
+        
 
         Console.WriteLine("\n========================================");
         Console.WriteLine("Press any key to start the battle...");
@@ -105,7 +122,7 @@ public static class Menu
         Console.WriteLine(@$"
         ****************************************************
         *                                                  *
-        *      CONGRATULATIONS, {CharacterWhoAttacks.Name.ToUpper()} !         *
+        *      CONGRATULATIONS,!         *
         *                                                  *
         *        YOU HAVE EMERGED VICTORIOUS!              *
         *                                                  *

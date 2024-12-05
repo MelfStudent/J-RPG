@@ -5,16 +5,17 @@ using Services;
 public abstract class Character
 {
     public string Name { get; protected set; }
-    public int CurrentHitPoints { get; private set; }
-    public int MaxHitPoints { get; private set; }
-    public int PhysicalAttackPower  { get; protected set; }
-    public int MagicAttackPower  { get; private set; }
-    public TypeOfArmor Armor { get; private set; }
-    public int DodgeChance { get; protected set; }
-    public int ParadeChance { get; private set; }
-    public int ChanceSpellResistance { get; protected set; }
+    protected int CurrentHitPoints { get; private set; }
+    protected int MaxHitPoints { get; private set; }
+    public int PhysicalAttackPower  { get; set; }
+    protected int MagicAttackPower  { get; private set; }
+    private TypeOfArmor Armor { get; set; }
+    public int DodgeChance { get; set; }
+    private int ParadeChance { get; set; }
+    protected int ChanceSpellResistance { get; set; }
     public int Speed { get; protected set; }
     public bool IsDead { get; private set; }
+    protected List<Skill> Skills { get; set; } = new List<Skill>();
     
     private Random Rand { get; set; } = new Random();
     public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
@@ -35,7 +36,7 @@ public abstract class Character
         IsDead = false;
     }
 
-    protected static void Tackle(Attack attack)
+    public static void Tackle(Attack attack)
     {
         Console.WriteLine("\n========== ATTACK PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Red;
@@ -81,16 +82,16 @@ public abstract class Character
             return;
         }
         
-        if (Menu.CharacterWhoAttacks.GetType().Name == "Paladin")
+        if (Menu.TeamThatAttacks.GetType().Name == "Paladin")
         {
-            Menu.CharacterWhoAttacks.Heal((int)(damage * 0.50));
+            //Menu.CharacterWhoAttacks.Heal((int)(damage * 0.50));
         }
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
-    protected void Heal(int extraLife)
+    public void Heal(int extraLife)
     {
-        if (CurrentHitPoints + extraLife <= MaxHitPoints)
+       /* if (CurrentHitPoints + extraLife <= MaxHitPoints)
         {
             CurrentHitPoints += extraLife;
             Console.WriteLine(
@@ -99,6 +100,7 @@ public abstract class Character
         }
         CurrentHitPoints = MaxHitPoints;
         Console.WriteLine($"{Menu.CharacterWhoAttacks.Name} has regenerated life. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
+    */
     }
 
     protected bool LuckTest(int percentage)
@@ -181,5 +183,13 @@ public abstract class Character
         result += "----------------------------------------";
         
         return result;
+    }
+    
+    public void ReduceCooldowns()
+    {
+        foreach (var skill in Skills)
+        {
+            skill.ReduceCooldown();
+        }
     }
 }

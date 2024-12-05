@@ -47,13 +47,13 @@ public class Mage : Character
     
     private void FrostBolt()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses FROST BOLT!");
         Console.ResetColor();
         
         var attack = new Attack("FrostBolt", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, MagicAttackPower, Attack.TypeDamage.Magic );
-        Tackle(attack);
+        Tackle(attack);*/
     }
 
     private void FrostBarrier()
