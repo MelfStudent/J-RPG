@@ -4,7 +4,35 @@ using Services;
 
 public class Warrior : Character
 {
-    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50) {}
+    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50)
+    {
+        Skills.Add(new Skill(
+            "Heroic Strike",
+            1,
+            Skill.TargetType.Enemy,
+            0,
+            Skill.ActionType.Damage,
+            50
+        ));
+
+        Skills.Add(new Skill(
+            "Battle cry",
+            2,
+            Skill.TargetType.AllAllies,
+            0,
+            Skill.ActionType.Buff,
+            25
+        ));
+
+        Skills.Add(new Skill(
+            "Whirlwind",
+            2,
+            Skill.TargetType.AllEnemies,
+            0,
+            Skill.ActionType.Damage,
+            (int)(50 * 0.33)
+        ));
+    }
 
     protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
     {
@@ -26,14 +54,14 @@ public class Warrior : Character
                     Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
                     Console.ResetColor();
                 
-                    var attack = new Attack("Heroic Strike", Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks, damageReceived / 2, Attack.TypeDamage.Physical );
-                    Tackle(attack);
+                    //var attack = new Attack("Heroic Strike", Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks, damageReceived / 2, Attack.TypeDamage.Physical );
+                    //Tackle(attack);
                 }
                 break;
         }
     }
     
-    private void HeroicStrike()
+    /*private void HeroicStrike()
     {
         Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
@@ -42,7 +70,7 @@ public class Warrior : Character
         
         var attack = new Attack("Heroic Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
         Tackle(attack);
-    }
+    }*/
 
     private void BattleCry()
     {
@@ -66,17 +94,15 @@ public class Warrior : Character
         Console.WriteLine("2. Battle Cry (multiplies the warrior's attack power by 2)");
         Console.ResetColor();
         
-        List<string> options = new() { "Heroic Strike", "Battle Cry" };
-        var choice = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
-        
-        switch (choice)
+        var skillChoice = Utils.PromptChoice(Skills.Select(s => s.Name).ToList(), "Enter a number corresponding to the desired action:");
+        var skill = Skills[skillChoice - 1];
+
+        Character target = null;
+        if (skill.Target == Skill.TargetType.Enemy)
         {
-            case 1:
-                HeroicStrike();
-                break;
-            case 2:
-                BattleCry();
-                break;
+            target = Utils.PromptTarget("\nChoose a target:");
         }
+        
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
     }
 }

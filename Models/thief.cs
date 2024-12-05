@@ -20,7 +20,7 @@ public class Thief : Character
     
     private void LowBlow()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses LOW BLOW!");
         Console.ResetColor();
@@ -33,7 +33,7 @@ public class Thief : Character
         }
         
         var attack = new Attack("Low Blow", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, newPhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        Tackle(attack);*/
     }
 
     private void Escape()
