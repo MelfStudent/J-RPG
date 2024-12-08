@@ -94,11 +94,18 @@ public class Warrior : Character
         Console.WriteLine("2. Battle Cry (multiplies the warrior's attack power by 2)");
         Console.ResetColor();
         
-        var skillChoice = Utils.PromptChoice(Skills.Select(s => s.Name).ToList(), "Enter a number corresponding to the desired action:");
-        var skill = Skills[skillChoice - 1];
+        var skillNames = Skills.Select(s => s.Name).ToList();
+        skillNames.Add("Skip the turn");
+        var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
+
+        Skill skill = null;
+        if (skillChoice != skillNames.Count)
+        {
+            skill = Skills[skillChoice - 1];   
+        }
 
         Character target = null;
-        if (skill.Target == Skill.TargetType.Enemy)
+        if (skill != null && skill.Target == Skill.TargetType.Enemy)
         {
             target = Utils.PromptTarget("\nChoose a target:");
         }

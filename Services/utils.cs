@@ -159,7 +159,18 @@ public static class Utils
         {
             var skillUsage = Menu.SkillsTourCurrent.FirstOrDefault(su => su.User == player);
             var skill = skillUsage.ChosenSkill;
-            skill.UseSkill(player, skillUsage.Target);
+            if (skill != null)
+            {
+                skill.UseSkill(player, skillUsage.Target);   
+            }
+            else
+            {
+                Console.WriteLine("\n========== ATTACK PHASE ==========");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{player.Name} has passed his turn");
+                Console.ResetColor();
+                Console.WriteLine("===================================\n");
+            }
         }
         CooldownReductionAllTeams();
     }
