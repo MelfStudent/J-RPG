@@ -6,7 +6,7 @@ public class Skill
 {
     public string Name { get; set; }
     private int Cooldown { get; set; }
-    private int CurrentCooldown { get; set; }
+    public int CurrentCooldown { get; set; }
     public TargetType Target { get; private set; }
     private int ManaCost { get; set; }
     private ActionType SkillAction { get; set; }

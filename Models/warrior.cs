@@ -8,7 +8,7 @@ public class Warrior : Character
     {
         Skills.Add(new Skill(
             "Heroic Strike",
-            1,
+            2,
             Skill.TargetType.Enemy,
             0,
             Skill.ActionType.Damage,
@@ -96,18 +96,33 @@ public class Warrior : Character
         
         var skillNames = Skills.Select(s => s.Name).ToList();
         skillNames.Add("Skip the turn");
-        var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
 
         Skill skill = null;
-        if (skillChoice != skillNames.Count)
-        {
-            skill = Skills[skillChoice - 1];   
-        }
-
         Character target = null;
-        if (skill != null && skill.Target == Skill.TargetType.Enemy)
+
+        while (true)
         {
-            target = Utils.PromptTarget("\nChoose a target:");
+            var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
+
+            if (skillChoice == skillNames.Count)
+            {
+                Console.WriteLine("You decided to skip the turn.");
+                break;
+            }
+            
+            skill = Skills[skillChoice - 1]; 
+            
+            if (skill.CurrentCooldown != 0)
+            {
+                Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
+                continue;
+            }
+            
+            if (skill.Target == Skill.TargetType.Enemy)
+            {
+                target = Utils.PromptTarget("\nChoose a target:");
+            }
+            break;
         }
         
         Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
