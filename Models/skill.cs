@@ -12,8 +12,9 @@ public class Skill
     private ActionType SkillAction { get; set; }
     private int EffectPower { get; set; }
     private TypeDamage TypeOfDamage { get; set; }
+    private AffectedStat TargetStat { get; set; }
 
-    public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null)
+    public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
     {
         Name = name;
         Cooldown = cooldown;
@@ -23,6 +24,7 @@ public class Skill
         SkillAction = actionType;
         EffectPower = effectPower;
         TypeOfDamage = typeOfDamage;
+        TargetStat = targetStat;
     }
 
     public void UseSkill(Character user, Character target = null)
@@ -72,8 +74,22 @@ public class Skill
                 break;
 
             case ActionType.Buff:
-                    Console.WriteLine($"{target.Name} strengthens with {Name} !");
-                    target.PhysicalAttackPower += EffectPower;
+                switch (TargetStat)
+                {
+                    case AffectedStat.PhysicalAttack:
+                        Console.WriteLine($"{target.Name}'s physical attack increases by {EffectPower} due to {Name}!");
+                        target.PhysicalAttackPower += EffectPower;
+                        break;
+
+                    case AffectedStat.MagicAttack:
+                        Console.WriteLine($"{target.Name}'s magic attack increases by {EffectPower} due to {Name}!");
+                        target.MagicAttackPower += EffectPower;
+                        break;
+
+                    default:
+                        Console.WriteLine($"{target.Name} receives a generic buff with {Name}.");
+                        break;
+                }
                 break;
 
             case ActionType.Debuff:
