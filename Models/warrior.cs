@@ -9,7 +9,7 @@ public class Warrior : Character
         Skills.Add(new Skill(
             "Heroic Strike",
             2,
-            Skill.TargetType.Enemy,
+            TargetType.Enemy,
             0,
             Skill.ActionType.Damage,
             50,
@@ -19,7 +19,7 @@ public class Warrior : Character
         Skills.Add(new Skill(
             "Battle cry",
             2,
-            Skill.TargetType.AllAllies,
+            TargetType.AllAllies,
             0,
             Skill.ActionType.Buff,
             25
@@ -28,7 +28,7 @@ public class Warrior : Character
         Skills.Add(new Skill(
             "Whirlwind",
             2,
-            Skill.TargetType.AllEnemies,
+            TargetType.AllEnemies,
             0,
             Skill.ActionType.Damage,
             (int)(50 * 0.33),
@@ -120,7 +120,7 @@ public class Warrior : Character
                 continue;
             }
             
-            if (skill.Target == Skill.TargetType.Enemy)
+            if (skill.Target == TargetType.Enemy)
             {
                 target = Utils.PromptTarget("\nChoose a target:");
             }
