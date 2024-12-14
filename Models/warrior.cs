@@ -11,7 +11,7 @@ public class Warrior : Character
             2,
             TargetType.Enemy,
             0,
-            Skill.ActionType.Damage,
+            ActionType.Damage,
             50,
             TypeDamage.Physical
         ));
@@ -21,7 +21,7 @@ public class Warrior : Character
             2,
             TargetType.AllAllies,
             0,
-            Skill.ActionType.Buff,
+            ActionType.Buff,
             25
         ));
 
@@ -30,7 +30,7 @@ public class Warrior : Character
             2,
             TargetType.AllEnemies,
             0,
-            Skill.ActionType.Damage,
+            ActionType.Damage,
             (int)(50 * 0.33),
             TypeDamage.Physical
         ));
