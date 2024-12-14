@@ -8,7 +8,7 @@ public abstract class Character
     protected int CurrentHitPoints { get; private set; }
     protected int MaxHitPoints { get; private set; }
     public int PhysicalAttackPower  { get; set; }
-    protected int MagicAttackPower  { get; private set; }
+    public int MagicAttackPower  { get; set; }
     private TypeOfArmor Armor { get; set; }
     public int DodgeChance { get; set; }
     private int ParadeChance { get; set; }

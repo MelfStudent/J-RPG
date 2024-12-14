@@ -8,7 +8,7 @@ public class Warrior : Character
     {
         Skills.Add(new Skill(
             "Heroic Strike",
-            2,
+            1,
             TargetType.Enemy,
             0,
             ActionType.Damage,
@@ -22,7 +22,9 @@ public class Warrior : Character
             TargetType.AllAllies,
             0,
             ActionType.Buff,
-            25
+            25,
+            TypeDamage.Null,
+            AffectedStat.PhysicalAttack
         ));
 
         Skills.Add(new Skill(
