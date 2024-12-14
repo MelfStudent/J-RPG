@@ -4,10 +4,12 @@ using Models;
 
 public static class Menu
 {
-    public static Character? Player1 { get; private set; }
-    public static Character? Player2 { get; private set; }
-    public static Character? CharacterWhoAttacks { get; set; }
-    public static Character? CharacterWhoDefends { get; set; }
+    public static List<Character>? Player1 { get; private set; }
+    public static List<Character>? Player2 { get; private set; }
+    public static List<SkillUsage> SkillsTourCurrent { get; set; } = new List<SkillUsage>();
+    public static Team? TeamThatAttacks { get; set; }
+    public static Team? TeamThatDefends { get; set; }
+    public static List<Team> Teams { get; set; } = new List<Team>();
     
     public static void PrintGameLaunch()
     {
@@ -54,54 +56,54 @@ public static class Menu
     private static void PrintClassChoiceMenu()
     {
         Console.WriteLine("\n========== CHARACTER CREATION ==========");
-        var choiceCharacterName1 = Utils.PromptName("\nEnter the name of the first character: ");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Player1 = Utils.PromptTeam("\n\n\nCharacter selection team n°1");
+        var team1 = new Team("Player 1");
+        foreach (var player in Player1)
+        {
+            team1.AddMember(player);
+        }
         
-        List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief\n" };
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Player2 = Utils.PromptTeam("\n\n\nCharacter selection team n°2");
+        var team2 = new Team("Player 2");
+        foreach (var player in Player2)
+        {
+            team2.AddMember(player);
+        }
         
-        Console.Write("Choose a class for the player 1: ");
-        var choiceCharacterClass1 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
-        Player1 = Utils.CreatePlayer(choiceCharacterName1, choiceCharacterClass1);
-        
-        var choiceCharacterName2 = Utils.PromptName("\nEnter the name of the second character: ");
-        
-        Console.Write("Choose a class for the player 2: ");
-        var choiceCharacterClass2 = Utils.PromptChoice(existingCharacterClass, "Enter a number corresponding to a class: ");
-        Player2 = Utils.CreatePlayer(choiceCharacterName2, choiceCharacterClass2);
-        
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("\n========== CHARACTERS READY ==========");
-        Console.WriteLine($"Player 1: {Player1.Name} ({Player1.GetType().Name})");
-        DisplayCharacterStats(Player1);
+        Teams.Add(team1);
+        Teams.Add(team2);
 
-        Console.WriteLine($"\nPlayer 2: {Player2.Name} ({Player2.GetType().Name})");
-        DisplayCharacterStats(Player2);
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine("\n========== READY CHARACTERS TEAM 1 ==========");
+        DisplayCharacterStats(Player1, "Player 1");
+        
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("\n========== READY CHARACTERS TEAM 2 ==========");
+        DisplayCharacterStats(Player2, "Player 2");
         Console.ResetColor();
         
-        CharacterWhoAttacks = Player1;
-        CharacterWhoDefends = Player2;
+        TeamThatAttacks = Teams[0];;
+        TeamThatDefends = Teams[1];;
         
+
         Console.WriteLine("\n========================================");
         Console.WriteLine("Press any key to start the battle...");
         Console.ReadKey();
         Utils.StartGame();
     }
     
-    private static void DisplayCharacterStats(Character character)
+    private static void DisplayCharacterStats(List<Character> characters, string playerName)
     {
-        Console.WriteLine("----------------------------------------");
-        Console.WriteLine($"Name: {character.Name}");
-        Console.WriteLine($"Class: {character.GetType().Name}");
-        Console.WriteLine($"HP: {character.CurrentHitPoints}/{character.MaxHitPoints}");
-        Console.WriteLine($"Physical Attack: {character.PhysicalAttackPower}");
-        Console.WriteLine($"Magical Attack: {character.MagicAttackPower}");
-        Console.WriteLine($"Dodge Chance: {character.DodgeChance}%");
-        Console.WriteLine($"Parade Chance: {character.ParadeChance}%");
-        Console.WriteLine($"Spell Resistance Chance: {character.ChanceSpellResistance}%");
-        Console.WriteLine($"Armor Type: {character.Armor} (Resistance: {GetArmorPercentage(character.Armor)})");
-        Console.WriteLine("----------------------------------------");
+        foreach (var character in characters)
+        {
+            Console.WriteLine($"{playerName}: {character.Name} ({character.GetType().Name})");
+            Console.WriteLine(character.ToString());
+        }
     }
     
-    private static string GetArmorPercentage(Character.TypeOfArmor armor)
+    public static string GetArmorPercentage(Character.TypeOfArmor armor)
     {
         return armor switch
         {
@@ -120,7 +122,7 @@ public static class Menu
         Console.WriteLine(@$"
         ****************************************************
         *                                                  *
-        *      CONGRATULATIONS, {CharacterWhoAttacks.Name.ToUpper()} !         *
+        *      CONGRATULATIONS,!         *
         *                                                  *
         *        YOU HAVE EMERGED VICTORIOUS!              *
         *                                                  *
