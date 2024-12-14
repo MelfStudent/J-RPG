@@ -18,7 +18,6 @@ public abstract class Character
     protected List<Skill> Skills { get; set; } = new List<Skill>();
     
     private Random Rand { get; set; } = new Random();
-    public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
     
     protected Character(string name, int maxHitPoints, int physicalAttackPower,
                         int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed)

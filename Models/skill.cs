@@ -13,9 +13,6 @@ public class Skill
     private int EffectPower { get; set; }
     private TypeDamage TypeOfDamage { get; set; }
 
-    public enum TargetType { Self, Ally, Enemy, AllEnemies, AllAllies }
-    public enum ActionType { Damage, Heal, Buff, Debuff }
-
     public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null)
     {
         Name = name;
