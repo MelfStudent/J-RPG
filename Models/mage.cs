@@ -13,8 +13,10 @@ public class Mage : Character
         AttackReductionNumber = 0;
     }
     
-    protected override void Defend(TypeDamage typeOfAttack, int attackPower)
+    protected override DefenseResult Defend(TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
@@ -43,6 +45,8 @@ public class Mage : Character
         }
         
         base.Defend(typeOfAttack, attackPower);
+
+        return result;
     }
     
     private void FrostBolt()
