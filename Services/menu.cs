@@ -103,14 +103,14 @@ public static class Menu
         }
     }
     
-    public static string GetArmorPercentage(Character.TypeOfArmor armor)
+    public static string GetArmorPercentage(TypeOfArmor armor)
     {
         return armor switch
         {
-            Character.TypeOfArmor.Fabric => "30% vs Magic",
-            Character.TypeOfArmor.Leather => "15% vs Physical, 20% vs Magic",
-            Character.TypeOfArmor.Mesh => "30% vs Physical, 10% vs Magic",
-            Character.TypeOfArmor.Plates => "45% vs Physical",
+            TypeOfArmor.Fabric => "30% vs Magic",
+            TypeOfArmor.Leather => "15% vs Physical, 20% vs Magic",
+            TypeOfArmor.Mesh => "30% vs Physical, 10% vs Magic",
+            TypeOfArmor.Plates => "45% vs Physical",
             _ => "No resistance"
         };
     }
