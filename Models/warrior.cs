@@ -8,11 +8,12 @@ public class Warrior : Character
     {
         Skills.Add(new Skill(
             "Heroic Strike",
-            1,
+            2,
             Skill.TargetType.Enemy,
             0,
             Skill.ActionType.Damage,
-            50
+            50,
+            TypeDamage.Physical
         ));
 
         Skills.Add(new Skill(
@@ -30,11 +31,12 @@ public class Warrior : Character
             Skill.TargetType.AllEnemies,
             0,
             Skill.ActionType.Damage,
-            (int)(50 * 0.33)
+            (int)(50 * 0.33),
+            TypeDamage.Physical
         ));
     }
 
-    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override void Defend(TypeDamage typeOfAttack, int attackPower)
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
@@ -45,7 +47,7 @@ public class Warrior : Character
 
         switch (typeOfAttack)
         {
-            case Attack.TypeDamage.Physical:
+            case TypeDamage.Physical:
                 if (LuckTest(25))
                 {
                     var damageReceived = lifeBeforeDefense - lifeAfterDefense;
@@ -94,13 +96,35 @@ public class Warrior : Character
         Console.WriteLine("2. Battle Cry (multiplies the warrior's attack power by 2)");
         Console.ResetColor();
         
-        var skillChoice = Utils.PromptChoice(Skills.Select(s => s.Name).ToList(), "Enter a number corresponding to the desired action:");
-        var skill = Skills[skillChoice - 1];
+        var skillNames = Skills.Select(s => s.Name).ToList();
+        skillNames.Add("Skip the turn");
 
+        Skill skill = null;
         Character target = null;
-        if (skill.Target == Skill.TargetType.Enemy)
+
+        while (true)
         {
-            target = Utils.PromptTarget("\nChoose a target:");
+            var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
+
+            if (skillChoice == skillNames.Count)
+            {
+                Console.WriteLine("You decided to skip the turn.");
+                break;
+            }
+            
+            skill = Skills[skillChoice - 1]; 
+            
+            if (skill.CurrentCooldown != 0)
+            {
+                Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
+                continue;
+            }
+            
+            if (skill.Target == Skill.TargetType.Enemy)
+            {
+                target = Utils.PromptTarget("\nChoose a target:");
+            }
+            break;
         }
         
         Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));

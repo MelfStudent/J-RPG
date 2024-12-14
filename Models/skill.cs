@@ -6,16 +6,17 @@ public class Skill
 {
     public string Name { get; set; }
     private int Cooldown { get; set; }
-    private int CurrentCooldown { get; set; }
+    public int CurrentCooldown { get; set; }
     public TargetType Target { get; private set; }
     private int ManaCost { get; set; }
     private ActionType SkillAction { get; set; }
     private int EffectPower { get; set; }
+    private TypeDamage TypeOfDamage { get; set; }
 
     public enum TargetType { Self, Ally, Enemy, AllEnemies, AllAllies }
     public enum ActionType { Damage, Heal, Buff, Debuff }
 
-    public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower)
+    public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null)
     {
         Name = name;
         Cooldown = cooldown;
@@ -24,6 +25,7 @@ public class Skill
         ManaCost = manaCost;
         SkillAction = actionType;
         EffectPower = effectPower;
+        TypeOfDamage = typeOfDamage;
     }
 
     public void UseSkill(Character user, Character target = null)
@@ -63,7 +65,7 @@ public class Skill
         switch (SkillAction)
         {
             case ActionType.Damage:
-                var damageAttack = new Attack(Name, user, target, EffectPower, Attack.TypeDamage.Physical);
+                var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
                     Character.Tackle(damageAttack);   
                 break;
 

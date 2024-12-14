@@ -48,10 +48,10 @@ public abstract class Character
         Console.WriteLine("===================================\n");
     }
 
-    protected virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected virtual void Defend(TypeDamage typeOfAttack, int attackPower)
     {
         var damage = attackPower;
-        if (typeOfAttack == Attack.TypeDamage.Physical)
+        if (typeOfAttack == TypeDamage.Physical)
         {
             if (LuckTest(DodgeChance))
             {
@@ -63,7 +63,7 @@ public abstract class Character
                 Console.WriteLine($"The {Name} character parried the attack!");
                 damage = attackPower / 2;
             }
-        } else if (typeOfAttack == Attack.TypeDamage.Magic)
+        } else if (typeOfAttack == TypeDamage.Magic)
         {
             if (LuckTest(ChanceSpellResistance))
             {
@@ -135,18 +135,18 @@ public abstract class Character
         return values;
     }
 
-    private static int GetArmorResistance(TypeOfArmor armor, Attack.TypeDamage typeOfAttack ,int damageReceived)
+    private static int GetArmorResistance(TypeOfArmor armor, TypeDamage typeOfAttack ,int damageReceived)
     {
         var reductionFactor = typeOfAttack switch
         {
-            Attack.TypeDamage.Physical => armor switch
+            TypeDamage.Physical => armor switch
             {
                 TypeOfArmor.Leather => 0.85,
                 TypeOfArmor.Mesh => 0.70,
                 TypeOfArmor.Plates => 0.55,
                 _ => 1.0
             },
-            Attack.TypeDamage.Magic => armor switch
+            TypeDamage.Magic => armor switch
             {
                 TypeOfArmor.Fabric => 0.70,
                 TypeOfArmor.Leather => .80,

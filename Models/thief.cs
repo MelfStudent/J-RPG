@@ -11,7 +11,7 @@ public class Thief : Character
         AttackReductionNumber = 0;
     }
     
-    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override void Defend(TypeDamage typeOfAttack, int attackPower)
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");

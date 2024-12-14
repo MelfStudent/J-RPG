@@ -8,8 +8,6 @@ public class Attack
     public int Damage { get; set; }
     public TypeDamage TypeOfDamage { get; set; }
     
-    public enum TypeDamage { Physical, Magic }
-    
     public Attack(string name, Character attackingCharacter, Character targetCharacter, int damage, TypeDamage typeOfDamage)
     {
         Name = name;
