@@ -47,38 +47,45 @@ public abstract class Character
         Console.WriteLine("===================================\n");
     }
 
-    protected virtual void Defend(TypeDamage typeOfAttack, int attackPower)
+    protected virtual DefenseResult Defend(TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         var damage = attackPower;
+        
         if (typeOfAttack == TypeDamage.Physical)
         {
             if (LuckTest(DodgeChance))
             {
-                Console.WriteLine($"The {Name} character dodged the attack !");
-                return;
+                result.IsDodged = true;
+                Console.WriteLine($"{Name} dodged the attack!");
+                return result;
             }
             if (LuckTest(ParadeChance))
             {
-                Console.WriteLine($"The {Name} character parried the attack!");
+                result.IsParried = true;
                 damage = attackPower / 2;
+                Console.WriteLine($"{Name} parried the attack and reduced damage to {damage}!");
             }
         } else if (typeOfAttack == TypeDamage.Magic)
         {
             if (LuckTest(ChanceSpellResistance))
             {
-                Console.WriteLine($"The {Name} character resisted the attack !");
-                return;
+                result.IsResisted = true;
+                Console.WriteLine($"{Name} resisted the magic attack!");
+                return result;
             }
         }
         
         damage = GetArmorResistance(Armor, typeOfAttack, damage);
+        result.DamageTaken = damage;
         
         if ((CurrentHitPoints -= damage) <= 0)
         {
             CurrentHitPoints = 0;
             IsDead = true;
             Console.WriteLine($"{Name} has died.");
-            return;
+            return result;
         }
         
         if (Menu.TeamThatAttacks.GetType().Name == "Paladin")
@@ -86,6 +93,8 @@ public abstract class Character
             //Menu.CharacterWhoAttacks.Heal((int)(damage * 0.50));
         }
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
+        
+        return result;
     }
 
     public void Heal(int extraLife)

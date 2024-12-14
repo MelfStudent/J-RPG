@@ -38,8 +38,10 @@ public class Warrior : Character
         ));
     }
 
-    protected override void Defend(TypeDamage typeOfAttack, int attackPower)
+    protected override DefenseResult Defend(TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
         
@@ -63,6 +65,8 @@ public class Warrior : Character
                 }
                 break;
         }
+
+        return result;
     }
     
     /*private void HeroicStrike()
