@@ -38,57 +38,33 @@ public class Warrior : Character
         ));
     }
 
-    protected override DefenseResult Defend(TypeDamage typeOfAttack, int attackPower)
+    protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         var result = new DefenseResult();
         
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
         
-        var lifeBeforeDefense = CurrentHitPoints;
-        base.Defend(typeOfAttack, attackPower);
-        var lifeAfterDefense = CurrentHitPoints;
+        var defenseResult = base.Defend(attacker, typeOfAttack, attackPower);
 
-        switch (typeOfAttack)
+        if (typeOfAttack == TypeDamage.Physical)
         {
-            case TypeDamage.Physical:
-                if (LuckTest(25))
-                {
-                    var damageReceived = lifeBeforeDefense - lifeAfterDefense;
+            if (defenseResult.IsParried || LuckTest(25))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
+                Console.ResetColor();
                 
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
-                    Console.ResetColor();
-                
-                    //var attack = new Attack("Heroic Strike", Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks, damageReceived / 2, Attack.TypeDamage.Physical );
-                    //Tackle(attack);
-                }
-                break;
+                var counterAttackPower = defenseResult.IsParried
+                    ? (int)(defenseResult.DamageTaken * 1.50)
+                    : defenseResult.DamageTaken / 2;
+            
+                var counterAttack = new Attack("Counterattack", this, attacker, counterAttackPower, TypeDamage.Physical );
+                Tackle(counterAttack);
+            }
         }
 
         return result;
-    }
-    
-    /*private void HeroicStrike()
-    {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"[{Name.ToUpper()}] uses HEROIC STRIKE!");
-        Console.ResetColor();
-        
-        var attack = new Attack("Heroic Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
-    }*/
-
-    private void BattleCry()
-    {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[{Name.ToUpper()}] shouts a BATTLE CRY!");
-        Console.ResetColor();
-        PhysicalAttackPower *= 2;
-        Console.WriteLine($"{Name} now deals {PhysicalAttackPower} damage, because his damage has just been multiplied by two for the next hits.");
-        Console.WriteLine("===================================\n");
     }
 
     public override void ChoiceAction()
