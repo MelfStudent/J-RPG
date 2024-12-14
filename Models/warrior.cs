@@ -12,7 +12,8 @@ public class Warrior : Character
             Skill.TargetType.Enemy,
             0,
             Skill.ActionType.Damage,
-            50
+            50,
+            TypeDamage.Physical
         ));
 
         Skills.Add(new Skill(
@@ -30,11 +31,12 @@ public class Warrior : Character
             Skill.TargetType.AllEnemies,
             0,
             Skill.ActionType.Damage,
-            (int)(50 * 0.33)
+            (int)(50 * 0.33),
+            TypeDamage.Physical
         ));
     }
 
-    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override void Defend(TypeDamage typeOfAttack, int attackPower)
     {
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
@@ -45,7 +47,7 @@ public class Warrior : Character
 
         switch (typeOfAttack)
         {
-            case Attack.TypeDamage.Physical:
+            case TypeDamage.Physical:
                 if (LuckTest(25))
                 {
                     var damageReceived = lifeBeforeDefense - lifeAfterDefense;
