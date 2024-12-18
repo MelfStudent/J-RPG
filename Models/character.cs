@@ -120,16 +120,15 @@ public abstract class Character
 
     public void Heal(int extraLife)
     {
-       /* if (CurrentHitPoints + extraLife <= MaxHitPoints)
-        {
+       if (CurrentHitPoints + extraLife <= MaxHitPoints)
+       {
             CurrentHitPoints += extraLife;
             Console.WriteLine(
-                $"{Menu.CharacterWhoAttacks.Name} regenerated {extraLife} hp. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
+                $"{Name} regenerated {extraLife} hp. It now has {CurrentHitPoints} hp");
             return;
-        }
-        CurrentHitPoints = MaxHitPoints;
-        Console.WriteLine($"{Menu.CharacterWhoAttacks.Name} has regenerated life. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
-    */
+       }
+       CurrentHitPoints = MaxHitPoints;
+       Console.WriteLine($"{Name} has regenerated life. It now has {CurrentHitPoints} hp");
     }
 
     protected bool LuckTest(int percentage)
