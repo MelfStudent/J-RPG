@@ -5,22 +5,25 @@ using Services;
 public abstract class Character
 {
     public string Name { get; protected set; }
-    public int CurrentHitPoints { get; private set; }
-    public int MaxHitPoints { get; private set; }
-    public int PhysicalAttackPower  { get; protected set; }
-    public int MagicAttackPower  { get; private set; }
-    public TypeOfArmor Armor { get; private set; }
-    public int DodgeChance { get; protected set; }
-    public int ParadeChance { get; private set; }
-    public int ChanceSpellResistance { get; protected set; }
+    protected int CurrentHitPoints { get; private set; }
+    protected int MaxHitPoints { get; private set; }
+    public int PhysicalAttackPower  { get; set; }
+    public int MagicAttackPower  { get; set; }
+    private TypeOfArmor Armor { get; set; }
+    public int DodgeChance { get; set; }
+    private int ParadeChance { get; set; }
+    protected int ChanceSpellResistance { get; set; }
     public int Speed { get; protected set; }
     public bool IsDead { get; private set; }
+    protected List<Skill> Skills { get; set; } = new List<Skill>();
+    public bool UsesMana { get; private set; }
+    public int CurrentMana { get; set; }
+    public int MaxMana { get; private set; }
     
     private Random Rand { get; set; } = new Random();
-    public enum TypeOfArmor { Fabric, Leather, Mesh, Plates }
     
     protected Character(string name, int maxHitPoints, int physicalAttackPower,
-                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed)
+                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana = false, int maxMana = 0)
     {
         Name = name;
         CurrentHitPoints = maxHitPoints;
@@ -33,72 +36,99 @@ public abstract class Character
         ChanceSpellResistance = chanceSpellResistance;
         Speed = speed;
         IsDead = false;
+        UsesMana = usesMana;
+        if (UsesMana)
+        {
+            CurrentMana = maxMana;
+            MaxMana = maxMana;
+            Skills.Add(new Skill(
+                "Drink",
+                "Regenerates half mana",
+                1,
+                TargetType.Self,
+                0,
+                ActionType.Buff,
+                MaxMana / 2
+            ));
+        }
     }
 
-    protected static void Tackle(Attack attack)
+    public static void Tackle(Attack attack)
     {
         Console.WriteLine("\n========== ATTACK PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"Attack Name: {attack.Name}");
         Console.WriteLine($"[{attack.AttackingCharacter.Name.ToUpper()}] attacks [{attack.TargetCharacter.Name.ToUpper()}]");
         Console.WriteLine($"Attack Type: {attack.TypeOfDamage}");
         Console.WriteLine($"Damage: {attack.Damage}");
         Console.ResetColor();
-        attack.TargetCharacter.Defend(attack.TypeOfDamage, attack.Damage);
+        attack.TargetCharacter.Defend(attack.AttackingCharacter ,attack.TypeOfDamage, attack.Damage);
         Console.WriteLine("===================================\n");
     }
 
-    protected virtual void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected virtual DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         var damage = attackPower;
-        if (typeOfAttack == Attack.TypeDamage.Physical)
+        
+        if (typeOfAttack == TypeDamage.Physical)
         {
             if (LuckTest(DodgeChance))
             {
-                Console.WriteLine($"The {Name} character dodged the attack !");
-                return;
+                result.IsDodged = true;
+                Console.WriteLine($"{Name} dodged the attack!");
+                return result;
             }
             if (LuckTest(ParadeChance))
             {
-                Console.WriteLine($"The {Name} character parried the attack!");
+                result.IsParried = true;
                 damage = attackPower / 2;
+                Console.WriteLine($"{Name} parried the attack and reduced damage to {damage}!");
             }
-        } else if (typeOfAttack == Attack.TypeDamage.Magic)
+        } else if (typeOfAttack == TypeDamage.Magic)
         {
             if (LuckTest(ChanceSpellResistance))
             {
-                Console.WriteLine($"The {Name} character resisted the attack !");
-                return;
+                result.IsResisted = true;
+                Console.WriteLine($"{Name} resisted the magic attack!");
+                return result;
             }
+            Speed = (int)(Speed * 0.85);
         }
         
         damage = GetArmorResistance(Armor, typeOfAttack, damage);
+        result.DamageTaken = damage;
+
+        if (attacker is Paladin paladin)
+        {
+            paladin.Heal(damage / 2);
+        }
         
         if ((CurrentHitPoints -= damage) <= 0)
         {
             CurrentHitPoints = 0;
             IsDead = true;
             Console.WriteLine($"{Name} has died.");
-            return;
+            return result;
         }
         
-        if (Menu.CharacterWhoAttacks.GetType().Name == "Paladin")
-        {
-            Menu.CharacterWhoAttacks.Heal((int)(damage * 0.50));
-        }
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
+        
+        return result;
     }
 
-    protected void Heal(int extraLife)
+    public void Heal(int extraLife)
     {
-        if (CurrentHitPoints + extraLife <= MaxHitPoints)
-        {
+       if (CurrentHitPoints + extraLife <= MaxHitPoints)
+       {
             CurrentHitPoints += extraLife;
             Console.WriteLine(
-                $"{Menu.CharacterWhoAttacks.Name} regenerated {extraLife} hp. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
+                $"{Name} regenerated {extraLife} hp. It now has {CurrentHitPoints} hp");
             return;
-        }
-        CurrentHitPoints = MaxHitPoints;
-        Console.WriteLine($"{Menu.CharacterWhoAttacks.Name} has regenerated life. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
+       }
+       CurrentHitPoints = MaxHitPoints;
+       Console.WriteLine($"{Name} has regenerated life. It now has {CurrentHitPoints} hp");
     }
 
     protected bool LuckTest(int percentage)
@@ -133,18 +163,18 @@ public abstract class Character
         return values;
     }
 
-    private static int GetArmorResistance(TypeOfArmor armor, Attack.TypeDamage typeOfAttack ,int damageReceived)
+    private static int GetArmorResistance(TypeOfArmor armor, TypeDamage typeOfAttack ,int damageReceived)
     {
         var reductionFactor = typeOfAttack switch
         {
-            Attack.TypeDamage.Physical => armor switch
+            TypeDamage.Physical => armor switch
             {
                 TypeOfArmor.Leather => 0.85,
                 TypeOfArmor.Mesh => 0.70,
                 TypeOfArmor.Plates => 0.55,
                 _ => 1.0
             },
-            Attack.TypeDamage.Magic => armor switch
+            TypeDamage.Magic => armor switch
             {
                 TypeOfArmor.Fabric => 0.70,
                 TypeOfArmor.Leather => .80,
@@ -158,4 +188,45 @@ public abstract class Character
     }
 
     public abstract void ChoiceAction();
+
+    public override string ToString()
+    {
+        var result = 
+            "----------------------------------------\n" +
+            $"Name: {Name}\n" +
+            $"Class: {GetType().Name}\n" +
+            $"HP: {CurrentHitPoints}/{MaxHitPoints}\n" +
+            $"Physical Attack: {PhysicalAttackPower}\n" +
+            $"Magical Attack: {MagicAttackPower}\n" +
+            $"Dodge Chance: {DodgeChance}%\n" +
+            $"Parade Chance: {ParadeChance}%\n" +
+            $"Spell Resistance Chance: {ChanceSpellResistance}%\n" +
+            $"Speed : {Speed}\n" +
+            $"Armor Type: {Armor} (Resistance: {Menu.GetArmorPercentage(Armor)})\n";
+            if (GetType().GetProperty("ManaPoints") is not null)
+            {
+                var manaPoints = (int)GetType().GetProperty("ManaPoints")?.GetValue(this)!;
+                result += $"Mana Points: {manaPoints}\n";
+            }
+        result += "----------------------------------------";
+        
+        return result;
+    }
+    
+    public void ReduceCooldowns()
+    {
+        foreach (var skill in Skills)
+        {
+            skill.ReduceCooldown();
+        }
+    }
+    
+    public void ConsumeMana(int skillCost)
+    {
+        if (skillCost <= CurrentMana)
+        {
+            CurrentMana -= skillCost;
+            Console.WriteLine($"{Name} uses {skillCost} mana points. Remaining Mana: {CurrentMana}/{MaxMana}");
+        }
+    }
 }

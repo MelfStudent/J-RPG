@@ -4,55 +4,70 @@ using Services;
 
 public class Warrior : Character
 {
-    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50) {}
-
-    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50)
     {
+        Skills.Add(new Skill(
+            "Heroic Strike",
+            "Physical attack that deals 100% of physical attack power to a target",
+            1,
+            TargetType.Enemy,
+            0,
+            ActionType.Damage,
+            50,
+            TypeDamage.Physical
+        ));
+
+        Skills.Add(new Skill(
+            "Battle cry",
+            "Increases the physical attack power of all characters on the team by 25",
+            2,
+            TargetType.AllAllies,
+            0,
+            ActionType.Buff,
+            25,
+            TypeDamage.Null,
+            AffectedStat.PhysicalAttack
+        ));
+
+        Skills.Add(new Skill(
+            "Whirlwind",
+            "Physical attack that deals 33% of physical attack power to the entire enemy team",
+            2,
+            TargetType.AllEnemies,
+            0,
+            ActionType.Damage,
+            (int)(50 * 0.33),
+            TypeDamage.Physical
+        ));
+    }
+
+    protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
+    {
+        var result = new DefenseResult();
+        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
         
-        var lifeBeforeDefense = CurrentHitPoints;
-        base.Defend(typeOfAttack, attackPower);
-        var lifeAfterDefense = CurrentHitPoints;
+        var defenseResult = base.Defend(attacker, typeOfAttack, attackPower);
 
-        switch (typeOfAttack)
+        if (typeOfAttack == TypeDamage.Physical)
         {
-            case Attack.TypeDamage.Physical:
-                if (LuckTest(25))
-                {
-                    var damageReceived = lifeBeforeDefense - lifeAfterDefense;
+            if (defenseResult.IsParried || LuckTest(25))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
+                Console.ResetColor();
                 
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
-                    Console.ResetColor();
-                
-                    var attack = new Attack("Heroic Strike", Menu.CharacterWhoDefends, Menu.CharacterWhoAttacks, damageReceived / 2, Attack.TypeDamage.Physical );
-                    Tackle(attack);
-                }
-                break;
+                var counterAttackPower = defenseResult.IsParried
+                    ? (int)(defenseResult.DamageTaken * 1.50)
+                    : defenseResult.DamageTaken / 2;
+            
+                var counterAttack = new Attack("Counterattack", this, attacker, counterAttackPower, TypeDamage.Physical );
+                Tackle(counterAttack);
+            }
         }
-    }
-    
-    private void HeroicStrike()
-    {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"[{Name.ToUpper()}] uses HEROIC STRIKE!");
-        Console.ResetColor();
-        
-        var attack = new Attack("Heroic Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
-    }
 
-    private void BattleCry()
-    {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[{Name.ToUpper()}] shouts a BATTLE CRY!");
-        Console.ResetColor();
-        PhysicalAttackPower *= 2;
-        Console.WriteLine($"{Name} now deals {PhysicalAttackPower} damage, because his damage has just been multiplied by two for the next hits.");
-        Console.WriteLine("===================================\n");
+        return result;
     }
 
     public override void ChoiceAction()
@@ -60,23 +75,38 @@ public class Warrior : Character
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: WARRIOR)");
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
-        Console.WriteLine("Choose an action:");
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("1. Heroic Strike (a physical attack that deals 100% of physical attack power to the target)");
-        Console.WriteLine("2. Battle Cry (multiplies the warrior's attack power by 2)");
-        Console.ResetColor();
         
-        List<string> options = new() { "Heroic Strike", "Battle Cry" };
-        var choice = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
-        
-        switch (choice)
+        var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
+        skillNames.Add("Skip the turn");
+
+        Skill skill = null;
+        Character target = null;
+
+        while (true)
         {
-            case 1:
-                HeroicStrike();
+            var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
+
+            if (skillChoice == skillNames.Count)
+            {
+                Console.WriteLine("You decided to skip the turn.");
                 break;
-            case 2:
-                BattleCry();
-                break;
+            }
+            
+            skill = Skills[skillChoice - 1]; 
+            
+            if (skill.CurrentCooldown != 0)
+            {
+                Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
+                continue;
+            }
+            
+            if (skill.Target == TargetType.Enemy)
+            {
+                target = Utils.PromptTarget("\nChoose a target:");
+            }
+            break;
         }
+        
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
     }
 }
