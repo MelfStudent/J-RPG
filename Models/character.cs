@@ -43,6 +43,7 @@ public abstract class Character
             MaxMana = maxMana;
             Skills.Add(new Skill(
                 "Drink",
+                "Regenerates half mana",
                 1,
                 TargetType.Self,
                 0,
@@ -93,10 +94,16 @@ public abstract class Character
                 Console.WriteLine($"{Name} resisted the magic attack!");
                 return result;
             }
+            Speed = (int)(Speed * 0.85);
         }
         
         damage = GetArmorResistance(Armor, typeOfAttack, damage);
         result.DamageTaken = damage;
+
+        if (attacker is Paladin paladin)
+        {
+            paladin.Heal(damage / 2);
+        }
         
         if ((CurrentHitPoints -= damage) <= 0)
         {
@@ -106,10 +113,6 @@ public abstract class Character
             return result;
         }
         
-        if (Menu.TeamThatAttacks.GetType().Name == "Paladin")
-        {
-            //Menu.CharacterWhoAttacks.Heal((int)(damage * 0.50));
-        }
         Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
         
         return result;

@@ -5,6 +5,7 @@ using Services;
 public class Skill
 {
     public string Name { get; set; }
+    public string Description { get; set; }
     private int Cooldown { get; set; }
     public int CurrentCooldown { get; set; }
     public TargetType Target { get; private set; }
@@ -14,9 +15,10 @@ public class Skill
     private TypeDamage TypeOfDamage { get; set; }
     private AffectedStat TargetStat { get; set; }
 
-    public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
+    public Skill(string name, string description, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
     {
         Name = name;
+        Description = description;
         Cooldown = cooldown;
         CurrentCooldown = 0;
         Target = target;
@@ -90,6 +92,20 @@ public class Skill
                     var manaRecovered = Math.Min(EffectPower, user.MaxMana - user.CurrentMana);
                     user.CurrentMana += manaRecovered;
                     Console.WriteLine($"{user.Name} drinks a potion and recovers {manaRecovered} mana points. Current Mana: {user.CurrentMana}/{user.MaxMana}");
+                } else if (Name == "Frost Barrier")
+                {
+                    if (user is Mage mage)
+                    {
+                        Console.WriteLine("\n========== ACTION PHASE ==========");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"{user.Name} activates Frost Barrier!");
+                        Console.WriteLine("The next two attacks will be reduced:");
+                        Console.WriteLine("- Physical damage reduced by 60%");
+                        Console.WriteLine("- Magical damage reduced by 50%");
+                        Console.ResetColor();
+                        mage.AttackReductionNumber = 2;
+                        Console.WriteLine("===================================\n");
+                    }
                 }
                 else
                 {

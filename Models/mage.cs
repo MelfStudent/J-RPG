@@ -4,13 +4,54 @@ using Services;
 
 public class Mage : Character
 {
-    public int ManaPoints { get; private set; }
-    private int AttackReductionNumber { get; set; }
+    public int AttackReductionNumber { get; set; }
+    private bool IsSpellReturned = false;
     
-    public Mage(string name, int manaPoints) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75)
+    public Mage(string name) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100)
     {
-        ManaPoints = manaPoints;
         AttackReductionNumber = 0;
+
+        Skills.Add(new Skill(
+            "Frost bolt",
+            "Magic attack that deals 100% of magic attack power to the target",
+            1,
+            TargetType.Enemy,
+            15,
+            ActionType.Damage,
+            75,
+            TypeDamage.Magic
+        ));
+        
+        Skills.Add(new Skill(
+            "Frost Barrier",
+            "Reduces damage from the next two attacks received",
+            2,
+            TargetType.Self,
+            25,
+            ActionType.Buff,
+            0
+        ));
+        
+        Skills.Add(new Skill(
+            "Blizzard",
+            "Magic attack that deals 50% of magic attack power to the entire enemy team",
+            2,
+            TargetType.AllEnemies,
+            25,
+            ActionType.Damage,
+            75 / 2,
+            TypeDamage.Magic
+        ));
+        
+        Skills.Add(new Skill(
+            "Spell Return",
+            "Returns the next magical attack suffered to the attacker",
+            0,
+            TargetType.Self,
+            25,
+            ActionType.Buff,
+            0
+        ));
     }
     
     protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
@@ -20,19 +61,23 @@ public class Mage : Character
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
+        if (IsSpellReturned && typeOfAttack == TypeDamage.Magic)
+        {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine($"{Name} returns the magic attack to {attacker.Name} !");
+            Console.ResetColor();
+
+            var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
+            Tackle(damageAttack);
+
+            IsSpellReturned = false;
+            return result;
+        } 
         if (AttackReductionNumber > 0)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{Name} is protected by FROST BARRIER!");
             Console.ResetColor();
-
-            if (typeOfAttack == TypeDamage.Physical)
-            {
-                attackPower = (int)(attackPower * 0.40);
-            } else if (typeOfAttack == TypeDamage.Magic)
-            {
-                attackPower = (int)(attackPower * 0.50);
-            }
             
             attackPower = typeOfAttack switch
             {
@@ -48,54 +93,45 @@ public class Mage : Character
 
         return result;
     }
-    
-    private void FrostBolt()
-    {
-        /*Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"[{Name.ToUpper()}] uses FROST BOLT!");
-        Console.ResetColor();
-        
-        var attack = new Attack("FrostBolt", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, MagicAttackPower, Attack.TypeDamage.Magic );
-        Tackle(attack);*/
-    }
-
-    private void FrostBarrier()
-    {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[{Name.ToUpper()}] shouts a FROST BARRIER!");
-        Console.WriteLine("The next two attacks will be reduced:");
-        Console.WriteLine("- Physical damage reduced by 60%");
-        Console.WriteLine("- Magical damage reduced by 50%");
-        Console.ResetColor();
-        AttackReductionNumber = 2;
-        Console.WriteLine("===================================\n");
-    }
 
     public override void ChoiceAction()
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: MAGE)");
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
-        Console.WriteLine("Choose an action:");
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("1. Frost bolt (a magical attack that deals 100% of magical attack power to the target)");
-        Console.WriteLine("2. Frost barrier (reduces damage from the next two attacks received)");
-        Console.ResetColor();
         
-        List<string> options = new() { "Frost bolt", "Frost barrier" };
-        var choice = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
-        
-        switch (choice)
+        var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
+        skillNames.Add("Skip the turn");
+
+        Skill skill = null;
+        Character target = null;
+
+        while (true)
         {
-            case 1:
-                FrostBolt();
+            var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
+
+            if (skillChoice == skillNames.Count)
+            {
+                Console.WriteLine("You decided to skip the turn.");
                 break;
-            case 2:
-                FrostBarrier();
-                break;
+            }
+            
+            skill = Skills[skillChoice - 1]; 
+            
+            if (skill.CurrentCooldown != 0)
+            {
+                Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
+                continue;
+            }
+            
+            if (skill.Target == TargetType.Enemy)
+            {
+                target = Utils.PromptTarget("\nChoose a target:");
+            }
+            break;
         }
+        
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
     }
     
     
