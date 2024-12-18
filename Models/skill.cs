@@ -90,6 +90,20 @@ public class Skill
                     var manaRecovered = Math.Min(EffectPower, user.MaxMana - user.CurrentMana);
                     user.CurrentMana += manaRecovered;
                     Console.WriteLine($"{user.Name} drinks a potion and recovers {manaRecovered} mana points. Current Mana: {user.CurrentMana}/{user.MaxMana}");
+                } else if (Name == "Frost Barrier")
+                {
+                    if (user is Mage mage)
+                    {
+                        Console.WriteLine("\n========== ACTION PHASE ==========");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"{user.Name} activates Frost Barrier!");
+                        Console.WriteLine("The next two attacks will be reduced:");
+                        Console.WriteLine("- Physical damage reduced by 60%");
+                        Console.WriteLine("- Magical damage reduced by 50%");
+                        Console.ResetColor();
+                        mage.AttackReductionNumber = 2;
+                        Console.WriteLine("===================================\n");
+                    }
                 }
                 else
                 {
