@@ -16,11 +16,14 @@ public abstract class Character
     public int Speed { get; protected set; }
     public bool IsDead { get; private set; }
     protected List<Skill> Skills { get; set; } = new List<Skill>();
+    public bool UsesMana { get; private set; }
+    public int CurrentMana { get; set; }
+    public int MaxMana { get; private set; }
     
     private Random Rand { get; set; } = new Random();
     
     protected Character(string name, int maxHitPoints, int physicalAttackPower,
-                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed)
+                        int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana = false, int maxMana = 0)
     {
         Name = name;
         CurrentHitPoints = maxHitPoints;
@@ -33,6 +36,20 @@ public abstract class Character
         ChanceSpellResistance = chanceSpellResistance;
         Speed = speed;
         IsDead = false;
+        UsesMana = usesMana;
+        if (UsesMana)
+        {
+            CurrentMana = maxMana;
+            MaxMana = maxMana;
+            Skills.Add(new Skill(
+                "Drink",
+                1,
+                TargetType.Self,
+                0,
+                ActionType.Buff,
+                MaxMana / 2
+            ));
+        }
     }
 
     public static void Tackle(Attack attack)
@@ -199,6 +216,15 @@ public abstract class Character
         foreach (var skill in Skills)
         {
             skill.ReduceCooldown();
+        }
+    }
+    
+    public void ConsumeMana(int skillCost)
+    {
+        if (skillCost <= CurrentMana)
+        {
+            CurrentMana -= skillCost;
+            Console.WriteLine($"{Name} uses {skillCost} mana points. Remaining Mana: {CurrentMana}/{MaxMana}");
         }
     }
 }

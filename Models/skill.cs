@@ -8,7 +8,7 @@ public class Skill
     private int Cooldown { get; set; }
     public int CurrentCooldown { get; set; }
     public TargetType Target { get; private set; }
-    private int ManaCost { get; set; }
+    public int ManaCost { get; private set; }
     private ActionType SkillAction { get; set; }
     private int EffectPower { get; set; }
     private TypeDamage TypeOfDamage { get; set; }
@@ -33,6 +33,17 @@ public class Skill
         {
             Console.WriteLine($"{Name} is not ready (recharging) !");
             return;
+        }
+
+        if (user.UsesMana && user.CurrentMana < ManaCost)
+        {
+            Console.WriteLine($"{user.Name} doesn't have enough mana to cast {Name}!");
+            return;
+        }
+
+        if (user.UsesMana)
+        {
+            user.ConsumeMana(ManaCost);
         }
 
         if (Target == TargetType.Self)
@@ -74,21 +85,30 @@ public class Skill
                 break;
 
             case ActionType.Buff:
-                switch (TargetStat)
+                if (Name == "Drink")
                 {
-                    case AffectedStat.PhysicalAttack:
-                        Console.WriteLine($"{target.Name}'s physical attack increases by {EffectPower} due to {Name}!");
-                        target.PhysicalAttackPower += EffectPower;
-                        break;
+                    var manaRecovered = Math.Min(EffectPower, user.MaxMana - user.CurrentMana);
+                    user.CurrentMana += manaRecovered;
+                    Console.WriteLine($"{user.Name} drinks a potion and recovers {manaRecovered} mana points. Current Mana: {user.CurrentMana}/{user.MaxMana}");
+                }
+                else
+                {
+                    switch (TargetStat)
+                    {
+                        case AffectedStat.PhysicalAttack:
+                            Console.WriteLine($"{target.Name}'s physical attack increases by {EffectPower} due to {Name}!");
+                            target.PhysicalAttackPower += EffectPower;
+                            break;
 
-                    case AffectedStat.MagicAttack:
-                        Console.WriteLine($"{target.Name}'s magic attack increases by {EffectPower} due to {Name}!");
-                        target.MagicAttackPower += EffectPower;
-                        break;
+                        case AffectedStat.MagicAttack:
+                            Console.WriteLine($"{target.Name}'s magic attack increases by {EffectPower} due to {Name}!");
+                            target.MagicAttackPower += EffectPower;
+                            break;
 
-                    default:
-                        Console.WriteLine($"{target.Name} receives a generic buff with {Name}.");
-                        break;
+                        default:
+                            Console.WriteLine($"{target.Name} receives a generic buff with {Name}.");
+                            break;
+                    }   
                 }
                 break;
 
