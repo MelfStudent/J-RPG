@@ -9,6 +9,28 @@ public class Thief : Character
     public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100)
     {
         AttackReductionNumber = 0;
+        
+        Skills.Add(new Skill(
+            "Low blow",
+            "Physical attack that deals 100% of physical attack power to the target, or 150% if the target has less than half of his life points",
+            1,
+            TargetType.Enemy,
+            0,
+            ActionType.Damage,
+            55,
+            TypeDamage.Physical
+        ));
+        
+        Skills.Add(new Skill(
+            "Escape",
+            "Increases the thief's chance to dodge and resist spells by 20%",
+            1,
+            TargetType.Self,
+            0,
+            ActionType.Buff,
+            20,
+            TypeDamage.Physical
+        ));
     }
     
     protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
@@ -17,48 +39,15 @@ public class Thief : Character
         
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
-        base.Defend(attacker, typeOfAttack, attackPower);
+        var defendResult = base.Defend(attacker, typeOfAttack, attackPower);
+
+        if (defendResult.IsDodged)
+        {
+            var attack = new Attack("Stab in the back", this, attacker, 15, TypeDamage.Physical);
+            Tackle(attack);   
+        }
         
         return result;
-    }
-    
-    private void LowBlow()
-    {
-        /*Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"[{Name.ToUpper()}] uses LOW BLOW!");
-        Console.ResetColor();
-
-        var newPhysicalAttackPower = PhysicalAttackPower;
-
-        if (Menu.CharacterWhoDefends.CurrentHitPoints < Menu.CharacterWhoDefends.MaxHitPoints / 2)
-        {
-            newPhysicalAttackPower = (int)(PhysicalAttackPower * 1.50);
-        }
-        
-        var attack = new Attack("Low Blow", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, newPhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);*/
-    }
-
-    private void Escape()
-    {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"[{Name.ToUpper()}] uses ESCAPE!");
-        Console.ResetColor();
-
-        var newDodgeChance = 50;
-        var newChanceSpellResistance = 50;
-
-        if (DodgeChance + 20 <= 50)
-        {
-            newDodgeChance += DodgeChance + 20;
-        } else if (ChanceSpellResistance + 20 <= 50)
-        {
-            newChanceSpellResistance += ChanceSpellResistance + 20;
-        }
-        DodgeChance = newDodgeChance;
-        ChanceSpellResistance = newChanceSpellResistance;
     }
 
     public override void ChoiceAction()
@@ -66,23 +55,38 @@ public class Thief : Character
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: THIEF)");
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
-        Console.WriteLine("Choose an action:");
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("1. Low Blow ()");
-        Console.WriteLine("2. Escape ()");
-        Console.ResetColor();
         
-        List<string> options = new() { "Low Blow", "Escape" };
-        var choice = Utils.PromptChoice(options, "\nEnter a number corresponding to the desired action: ");
-        
-        switch (choice)
+        var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
+        skillNames.Add("Skip the turn");
+
+        Skill skill = null;
+        Character target = null;
+
+        while (true)
         {
-            case 1:
-                LowBlow();
+            var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
+
+            if (skillChoice == skillNames.Count)
+            {
+                Console.WriteLine("You decided to skip the turn.");
                 break;
-            case 2:
-                Escape();
-                break;
+            }
+            
+            skill = Skills[skillChoice - 1]; 
+            
+            if (skill.CurrentCooldown != 0)
+            {
+                Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
+                continue;
+            }
+            
+            if (skill.Target == TargetType.Enemy)
+            {
+                target = Utils.PromptTarget("\nChoose a target:");
+            }
+            break;
         }
+        
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
     }
 }
