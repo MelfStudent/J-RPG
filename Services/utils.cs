@@ -162,6 +162,10 @@ public static class Utils
             if (skill != null)
             {
                 skill.UseSkill(player, skillUsage.Target);   
+                if (player.UsesMana && player.CurrentMana < skill.ManaCost) 
+                {
+                    Console.WriteLine($"{player.Name} failed to cast {skill.Name} due to insufficient mana and passes their turn!");
+                }
             }
             else
             {
