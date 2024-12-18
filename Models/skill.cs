@@ -5,6 +5,7 @@ using Services;
 public class Skill
 {
     public string Name { get; set; }
+    public string Description { get; set; }
     private int Cooldown { get; set; }
     public int CurrentCooldown { get; set; }
     public TargetType Target { get; private set; }
@@ -14,9 +15,10 @@ public class Skill
     private TypeDamage TypeOfDamage { get; set; }
     private AffectedStat TargetStat { get; set; }
 
-    public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
+    public Skill(string name, string description, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
     {
         Name = name;
+        Description = description;
         Cooldown = cooldown;
         CurrentCooldown = 0;
         Target = target;
@@ -75,7 +77,11 @@ public class Skill
         switch (SkillAction)
         {
             case ActionType.Damage:
-                var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
+                    var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
+                    if (Name == "Low blow" && target.CurrentHitPoints < target.MaxHitPoints)
+                    {
+                        damageAttack.Damage = (int)(damageAttack.Damage * 1.50);
+                    }
                     Character.Tackle(damageAttack);   
                 break;
 
@@ -102,6 +108,31 @@ public class Skill
                         Console.WriteLine("- Magical damage reduced by 50%");
                         Console.ResetColor();
                         mage.AttackReductionNumber = 2;
+                        Console.WriteLine("===================================\n");
+                    }
+                } else if (Name == "Escape")
+                {
+                    if (user is Thief thief)
+                    {
+                        Console.WriteLine("\n========== ACTION PHASE ==========");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"{user.Name} uses Escape!");
+                        var newDodgeChance = 50;
+                        var newChanceSpellResistance = 50;
+                        
+                        if (thief.DodgeChance + 20 <= 50)
+                        {
+                            newDodgeChance += thief.DodgeChance + 20;
+                        } else if (thief.ChanceSpellResistance + 20 <= 50)
+                        {
+                            newChanceSpellResistance += thief.ChanceSpellResistance + 20;
+                        }
+                        thief.DodgeChance = newDodgeChance;
+                        thief.ChanceSpellResistance = newChanceSpellResistance;
+                        
+                        Console.WriteLine($"New Dodge Chance: {thief.DodgeChance}%");
+                        Console.WriteLine($"New Resistance Chance: {thief.ChanceSpellResistance}%");
+                        Console.ResetColor();
                         Console.WriteLine("===================================\n");
                     }
                 }
