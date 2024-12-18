@@ -39,15 +39,16 @@ public abstract class Character
     {
         Console.WriteLine("\n========== ATTACK PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"Attack Name: {attack.Name}");
         Console.WriteLine($"[{attack.AttackingCharacter.Name.ToUpper()}] attacks [{attack.TargetCharacter.Name.ToUpper()}]");
         Console.WriteLine($"Attack Type: {attack.TypeOfDamage}");
         Console.WriteLine($"Damage: {attack.Damage}");
         Console.ResetColor();
-        attack.TargetCharacter.Defend(attack.TypeOfDamage, attack.Damage);
+        attack.TargetCharacter.Defend(attack.AttackingCharacter ,attack.TypeOfDamage, attack.Damage);
         Console.WriteLine("===================================\n");
     }
 
-    protected virtual DefenseResult Defend(TypeDamage typeOfAttack, int attackPower)
+    protected virtual DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         var result = new DefenseResult();
         
