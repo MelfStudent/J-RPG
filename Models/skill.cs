@@ -158,8 +158,27 @@ public class Skill
                 break;
 
             case ActionType.Debuff:
-                    Console.WriteLine($"{target.Name} undergoes a weakening with {Name} !");
-                    target.DodgeChance = Math.Max(0, target.DodgeChance - EffectPower);   
+                if (Name == "Mana Burn")
+                {
+                    Console.WriteLine("\n========== ACTION PHASE ==========");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{user.Name} uses Mana Burn on {target.Name}!");
+                    
+                    if (target.CurrentMana / 2 >= 40)
+                    {
+                        var previousMana = target.CurrentMana;
+                        target.CurrentMana /= 2;
+                        Console.WriteLine($"{target.Name}'s mana is reduced by half from {previousMana} to {target.CurrentMana}!");
+                    }
+                    else
+                    {
+                        var previousMana = target.CurrentMana;
+                        target.CurrentMana -= 40;
+                        Console.WriteLine($"{target.Name}'s mana is reduced by 40 from {previousMana} to {target.CurrentMana}!");
+                    }
+                    Console.ResetColor();
+                    Console.WriteLine("===================================\n");
+                }
                 break;
         }
     }
