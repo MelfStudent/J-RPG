@@ -4,7 +4,7 @@ using Services;
 
 public class Mage : Character
 {
-    private int ManaPoints { get; set; }
+    public int ManaPoints { get; private set; }
     private int AttackReductionNumber { get; set; }
     
     public Mage(string name, int manaPoints) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75)
@@ -13,8 +13,10 @@ public class Mage : Character
         AttackReductionNumber = 0;
     }
     
-    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
@@ -24,36 +26,38 @@ public class Mage : Character
             Console.WriteLine($"{Name} is protected by FROST BARRIER!");
             Console.ResetColor();
 
-            if (typeOfAttack == Attack.TypeDamage.Physical)
+            if (typeOfAttack == TypeDamage.Physical)
             {
                 attackPower = (int)(attackPower * 0.40);
-            } else if (typeOfAttack == Attack.TypeDamage.Magic)
+            } else if (typeOfAttack == TypeDamage.Magic)
             {
                 attackPower = (int)(attackPower * 0.50);
             }
             
             attackPower = typeOfAttack switch
             {
-                Attack.TypeDamage.Physical => (int)(attackPower * 0.40),
-                Attack.TypeDamage.Magic => (int)(attackPower * 0.50),
+                TypeDamage.Physical => (int)(attackPower * 0.40),
+                TypeDamage.Magic => (int)(attackPower * 0.50),
                 _ => attackPower
             };
 
             AttackReductionNumber--;
         }
         
-        base.Defend(typeOfAttack, attackPower);
+        base.Defend(attacker, typeOfAttack, attackPower);
+
+        return result;
     }
     
     private void FrostBolt()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses FROST BOLT!");
         Console.ResetColor();
         
         var attack = new Attack("FrostBolt", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, MagicAttackPower, Attack.TypeDamage.Magic );
-        Tackle(attack);
+        Tackle(attack);*/
     }
 
     private void FrostBarrier()
@@ -93,4 +97,6 @@ public class Mage : Character
                 break;
         }
     }
+    
+    
 }

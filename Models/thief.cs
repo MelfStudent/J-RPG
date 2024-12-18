@@ -6,21 +6,25 @@ public class Thief : Character
 {
     private int AttackReductionNumber { get; set; }
     
-    public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25)
+    public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100)
     {
         AttackReductionNumber = 0;
     }
     
-    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
-        base.Defend(typeOfAttack, attackPower);
+        base.Defend(attacker, typeOfAttack, attackPower);
+        
+        return result;
     }
     
     private void LowBlow()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses LOW BLOW!");
         Console.ResetColor();
@@ -33,7 +37,7 @@ public class Thief : Character
         }
         
         var attack = new Attack("Low Blow", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, newPhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        Tackle(attack);*/
     }
 
     private void Escape()

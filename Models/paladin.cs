@@ -4,40 +4,46 @@ using Services;
 
 public class Paladin : Character
 {
+    public int ManaPoints { get; private set; }
     private int AttackReductionNumber { get; set; }
     
-    public Paladin(string name) : base(name, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20)
+    public Paladin(string name, int manaPoints) : base(name, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20, 75)
     {
+        ManaPoints = manaPoints;
         AttackReductionNumber = 0;
     }
     
-    protected override void Defend(Attack.TypeDamage typeOfAttack, int attackPower)
+    protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
-        base.Defend(typeOfAttack, attackPower);
+        base.Defend(attacker, typeOfAttack, attackPower);
+
+        return result;
     }
     
     private void CrusaderStrike()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses CRUSADER STRIKE!");
         Console.ResetColor();
         
         Attack attack = new Attack("Crusader Strike", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, PhysicalAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        Tackle(attack);*/
     }
 
     private void Judgement()
     {
-        Console.WriteLine("\n========== ACTION PHASE ==========");
+        /*Console.WriteLine("\n========== ACTION PHASE ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"[{Name.ToUpper()}] uses JUDGEMENT!");
         Console.ResetColor();
         
         Attack attack = new Attack("Judgement", Menu.CharacterWhoAttacks, Menu.CharacterWhoDefends, MagicAttackPower, Attack.TypeDamage.Physical );
-        Tackle(attack);
+        Tackle(attack);*/
     }
     
     private void BrightFlash()
