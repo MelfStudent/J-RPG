@@ -7,7 +7,7 @@ public class Mage : Character
     public int AttackReductionNumber { get; set; }
     private bool IsSpellReturned = false;
     
-    public Mage(string name, int manaPoints) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100)
+    public Mage(string name) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100)
     {
         AttackReductionNumber = 0;
 

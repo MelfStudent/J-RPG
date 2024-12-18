@@ -99,6 +99,11 @@ public abstract class Character
         
         damage = GetArmorResistance(Armor, typeOfAttack, damage);
         result.DamageTaken = damage;
+
+        if (attacker is Paladin paladin)
+        {
+            paladin.Heal(damage / 2);
+        }
         
         if ((CurrentHitPoints -= damage) <= 0)
         {

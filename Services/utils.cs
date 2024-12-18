@@ -111,8 +111,8 @@ public static class Utils
         switch (chosenClass)
         {
             case 1: return new Warrior(chosenName);
-            case 2: return new Mage(chosenName, 100);
-            case 3: return new Paladin(chosenName, 60);
+            case 2: return new Mage(chosenName);
+            case 3: return new Paladin(chosenName);
             case 4: return new Thief(chosenName);
             default: throw new ArgumentException("Invalid class choice");
         }
