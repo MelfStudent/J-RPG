@@ -46,11 +46,21 @@ public class Mage : Character
         Skills.Add(new Skill(
             "Spell Return",
             "Returns the next magical attack suffered to the attacker",
-            0,
+            1,
             TargetType.Self,
             25,
             ActionType.Buff,
             0
+        ));
+        
+        Skills.Add(new Skill(
+            "Mana Burn",
+            "Halves the target's mana amount",
+            3,
+            TargetType.Enemy,
+            20,
+            ActionType.Debuff,
+            40
         ));
     }
     
