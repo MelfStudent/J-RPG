@@ -11,11 +11,15 @@ public class Thief : Character
         AttackReductionNumber = 0;
     }
     
-    protected override void Defend(TypeDamage typeOfAttack, int attackPower)
+    protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
+        var result = new DefenseResult();
+        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
-        base.Defend(typeOfAttack, attackPower);
+        base.Defend(attacker, typeOfAttack, attackPower);
+        
+        return result;
     }
     
     private void LowBlow()
