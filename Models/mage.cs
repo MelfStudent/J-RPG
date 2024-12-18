@@ -10,9 +10,10 @@ public class Mage : Character
     public Mage(string name, int manaPoints) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100)
     {
         AttackReductionNumber = 0;
-        
+
         Skills.Add(new Skill(
             "Frost bolt",
+            "Magic attack that deals 100% of magic attack power to the target",
             1,
             TargetType.Enemy,
             15,
@@ -23,6 +24,7 @@ public class Mage : Character
         
         Skills.Add(new Skill(
             "Frost Barrier",
+            "Reduces damage from the next two attacks received",
             2,
             TargetType.Self,
             25,
@@ -32,6 +34,7 @@ public class Mage : Character
         
         Skills.Add(new Skill(
             "Blizzard",
+            "Magic attack that deals 50% of magic attack power to the entire enemy team",
             2,
             TargetType.AllEnemies,
             25,
@@ -42,6 +45,7 @@ public class Mage : Character
         
         Skills.Add(new Skill(
             "Spell Return",
+            "Returns the next magical attack suffered to the attacker",
             0,
             TargetType.Self,
             25,
@@ -95,13 +99,8 @@ public class Mage : Character
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: MAGE)");
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
-        Console.WriteLine("Choose an action:");
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("1. Frost bolt (a magical attack that deals 100% of magical attack power to the target)");
-        Console.WriteLine("2. Frost barrier (reduces damage from the next two attacks received)");
-        Console.ResetColor();
         
-        var skillNames = Skills.Select(s => s.Name).ToList();
+        var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
         skillNames.Add("Skip the turn");
 
         Skill skill = null;

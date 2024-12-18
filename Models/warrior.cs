@@ -8,6 +8,7 @@ public class Warrior : Character
     {
         Skills.Add(new Skill(
             "Heroic Strike",
+            "Physical attack that deals 100% of physical attack power to a target",
             1,
             TargetType.Enemy,
             0,
@@ -18,6 +19,7 @@ public class Warrior : Character
 
         Skills.Add(new Skill(
             "Battle cry",
+            "Increases the physical attack power of all characters on the team by 25",
             2,
             TargetType.AllAllies,
             0,
@@ -29,6 +31,7 @@ public class Warrior : Character
 
         Skills.Add(new Skill(
             "Whirlwind",
+            "Physical attack that deals 33% of physical attack power to the entire enemy team",
             2,
             TargetType.AllEnemies,
             0,
@@ -72,13 +75,8 @@ public class Warrior : Character
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: WARRIOR)");
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
-        Console.WriteLine("Choose an action:");
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("1. Heroic Strike (a physical attack that deals 100% of physical attack power to the target)");
-        Console.WriteLine("2. Battle Cry (multiplies the warrior's attack power by 2)");
-        Console.ResetColor();
         
-        var skillNames = Skills.Select(s => s.Name).ToList();
+        var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
         skillNames.Add("Skip the turn");
 
         Skill skill = null;

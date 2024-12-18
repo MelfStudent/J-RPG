@@ -43,6 +43,7 @@ public abstract class Character
             MaxMana = maxMana;
             Skills.Add(new Skill(
                 "Drink",
+                "Regenerates half mana",
                 1,
                 TargetType.Self,
                 0,

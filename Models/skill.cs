@@ -5,6 +5,7 @@ using Services;
 public class Skill
 {
     public string Name { get; set; }
+    public string Description { get; set; }
     private int Cooldown { get; set; }
     public int CurrentCooldown { get; set; }
     public TargetType Target { get; private set; }
@@ -14,9 +15,10 @@ public class Skill
     private TypeDamage TypeOfDamage { get; set; }
     private AffectedStat TargetStat { get; set; }
 
-    public Skill(string name, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
+    public Skill(string name, string description, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
     {
         Name = name;
+        Description = description;
         Cooldown = cooldown;
         CurrentCooldown = 0;
         Target = target;
