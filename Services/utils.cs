@@ -67,7 +67,7 @@ public static class Utils
     public static List<Character> PromptTeam(string titled)
     {
         var result = new List<Character>();
-        List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief\n" };
+        List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief", "Priest\n" };
 
         Console.WriteLine(titled);
         for (var i = 1; i < 2; i++)
@@ -114,6 +114,7 @@ public static class Utils
             case 2: return new Mage(chosenName);
             case 3: return new Paladin(chosenName);
             case 4: return new Thief(chosenName);
+            case 5: return new Priest(chosenName);
             default: throw new ArgumentException("Invalid class choice");
         }
     }
