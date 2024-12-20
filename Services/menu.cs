@@ -115,16 +115,14 @@ public static class Menu
         };
     }
 
-    public static void EndGame()
+    public static void EndGame(string message)
     {
         Console.WriteLine("\n========== GAME OVER ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine(@$"
         ****************************************************
         *                                                  *
-        *      CONGRATULATIONS,!         *
-        *                                                  *
-        *        YOU HAVE EMERGED VICTORIOUS!              *
+        *      {message}         *
         *                                                  *
         ****************************************************
 
@@ -133,7 +131,7 @@ public static class Menu
                    / \ 
             ---------------------
            /                     \
-          /    VICTORY IS YOURS!  \
+          /    {message}  \
          /_________________________\
         ");
         Console.ResetColor();
