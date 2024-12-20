@@ -6,8 +6,10 @@ public static class Menu
 {
     public static List<Character>? Player1 { get; private set; }
     public static List<Character>? Player2 { get; private set; }
-    public static Character? CharacterWhoAttacks { get; set; }
-    public static Character? CharacterWhoDefends { get; set; }
+    public static List<SkillUsage> SkillsTourCurrent { get; set; } = new List<SkillUsage>();
+    public static Team? TeamThatAttacks { get; set; }
+    public static Team? TeamThatDefends { get; set; }
+    public static List<Team> Teams { get; set; } = new List<Team>();
     
     public static void PrintGameLaunch()
     {
@@ -56,20 +58,35 @@ public static class Menu
         Console.WriteLine("\n========== CHARACTER CREATION ==========");
         Console.ForegroundColor = ConsoleColor.Blue;
         Player1 = Utils.PromptTeam("\n\n\nCharacter selection team n°1");
+        var team1 = new Team("Player 1");
+        foreach (var player in Player1)
+        {
+            team1.AddMember(player);
+        }
+        
         Console.ForegroundColor = ConsoleColor.Yellow;
         Player2 = Utils.PromptTeam("\n\n\nCharacter selection team n°2");
+        var team2 = new Team("Player 2");
+        foreach (var player in Player2)
+        {
+            team2.AddMember(player);
+        }
+        
+        Teams.Add(team1);
+        Teams.Add(team2);
 
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("\n========== READY CHARACTERS TEAM 1 ==========");
-        DisplayCharacterStats(Player1);
+        DisplayCharacterStats(Player1, "Player 1");
         
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("\n========== READY CHARACTERS TEAM 2 ==========");
-        DisplayCharacterStats(Player2);
+        DisplayCharacterStats(Player2, "Player 2");
         Console.ResetColor();
         
-        //CharacterWhoAttacks = Player1;
-        //CharacterWhoDefends = Player2;
+        TeamThatAttacks = Teams[0];;
+        TeamThatDefends = Teams[1];;
+        
 
         Console.WriteLine("\n========================================");
         Console.WriteLine("Press any key to start the battle...");
@@ -77,33 +94,23 @@ public static class Menu
         Utils.StartGame();
     }
     
-    private static void DisplayCharacterStats(List<Character> characters)
+    private static void DisplayCharacterStats(List<Character> characters, string playerName)
     {
         foreach (var character in characters)
         {
-            Console.WriteLine($"Player 1: {character.Name} ({character.GetType().Name})");
-            Console.WriteLine("----------------------------------------");
-            Console.WriteLine($"Name: {character.Name}");
-            Console.WriteLine($"Class: {character.GetType().Name}");
-            Console.WriteLine($"HP: {character.CurrentHitPoints}/{character.MaxHitPoints}");
-            Console.WriteLine($"Physical Attack: {character.PhysicalAttackPower}");
-            Console.WriteLine($"Magical Attack: {character.MagicAttackPower}");
-            Console.WriteLine($"Dodge Chance: {character.DodgeChance}%");
-            Console.WriteLine($"Parade Chance: {character.ParadeChance}%");
-            Console.WriteLine($"Spell Resistance Chance: {character.ChanceSpellResistance}%");
-            Console.WriteLine($"Armor Type: {character.Armor} (Resistance: {GetArmorPercentage(character.Armor)})");
-            Console.WriteLine("----------------------------------------");
+            Console.WriteLine($"{playerName}: {character.Name} ({character.GetType().Name})");
+            Console.WriteLine(character.ToString());
         }
     }
     
-    private static string GetArmorPercentage(Character.TypeOfArmor armor)
+    public static string GetArmorPercentage(TypeOfArmor armor)
     {
         return armor switch
         {
-            Character.TypeOfArmor.Fabric => "30% vs Magic",
-            Character.TypeOfArmor.Leather => "15% vs Physical, 20% vs Magic",
-            Character.TypeOfArmor.Mesh => "30% vs Physical, 10% vs Magic",
-            Character.TypeOfArmor.Plates => "45% vs Physical",
+            TypeOfArmor.Fabric => "30% vs Magic",
+            TypeOfArmor.Leather => "15% vs Physical, 20% vs Magic",
+            TypeOfArmor.Mesh => "30% vs Physical, 10% vs Magic",
+            TypeOfArmor.Plates => "45% vs Physical",
             _ => "No resistance"
         };
     }
@@ -115,7 +122,7 @@ public static class Menu
         Console.WriteLine(@$"
         ****************************************************
         *                                                  *
-        *      CONGRATULATIONS, {CharacterWhoAttacks.Name.ToUpper()} !         *
+        *      CONGRATULATIONS,!         *
         *                                                  *
         *        YOU HAVE EMERGED VICTORIOUS!              *
         *                                                  *
