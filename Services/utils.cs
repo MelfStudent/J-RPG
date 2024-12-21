@@ -7,7 +7,7 @@ using Models;
 
 public static class Utils
 {
-    private static HashSet<string> UsedNames { get; } = new();
+    public static HashSet<string> UsedNames { get; } = new();
     
     public static int PromptChoice(List<string> options, string titled)
     {
@@ -126,9 +126,19 @@ public static class Utils
             ChoiceActions();
             ExecutionOfAttacks();
             Menu.SkillsTourCurrent = new List<SkillUsage>();
-        }
 
-        Menu.EndGame();
+            if (!IsTeamAlive(Menu.TeamThatAttacks))
+            {
+                Menu.EndGame("Player 2 wins!");
+                break;
+            }
+
+            if (!IsTeamAlive(Menu.TeamThatDefends))
+            {
+                Menu.EndGame("Player 1 wins!");
+                break;
+            }
+        }
     }
 
     private static void ChoiceActions()
@@ -198,5 +208,10 @@ public static class Utils
                 character.ReduceCooldowns();
             }
         }
+    }
+    
+    private static bool IsTeamAlive(Team team)
+    {
+        return team.Members.Any(character => !character.IsDead);
     }
 }
