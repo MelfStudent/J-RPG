@@ -102,7 +102,7 @@ public class Warrior : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:");
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
             }
             break;
         }
