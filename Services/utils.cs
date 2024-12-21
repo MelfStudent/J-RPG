@@ -81,7 +81,7 @@ public static class Utils
         return result;
     }
     
-    public static Character PromptTarget(string titled)
+    public static Character PromptTarget(string titled, Team team, Character actor)
     {
         int result;
         bool isPromptValid;
@@ -89,16 +89,16 @@ public static class Utils
         do
         {
             Console.WriteLine(titled);
-            for (var i = 1; i <= Menu.TeamThatDefends.Members.Count; i++)
+            for (var i = 1; i <= team.Members.Count; i++)
             {
-                if (!Menu.TeamThatDefends.Members[i - 1].IsDead)
+                if (!team.Members[i - 1].IsDead && team.Members[i - 1] != actor)
                 {
-                    Console.Write($"{i} - {Menu.TeamThatDefends.Members[i - 1].Name}\n");
+                    Console.Write($"{i} - {team.Members[i - 1].Name}\n");
                 }
             }
 
             Console.Write("Choose: ");
-            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result <= Menu.TeamThatDefends.Members.Count && !Menu.TeamThatDefends.Members[result - 1].IsDead;
+            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result <= team.Members.Count && !team.Members[result - 1].IsDead && team.Members[result - 1] != actor;
 
             if (!isPromptValid)
             {
@@ -106,7 +106,7 @@ public static class Utils
             }
         } while (!isPromptValid);
 
-        return Menu.TeamThatDefends.Members[result-1]; 
+        return team.Members[result-1]; 
     }
     
     private static Character CreatePlayer(string chosenName, int chosenClass)
