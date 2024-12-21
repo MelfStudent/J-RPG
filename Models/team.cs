@@ -21,4 +21,11 @@ public class Team
     {
         (Menu.TeamThatDefends, Menu.TeamThatAttacks) = (Menu.TeamThatAttacks, Menu.TeamThatDefends);
     }
+    
+    public int NumberPeopleAlive()
+    {
+        var members = Members.Where(character => !character.IsDead);
+        
+        return members.Count();
+    }
 }
