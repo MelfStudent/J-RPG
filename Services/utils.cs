@@ -89,17 +89,20 @@ public static class Utils
         do
         {
             Console.WriteLine(titled);
-            for (var i = 1; i < Menu.TeamThatDefends.Members.Count+1; i++)
+            for (var i = 1; i <= Menu.TeamThatDefends.Members.Count; i++)
             {
-                Console.Write($"{i} - {Menu.TeamThatDefends.Members[i-1].Name}\n");
+                if (!Menu.TeamThatDefends.Members[i - 1].IsDead)
+                {
+                    Console.Write($"{i} - {Menu.TeamThatDefends.Members[i - 1].Name}\n");
+                }
             }
 
             Console.Write("Choose: ");
-            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result < Menu.TeamThatDefends.Members.Count+1;
+            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result <= Menu.TeamThatDefends.Members.Count && !Menu.TeamThatDefends.Members[result - 1].IsDead;
 
             if (!isPromptValid)
             {
-                Console.WriteLine("Invalid entry, please try again");
+                Console.WriteLine("Invalid entry or the selected character is not alive. Please try again.");
             }
         } while (!isPromptValid);
 
