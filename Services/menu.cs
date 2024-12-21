@@ -114,6 +114,17 @@ public static class Menu
             _ => "No resistance"
         };
     }
+    
+    private static void ResetGame()
+    {
+        Player1 = null;
+        Player2 = null;
+        SkillsTourCurrent.Clear();
+        Teams.Clear();
+        TeamThatAttacks = null;
+        TeamThatDefends = null;
+        Utils.UsedNames.Clear();
+    }
 
     public static void EndGame(string message)
     {
@@ -143,6 +154,7 @@ public static class Menu
             Thread.Sleep(1000);
         }
         Console.WriteLine();
+        ResetGame();
         PrintNavigationMenu();
     }
 }

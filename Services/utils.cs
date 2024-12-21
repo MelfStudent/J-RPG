@@ -7,7 +7,7 @@ using Models;
 
 public static class Utils
 {
-    private static HashSet<string> UsedNames { get; } = new();
+    public static HashSet<string> UsedNames { get; } = new();
     
     public static int PromptChoice(List<string> options, string titled)
     {
