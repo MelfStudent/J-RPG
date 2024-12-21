@@ -127,13 +127,13 @@ public static class Utils
             ExecutionOfAttacks();
             Menu.SkillsTourCurrent = new List<SkillUsage>();
 
-            if (!IsTeamAlive(Menu.TeamThatAttacks))
+            if (Menu.Teams[0].NumberPeopleAlive() == 0)
             {
                 Menu.EndGame("Player 2 wins!");
                 break;
             }
 
-            if (!IsTeamAlive(Menu.TeamThatDefends))
+            if (Menu.Teams[1].NumberPeopleAlive() == 0)
             {
                 Menu.EndGame("Player 1 wins!");
                 break;
@@ -208,10 +208,5 @@ public static class Utils
                 character.ReduceCooldowns();
             }
         }
-    }
-    
-    private static bool IsTeamAlive(Team team)
-    {
-        return team.Members.Any(character => !character.IsDead);
     }
 }
