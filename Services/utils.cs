@@ -113,11 +113,82 @@ public static class Utils
     {
         switch (chosenClass)
         {
-            case 1: return new Warrior(chosenName, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50);
-            case 2: return new Mage(chosenName, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100);
-            case 3: return new Paladin(chosenName, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20, 75, true, 60);
-            case 4: return new Thief(chosenName, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100);
-            case 5: return new Priest(chosenName, 70, 0, 65, TypeOfArmor.Fabric, 10, 0, 20, 70, true, 100);
+            case 1:
+                var warriorConfig = ClassConfigLoader.GetConfig("Warrior");
+                return new Warrior(
+                    chosenName,
+                    warriorConfig.MaxHitPoints,
+                    warriorConfig.PhysicalAttackPower,
+                    warriorConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(warriorConfig.Armor),
+                    warriorConfig.DodgeChance,
+                    warriorConfig.ParadeChance,
+                    warriorConfig.ChanceSpellResistance,
+                    warriorConfig.Speed
+                );
+            
+            case 2:
+                var mageConfig = ClassConfigLoader.GetConfig("Mage");
+                return new Mage(
+                    chosenName,
+                    mageConfig.MaxHitPoints,
+                    mageConfig.PhysicalAttackPower,
+                    mageConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(mageConfig.Armor),
+                    mageConfig.DodgeChance,
+                    mageConfig.ParadeChance,
+                    mageConfig.ChanceSpellResistance,
+                    mageConfig.Speed,
+                    mageConfig.HasMana,
+                    mageConfig.ManaPoints
+                );
+            
+            case 3:
+                var paladinConfig = ClassConfigLoader.GetConfig("Paladin");
+                return new Paladin(
+                    chosenName,
+                    paladinConfig.MaxHitPoints,
+                    paladinConfig.PhysicalAttackPower,
+                    paladinConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(paladinConfig.Armor),
+                    paladinConfig.DodgeChance,
+                    paladinConfig.ParadeChance,
+                    paladinConfig.ChanceSpellResistance,
+                    paladinConfig.Speed,
+                    paladinConfig.HasMana,
+                    paladinConfig.ManaPoints
+                );
+            
+            case 4:
+                var thiefConfig = ClassConfigLoader.GetConfig("Thief");
+                return new Thief(
+                    chosenName,
+                    thiefConfig.MaxHitPoints,
+                    thiefConfig.PhysicalAttackPower,
+                    thiefConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(thiefConfig.Armor),
+                    thiefConfig.DodgeChance,
+                    thiefConfig.ParadeChance,
+                    thiefConfig.ChanceSpellResistance,
+                    thiefConfig.Speed
+                );
+            
+            case 5:
+                var priestConfig = ClassConfigLoader.GetConfig("Priest");
+                return new Priest(
+                    chosenName,
+                    priestConfig.MaxHitPoints,
+                    priestConfig.PhysicalAttackPower,
+                    priestConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(priestConfig.Armor),
+                    priestConfig.DodgeChance,
+                    priestConfig.ParadeChance,
+                    priestConfig.ChanceSpellResistance,
+                    priestConfig.Speed,
+                    priestConfig.HasMana,
+                    priestConfig.ManaPoints
+                );
+            
             default: throw new ArgumentException("Invalid class choice");
         }
     }
