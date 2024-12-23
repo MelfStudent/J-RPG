@@ -2,34 +2,29 @@
 
 using Services;
 
-public class Thief : Character
+public class Priest : Character
 {
-    private int AttackReductionNumber { get; set; }
-    
-    public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100)
+    public Priest(string name) : base(name, 70, 0, 65, TypeOfArmor.Fabric, 10, 0, 20, 70, true, 100)
     {
-        AttackReductionNumber = 0;
-        
         Skills.Add(new Skill(
-            "Low blow",
-            "Physical attack that deals 100% of physical attack power to the target, or 150% if the target has less than half of his life points",
+            "Punishment",
+            "Magic attack that deals 75% of magic attack power to the target",
             1,
             TargetType.Enemy,
-            0,
+            15,
             ActionType.Damage,
-            55,
-            TypeDamage.Physical
+            (int)(65 * 0.75),
+            TypeDamage.Magic
         ));
         
         Skills.Add(new Skill(
-            "Escape",
-            "Increases the thief's chance to dodge and resist spells by 20%",
-            1,
-            TargetType.Self,
-            0,
-            ActionType.Buff,
-            20,
-            TypeDamage.Physical
+            "Circle of care",
+            "Heals the entire team for 75% of magic attack power",
+            2,
+            TargetType.AllAllies,
+            30,
+            ActionType.Heal,
+            (int)(65 * 0.75)
         ));
     }
     
@@ -39,21 +34,16 @@ public class Thief : Character
         
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
-        var defendResult = base.Defend(attacker, typeOfAttack, attackPower);
-
-        if (defendResult.IsDodged)
-        {
-            var attack = new Attack("Stab in the back", this, attacker, 15, TypeDamage.Physical);
-            Tackle(attack);   
-        }
         
+        base.Defend(attacker, typeOfAttack, attackPower);
+
         return result;
     }
-
+    
     public override void ChoiceAction()
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
-        Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: THIEF)");
+        Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: PRIEST)");
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
         
         var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
