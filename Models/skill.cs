@@ -77,7 +77,11 @@ public class Skill
         switch (SkillAction)
         {
             case ActionType.Damage:
-                var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
+                    var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
+                    if (Name == "Low blow" && target.CurrentHitPoints < target.MaxHitPoints)
+                    {
+                        damageAttack.Damage = (int)(damageAttack.Damage * 1.50);
+                    }
                     Character.Tackle(damageAttack);   
                 break;
 
@@ -106,6 +110,31 @@ public class Skill
                         mage.AttackReductionNumber = 2;
                         Console.WriteLine("===================================\n");
                     }
+                } else if (Name == "Escape")
+                {
+                    if (user is Thief thief)
+                    {
+                        Console.WriteLine("\n========== ACTION PHASE ==========");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"{user.Name} uses Escape!");
+                        var newDodgeChance = 50;
+                        var newChanceSpellResistance = 50;
+                        
+                        if (thief.DodgeChance + 20 <= 50)
+                        {
+                            newDodgeChance += thief.DodgeChance + 20;
+                        } else if (thief.ChanceSpellResistance + 20 <= 50)
+                        {
+                            newChanceSpellResistance += thief.ChanceSpellResistance + 20;
+                        }
+                        thief.DodgeChance = newDodgeChance;
+                        thief.ChanceSpellResistance = newChanceSpellResistance;
+                        
+                        Console.WriteLine($"New Dodge Chance: {thief.DodgeChance}%");
+                        Console.WriteLine($"New Resistance Chance: {thief.ChanceSpellResistance}%");
+                        Console.ResetColor();
+                        Console.WriteLine("===================================\n");
+                    }
                 }
                 else
                 {
@@ -129,8 +158,27 @@ public class Skill
                 break;
 
             case ActionType.Debuff:
-                    Console.WriteLine($"{target.Name} undergoes a weakening with {Name} !");
-                    target.DodgeChance = Math.Max(0, target.DodgeChance - EffectPower);   
+                if (Name == "Mana Burn")
+                {
+                    Console.WriteLine("\n========== ACTION PHASE ==========");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{user.Name} uses Mana Burn on {target.Name}!");
+                    
+                    if (target.CurrentMana / 2 >= 40)
+                    {
+                        var previousMana = target.CurrentMana;
+                        target.CurrentMana /= 2;
+                        Console.WriteLine($"{target.Name}'s mana is reduced by half from {previousMana} to {target.CurrentMana}!");
+                    }
+                    else
+                    {
+                        var previousMana = target.CurrentMana;
+                        target.CurrentMana -= 40;
+                        Console.WriteLine($"{target.Name}'s mana is reduced by 40 from {previousMana} to {target.CurrentMana}!");
+                    }
+                    Console.ResetColor();
+                    Console.WriteLine("===================================\n");
+                }
                 break;
         }
     }

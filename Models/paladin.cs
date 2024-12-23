@@ -84,7 +84,12 @@ public class Paladin : Character
 
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:");
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
+            }
+            
+            if (skill.Target == TargetType.Ally)
+            {
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatAttacks, this);
             }
 
             break;

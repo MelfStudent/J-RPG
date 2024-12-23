@@ -5,14 +5,14 @@ using Services;
 public abstract class Character
 {
     public string Name { get; protected set; }
-    protected int CurrentHitPoints { get; private set; }
-    protected int MaxHitPoints { get; private set; }
+    public int CurrentHitPoints { get; private set; }
+    public int MaxHitPoints { get; private set; }
     public int PhysicalAttackPower  { get; set; }
     public int MagicAttackPower  { get; set; }
     private TypeOfArmor Armor { get; set; }
     public int DodgeChance { get; set; }
     private int ParadeChance { get; set; }
-    protected int ChanceSpellResistance { get; set; }
+    public int ChanceSpellResistance { get; set; }
     public int Speed { get; protected set; }
     public bool IsDead { get; private set; }
     protected List<Skill> Skills { get; set; } = new List<Skill>();
@@ -120,16 +120,15 @@ public abstract class Character
 
     public void Heal(int extraLife)
     {
-       /* if (CurrentHitPoints + extraLife <= MaxHitPoints)
-        {
+       if (CurrentHitPoints + extraLife <= MaxHitPoints)
+       {
             CurrentHitPoints += extraLife;
             Console.WriteLine(
-                $"{Menu.CharacterWhoAttacks.Name} regenerated {extraLife} hp. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
+                $"{Name} regenerated {extraLife} hp. It now has {CurrentHitPoints} hp");
             return;
-        }
-        CurrentHitPoints = MaxHitPoints;
-        Console.WriteLine($"{Menu.CharacterWhoAttacks.Name} has regenerated life. It now has {Menu.CharacterWhoAttacks.CurrentHitPoints} hp");
-    */
+       }
+       CurrentHitPoints = MaxHitPoints;
+       Console.WriteLine($"{Name} has regenerated life. It now has {CurrentHitPoints} hp");
     }
 
     protected bool LuckTest(int percentage)
