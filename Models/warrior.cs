@@ -4,7 +4,7 @@ using Services;
 
 public class Warrior : Character
 {
-    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50)
+    public Warrior(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed)
     {
         Skills.Add(new Skill(
             "Heroic Strike",
@@ -13,7 +13,7 @@ public class Warrior : Character
             TargetType.Enemy,
             0,
             ActionType.Damage,
-            50,
+            physicalAttackPower,
             TypeDamage.Physical
         ));
 
@@ -36,7 +36,7 @@ public class Warrior : Character
             TargetType.AllEnemies,
             0,
             ActionType.Damage,
-            (int)(50 * 0.33),
+            (int)(physicalAttackPower * 0.33),
             TypeDamage.Physical
         ));
     }
