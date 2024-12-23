@@ -6,13 +6,13 @@ public class Skill
 {
     public string Name { get; set; }
     public string Description { get; set; }
-    private int Cooldown { get; set; }
+    public int Cooldown { get; private set; }
     public int CurrentCooldown { get; set; }
     public TargetType Target { get; private set; }
     public int ManaCost { get; private set; }
     private ActionType SkillAction { get; set; }
-    private int EffectPower { get; set; }
-    private TypeDamage TypeOfDamage { get; set; }
+    public int EffectPower { get; private set; }
+    public TypeDamage TypeOfDamage { get; private set; }
     private AffectedStat TargetStat { get; set; }
 
     public Skill(string name, string description, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
