@@ -117,7 +117,7 @@ public static class Utils
             case 2: return new Mage(chosenName, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100);
             case 3: return new Paladin(chosenName, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20, 75, true, 60);
             case 4: return new Thief(chosenName, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100);
-            case 5: return new Priest(chosenName);
+            case 5: return new Priest(chosenName, 70, 0, 65, TypeOfArmor.Fabric, 10, 0, 20, 70, true, 100);
             default: throw new ArgumentException("Invalid class choice");
         }
     }
