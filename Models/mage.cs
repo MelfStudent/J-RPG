@@ -18,7 +18,7 @@ public class Mage : Character
             TargetType.Enemy,
             15,
             ActionType.Damage,
-            75,
+            magicAttackPower,
             TypeDamage.Magic
         ));
         
@@ -39,7 +39,7 @@ public class Mage : Character
             TargetType.AllEnemies,
             25,
             ActionType.Damage,
-            75 / 2,
+            magicAttackPower / 2,
             TypeDamage.Magic
         ));
         
