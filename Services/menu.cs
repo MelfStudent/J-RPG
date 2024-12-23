@@ -114,17 +114,26 @@ public static class Menu
             _ => "No resistance"
         };
     }
+    
+    private static void ResetGame()
+    {
+        Player1 = null;
+        Player2 = null;
+        SkillsTourCurrent.Clear();
+        Teams.Clear();
+        TeamThatAttacks = null;
+        TeamThatDefends = null;
+        Utils.UsedNames.Clear();
+    }
 
-    public static void EndGame()
+    public static void EndGame(string message)
     {
         Console.WriteLine("\n========== GAME OVER ==========");
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine(@$"
         ****************************************************
         *                                                  *
-        *      CONGRATULATIONS,!         *
-        *                                                  *
-        *        YOU HAVE EMERGED VICTORIOUS!              *
+        *      {message}         *
         *                                                  *
         ****************************************************
 
@@ -133,7 +142,7 @@ public static class Menu
                    / \ 
             ---------------------
            /                     \
-          /    VICTORY IS YOURS!  \
+          /    {message}  \
          /_________________________\
         ");
         Console.ResetColor();
@@ -145,6 +154,7 @@ public static class Menu
             Thread.Sleep(1000);
         }
         Console.WriteLine();
+        ResetGame();
         PrintNavigationMenu();
     }
 }

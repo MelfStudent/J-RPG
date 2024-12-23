@@ -2,45 +2,32 @@
 
 using Services;
 
-public class Warrior : Character
+public class Priest : Character
 {
-    public Warrior(string name) : base(name, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50)
+    public Priest(string name) : base(name, 70, 0, 65, TypeOfArmor.Fabric, 10, 0, 20, 70, true, 100)
     {
         Skills.Add(new Skill(
-            "Heroic Strike",
-            "Physical attack that deals 100% of physical attack power to a target",
+            "Punishment",
+            "Magic attack that deals 75% of magic attack power to the target",
             1,
             TargetType.Enemy,
-            0,
+            15,
             ActionType.Damage,
-            50,
-            TypeDamage.Physical
+            (int)(65 * 0.75),
+            TypeDamage.Magic
         ));
-
+        
         Skills.Add(new Skill(
-            "Battle cry",
-            "Increases the physical attack power of all characters on the team by 25",
+            "Circle of care",
+            "Heals the entire team for 75% of magic attack power",
             2,
             TargetType.AllAllies,
-            0,
-            ActionType.Buff,
-            25,
-            TypeDamage.Null,
-            AffectedStat.PhysicalAttack
-        ));
-
-        Skills.Add(new Skill(
-            "Whirlwind",
-            "Physical attack that deals 33% of physical attack power to the entire enemy team",
-            2,
-            TargetType.AllEnemies,
-            0,
-            ActionType.Damage,
-            (int)(50 * 0.33),
-            TypeDamage.Physical
+            30,
+            ActionType.Heal,
+            (int)(65 * 0.75)
         ));
     }
-
+    
     protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         var result = new DefenseResult();
@@ -48,32 +35,15 @@ public class Warrior : Character
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
         
-        var defenseResult = base.Defend(attacker, typeOfAttack, attackPower);
-
-        if (typeOfAttack == TypeDamage.Physical)
-        {
-            if (defenseResult.IsParried || LuckTest(25))
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
-                Console.ResetColor();
-                
-                var counterAttackPower = defenseResult.IsParried
-                    ? (int)(defenseResult.DamageTaken * 1.50)
-                    : defenseResult.DamageTaken / 2;
-            
-                var counterAttack = new Attack("Counterattack", this, attacker, counterAttackPower, TypeDamage.Physical );
-                Tackle(counterAttack);
-            }
-        }
+        base.Defend(attacker, typeOfAttack, attackPower);
 
         return result;
     }
-
+    
     public override void ChoiceAction()
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
-        Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: WARRIOR)");
+        Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: PRIEST)");
         Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
         
         var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
