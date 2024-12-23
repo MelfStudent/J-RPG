@@ -1,4 +1,4 @@
-﻿{
+{
   "Warrior": {
     "MaxHitPoints": 100,
     "PhysicalAttackPower": 50,
@@ -7,7 +7,9 @@
     "DodgeChance": 5,
     "ParadeChance": 25,
     "ChanceSpellResistance": 10,
-    "Speed": 50
+    "Speed": 50,
+    "HasMana": false,
+    "ManaPoints": 0
   },
   "Mage": {
     "MaxHitPoints": 60,
@@ -41,7 +43,9 @@
     "DodgeChance": 15,
     "ParadeChance": 25,
     "ChanceSpellResistance": 25,
-    "Speed": 100
+    "Speed": 100,
+    "HasMana": false,
+    "ManaPoints": 0
   },
   "Priest": {
     "MaxHitPoints": 70,
