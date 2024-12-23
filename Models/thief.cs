@@ -6,7 +6,7 @@ public class Thief : Character
 {
     private int AttackReductionNumber { get; set; }
     
-    public Thief(string name) : base(name, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100)
+    public Thief(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed)
     {
         AttackReductionNumber = 0;
         
@@ -17,7 +17,7 @@ public class Thief : Character
             TargetType.Enemy,
             0,
             ActionType.Damage,
-            55,
+            physicalAttackPower,
             TypeDamage.Physical
         ));
         
