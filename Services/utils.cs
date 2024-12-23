@@ -113,7 +113,7 @@ public static class Utils
     {
         switch (chosenClass)
         {
-            case 1: return new Warrior(chosenName);
+            case 1: return new Warrior(chosenName, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50);
             case 2: return new Mage(chosenName);
             case 3: return new Paladin(chosenName);
             case 4: return new Thief(chosenName);
