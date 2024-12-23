@@ -4,7 +4,7 @@ using Services;
 
 public class Priest : Character
 {
-    public Priest(string name) : base(name, 70, 0, 65, TypeOfArmor.Fabric, 10, 0, 20, 70, true, 100)
+    public Priest(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     {
         Skills.Add(new Skill(
             "Punishment",
@@ -13,7 +13,7 @@ public class Priest : Character
             TargetType.Enemy,
             15,
             ActionType.Damage,
-            (int)(65 * 0.75),
+            (int)(magicAttackPower * 0.75),
             TypeDamage.Magic
         ));
         
@@ -24,7 +24,7 @@ public class Priest : Character
             TargetType.AllAllies,
             30,
             ActionType.Heal,
-            (int)(65 * 0.75)
+            (int)(magicAttackPower * 0.75)
         ));
     }
     
@@ -72,7 +72,7 @@ public class Priest : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:");
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
             }
             break;
         }

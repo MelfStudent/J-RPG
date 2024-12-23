@@ -81,7 +81,7 @@ public static class Utils
         return result;
     }
     
-    public static Character PromptTarget(string titled)
+    public static Character PromptTarget(string titled, Team team, Character actor)
     {
         int result;
         bool isPromptValid;
@@ -89,32 +89,35 @@ public static class Utils
         do
         {
             Console.WriteLine(titled);
-            for (var i = 1; i < Menu.TeamThatDefends.Members.Count+1; i++)
+            for (var i = 1; i <= team.Members.Count; i++)
             {
-                Console.Write($"{i} - {Menu.TeamThatDefends.Members[i-1].Name}\n");
+                if (!team.Members[i - 1].IsDead && team.Members[i - 1] != actor)
+                {
+                    Console.Write($"{i} - {team.Members[i - 1].Name}\n");
+                }
             }
 
             Console.Write("Choose: ");
-            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result < Menu.TeamThatDefends.Members.Count+1;
+            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result <= team.Members.Count && !team.Members[result - 1].IsDead && team.Members[result - 1] != actor;
 
             if (!isPromptValid)
             {
-                Console.WriteLine("Invalid entry, please try again");
+                Console.WriteLine("Invalid entry or the selected character is not alive. Please try again.");
             }
         } while (!isPromptValid);
 
-        return Menu.TeamThatDefends.Members[result-1]; 
+        return team.Members[result-1]; 
     }
     
     private static Character CreatePlayer(string chosenName, int chosenClass)
     {
         switch (chosenClass)
         {
-            case 1: return new Warrior(chosenName);
-            case 2: return new Mage(chosenName);
-            case 3: return new Paladin(chosenName);
-            case 4: return new Thief(chosenName);
-            case 5: return new Priest(chosenName);
+            case 1: return new Warrior(chosenName, 100, 50, 0, TypeOfArmor.Plates, 5, 25, 10, 50);
+            case 2: return new Mage(chosenName, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100);
+            case 3: return new Paladin(chosenName, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20, 75, true, 60);
+            case 4: return new Thief(chosenName, 80, 55, 0, TypeOfArmor.Leather, 15, 25, 25, 100);
+            case 5: return new Priest(chosenName, 70, 0, 65, TypeOfArmor.Fabric, 10, 0, 20, 70, true, 100);
             default: throw new ArgumentException("Invalid class choice");
         }
     }
@@ -127,13 +130,13 @@ public static class Utils
             ExecutionOfAttacks();
             Menu.SkillsTourCurrent = new List<SkillUsage>();
 
-            if (!IsTeamAlive(Menu.TeamThatAttacks))
+            if (Menu.Teams[0].NumberPeopleAlive() == 0)
             {
                 Menu.EndGame("Player 2 wins!");
                 break;
             }
 
-            if (!IsTeamAlive(Menu.TeamThatDefends))
+            if (Menu.Teams[1].NumberPeopleAlive() == 0)
             {
                 Menu.EndGame("Player 1 wins!");
                 break;
@@ -208,10 +211,5 @@ public static class Utils
                 character.ReduceCooldowns();
             }
         }
-    }
-    
-    private static bool IsTeamAlive(Team team)
-    {
-        return team.Members.Any(character => !character.IsDead);
     }
 }
