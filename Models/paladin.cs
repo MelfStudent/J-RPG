@@ -4,7 +4,7 @@ using Services;
 
 public class Paladin : Character
 {
-    public Paladin(string name) : base(name, 95, 40, 40, TypeOfArmor.Mesh, 5, 10, 20, 75, true, 60)
+    public Paladin(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     { 
         Skills.Add(new Skill(
             "Crusader Strike",
@@ -13,7 +13,7 @@ public class Paladin : Character
             TargetType.Enemy,
             5,
             ActionType.Damage,
-            40,
+            physicalAttackPower,
             TypeDamage.Physical
         ));
         
@@ -24,7 +24,7 @@ public class Paladin : Character
             TargetType.Enemy,
             10,
             ActionType.Damage,
-            40,
+            magicAttackPower,
             TypeDamage.Magic
         ));
         
@@ -35,7 +35,7 @@ public class Paladin : Character
             TargetType.Ally,
             25,
             ActionType.Heal,
-            (int)(40 * 1.25),
+            (int)(magicAttackPower * 1.25),
             TypeDamage.Magic
         ));
     }
