@@ -108,7 +108,7 @@ public class Mage : Character
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: MAGE)");
-        Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
+        Console.WriteLine(ToString());
         
         var skillDetails = Skills.Select(s => 
             $"{s.Name} - {s.Description}\n" +
@@ -116,7 +116,7 @@ public class Mage : Character
             $"  Mana Cost: {s.ManaCost}\n" +
             $"  Damage: {s.EffectPower}\n" +
             $"  Type: {s.TypeOfDamage}\n" +
-            $"  Target: {s.Target}"
+            $"  Target: {s.Target}\n"
         ).ToList();
         skillDetails.Add("Skip the turn");
 
@@ -151,5 +151,16 @@ public class Mage : Character
         Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
     }
     
-    
+    public override string ToString()
+    {
+        return $"HP: {CurrentHitPoints}/{MaxHitPoints} | " +
+               $"Physical Attack: {PhysicalAttackPower} | " +
+               $"Magic Attack: {MagicAttackPower} | " +
+               $"Armor: {Armor} | " +
+               $"Dodge: {DodgeChance}% | " +
+               $"Parade: {ParadeChance}% | " +
+               $"Spell Resistance: {ChanceSpellResistance}% | " +
+               $"Speed: {Speed} | " +
+               $"Mana: {CurrentMana}/{MaxMana}\n";
+    }
 }
