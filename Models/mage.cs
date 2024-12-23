@@ -7,7 +7,7 @@ public class Mage : Character
     public int AttackReductionNumber { get; set; }
     private bool IsSpellReturned = false;
     
-    public Mage(string name) : base(name, 60, 0, 75, TypeOfArmor.Fabric, 5, 5, 25, 75, true, 100)
+    public Mage(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     {
         AttackReductionNumber = 0;
 
@@ -18,7 +18,7 @@ public class Mage : Character
             TargetType.Enemy,
             15,
             ActionType.Damage,
-            75,
+            magicAttackPower,
             TypeDamage.Magic
         ));
         
@@ -39,7 +39,7 @@ public class Mage : Character
             TargetType.AllEnemies,
             25,
             ActionType.Damage,
-            75 / 2,
+            magicAttackPower / 2,
             TypeDamage.Magic
         ));
         
@@ -136,7 +136,7 @@ public class Mage : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:");
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
             }
             break;
         }
