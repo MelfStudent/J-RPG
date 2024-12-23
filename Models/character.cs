@@ -9,9 +9,9 @@ public abstract class Character
     public int MaxHitPoints { get; private set; }
     public int PhysicalAttackPower  { get; set; }
     public int MagicAttackPower  { get; set; }
-    private TypeOfArmor Armor { get; set; }
+    protected TypeOfArmor Armor { get; private set; }
     public int DodgeChance { get; set; }
-    private int ParadeChance { get; set; }
+    protected int ParadeChance { get; private set; }
     public int ChanceSpellResistance { get; set; }
     public int Speed { get; protected set; }
     public bool IsDead { get; private set; }
@@ -203,11 +203,6 @@ public abstract class Character
             $"Spell Resistance Chance: {ChanceSpellResistance}%\n" +
             $"Speed : {Speed}\n" +
             $"Armor Type: {Armor} (Resistance: {Menu.GetArmorPercentage(Armor)})\n";
-            if (GetType().GetProperty("ManaPoints") is not null)
-            {
-                var manaPoints = (int)GetType().GetProperty("ManaPoints")?.GetValue(this)!;
-                result += $"Mana Points: {manaPoints}\n";
-            }
         result += "----------------------------------------";
         
         return result;

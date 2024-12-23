@@ -44,19 +44,26 @@ public class Priest : Character
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: PRIEST)");
-        Console.WriteLine($"HP: {CurrentHitPoints}/{MaxHitPoints} | Physical Attack: {PhysicalAttackPower} | Magic Attack: {MagicAttackPower}");
+        Console.WriteLine(ToString());
         
-        var skillNames = Skills.Select(s => $"{s.Name} - {s.Description}").ToList();
-        skillNames.Add("Skip the turn");
+        var skillDetails = Skills.Select(s => 
+            $"{s.Name} - {s.Description}\n" +
+            $"  Cooldown: {s.CurrentCooldown}/{s.Cooldown}\n" +
+            $"  Mana Cost: {s.ManaCost}\n" +
+            $"  Damage: {s.EffectPower}\n" +
+            $"  Type: {s.TypeOfDamage}\n" +
+            $"  Target: {s.Target}\n"
+        ).ToList();
+        skillDetails.Add("Skip the turn");
 
         Skill skill = null;
         Character target = null;
 
         while (true)
         {
-            var skillChoice = Utils.PromptChoice(skillNames, "Enter a number corresponding to the desired action:");
+            var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
 
-            if (skillChoice == skillNames.Count)
+            if (skillChoice == skillDetails.Count)
             {
                 Console.WriteLine("You decided to skip the turn.");
                 break;
@@ -78,5 +85,18 @@ public class Priest : Character
         }
         
         Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
+    }
+    
+    public override string ToString()
+    {
+        return $"HP: {CurrentHitPoints}/{MaxHitPoints} | " +
+               $"Physical Attack: {PhysicalAttackPower} | " +
+               $"Magic Attack: {MagicAttackPower} | " +
+               $"Armor: {Armor} | " +
+               $"Dodge: {DodgeChance}% | " +
+               $"Parade: {ParadeChance}% | " +
+               $"Spell Resistance: {ChanceSpellResistance}% | " +
+               $"Speed: {Speed} | " +
+               $"Mana: {CurrentMana}/{MaxMana}\n";
     }
 }
