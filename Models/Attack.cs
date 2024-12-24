@@ -1,4 +1,6 @@
-﻿namespace J_RPG;
+﻿namespace J_RPG.Models;
+
+using Enums;
 
 public class Attack
 {
@@ -8,10 +10,7 @@ public class Attack
     public int Damage { get; set; }
     public TypeDamage TypeOfDamage { get; set; }
     
-    public enum TypeDamage { Physical, Magic }
-
-    public Attack(string name, Character attackingCharacter, Character targetCharacter, int damage,
-        TypeDamage typeOfDamage)
+    public Attack(string name, Character attackingCharacter, Character targetCharacter, int damage, TypeDamage typeOfDamage)
     {
         Name = name;
         AttackingCharacter = attackingCharacter;
