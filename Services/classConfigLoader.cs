@@ -5,19 +5,19 @@ using System.IO;
 
 public static class ClassConfigLoader
 {
-    private static Dictionary<string, ClassConfig> classConfigs;
+    private static Dictionary<string, ClassConfig> _classConfigs { get;}
 
     static ClassConfigLoader()
     {
         var basePath = AppDomain.CurrentDomain.BaseDirectory;
         var filePath = Path.Combine(basePath, "Resources", "classes.json");
         var json = File.ReadAllText(filePath);
-        classConfigs = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json);
+        _classConfigs = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json);
     }
 
     public static ClassConfig GetConfig(string className)
     {
-        if (classConfigs.TryGetValue(className, out var config))
+        if (_classConfigs.TryGetValue(className, out var config))
         {
             return config;
         }

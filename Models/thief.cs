@@ -4,12 +4,8 @@ using Services;
 
 public class Thief : Character
 {
-    private int AttackReductionNumber { get; set; }
-    
     public Thief(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed)
     {
-        AttackReductionNumber = 0;
-        
         Skills.Add(new Skill(
             "Low blow",
             "Physical attack that deals 100% of physical attack power to the target, or 150% if the target has less than half of his life points",
