@@ -3,26 +3,106 @@
 using Services;
 using Enums;
 
+/// <summary>
+/// Abstract class representing a character in the game.
+/// Manages health points, attack power, defense, skills, and mana.
+/// </summary>
 public abstract class Character
 {
+    /// <summary>
+    /// Name of the character.
+    /// </summary>
     public string Name { get; protected set; }
+
+    /// <summary>
+    /// Current hit points of the character.
+    /// </summary>
     public int CurrentHitPoints { get; private set; }
+
+    /// <summary>
+    /// Maximum hit points of the character.
+    /// </summary>
     public int MaxHitPoints { get; private set; }
-    public int PhysicalAttackPower  { get; set; }
-    public int MagicAttackPower  { get; set; }
+
+    /// <summary>
+    /// Physical attack power of the character.
+    /// </summary>
+    public int PhysicalAttackPower { get; set; }
+
+    /// <summary>
+    /// Magic attack power of the character.
+    /// </summary>
+    public int MagicAttackPower { get; set; }
+
+    /// <summary>
+    /// Type of armor equipped by the character.
+    /// </summary>
     protected TypeOfArmor Armor { get; private set; }
+
+    /// <summary>
+    /// Chance to dodge an attack.
+    /// </summary>
     public int DodgeChance { get; set; }
+
+    /// <summary>
+    /// Chance to parry an attack.
+    /// </summary>
     protected int ParadeChance { get; private set; }
+
+    /// <summary>
+    /// Chance to resist a magical attack.
+    /// </summary>
     public int ChanceSpellResistance { get; set; }
+
+    /// <summary>
+    /// Speed of the character, used to determine action order.
+    /// </summary>
     public int Speed { get; private set; }
+
+    /// <summary>
+    /// Indicates whether the character is dead.
+    /// </summary>
     public bool IsDead { get; private set; }
+
+    /// <summary>
+    /// List of skills the character has.
+    /// </summary>
     protected List<Skill> Skills { get; set; } = new List<Skill>();
+
+    /// <summary>
+    /// Indicates if the character uses mana.
+    /// </summary>
     public bool UsesMana { get; private set; }
+
+    /// <summary>
+    /// Current mana of the character.
+    /// </summary>
     public int CurrentMana { get; set; }
+
+    /// <summary>
+    /// Maximum mana of the character.
+    /// </summary>
     public int MaxMana { get; private set; }
-    
+
+    /// <summary>
+    /// Random instance used for luck tests.
+    /// </summary>
     private Random _rand { get; set; } = new Random();
-    
+
+    /// <summary>
+    /// Constructor to initialize a character.
+    /// </summary>
+    /// <param name="name">The character's name.</param>
+    /// <param name="maxHitPoints">The character's maximum hit points.</param>
+    /// <param name="physicalAttackPower">The character's physical attack power.</param>
+    /// <param name="magicAttackPower">The character's magic attack power.</param>
+    /// <param name="armor">The type of armor equipped by the character.</param>
+    /// <param name="dodgeChance">Chance to dodge an attack.</param>
+    /// <param name="paradeChance">Chance to parry an attack.</param>
+    /// <param name="chanceSpellResistance">Chance to resist a magical attack.</param>
+    /// <param name="speed">The character's speed.</param>
+    /// <param name="usesMana">Indicates whether the character uses mana.</param>
+    /// <param name="maxMana">The maximum mana for the character, if applicable.</param>
     protected Character(string name, int maxHitPoints, int physicalAttackPower,
                         int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana = false, int maxMana = 0)
     {
@@ -54,6 +134,12 @@ public abstract class Character
         }
     }
 
+    /// <summary>
+    /// Executes an attack from one character to another.
+    /// </summary>
+    /// <param name="attack">The attack to execute.</param>
+    /// <exception cref="ArgumentNullException">Thrown if the attack or any character is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if either the attacking or target character is not specified.</exception>
     public static void Tackle(Attack attack)
     {
         if (attack == null)
@@ -81,6 +167,15 @@ public abstract class Character
         }
     }
 
+    /// <summary>
+    /// Defends the character against an attack.
+    /// </summary>
+    /// <param name="attacker">The character attacking.</param>
+    /// <param name="typeOfAttack">The type of the attack (physical or magical).</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <returns>A <see cref="DefenseResult"/> object representing the defense result.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the attacker is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the attack power is negative.</exception>
     protected virtual DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         if (attacker == null)
@@ -145,6 +240,11 @@ public abstract class Character
         return result;
     }
 
+    /// <summary>
+    /// Restores health points to the character.
+    /// </summary>
+    /// <param name="extraLife">The amount of health to restore.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if extra life is negative.</exception>
     public void RestoreHealth(int extraLife)
     {
         if (extraLife < 0)
@@ -160,6 +260,13 @@ public abstract class Character
         CurrentHitPoints = MaxHitPoints;
         Console.WriteLine($"{Name} has regenerated life. It now has {CurrentHitPoints} hp");
     }
+
+    /// <summary>
+    /// Performs a luck test to determine the success based on a given probability.
+    /// </summary>
+    /// <param name="successProbabilityPercentage">The probability of success in percentage.</param>
+    /// <returns>True if the luck test is successful, otherwise false.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the probability is not between 0 and 100.</exception>
 
     protected bool PerformLuckTest(int successProbabilityPercentage)
     {
@@ -186,6 +293,11 @@ public abstract class Character
         return false;
     }
     
+    /// <summary>
+    /// Shuffles an array of integers.
+    /// </summary>
+    /// <param name="values">Array of values to shuffle.</param>
+    /// <returns>A shuffled array of integers.</returns>
     private int[] Shuffle(int[] values)
     {
         for (var i = values.Length - 1; i > 0; i--) {
@@ -196,6 +308,14 @@ public abstract class Character
         return values;
     }
 
+    /// <summary>
+    /// Calculates the damage reduction based on the character's armor and the attack type.
+    /// </summary>
+    /// <param name="armor">The armor of the character.</param>
+    /// <param name="typeOfAttack">The type of attack (physical or magical).</param>
+    /// <param name="damageReceived">The damage received before armor reduction.</param>
+    /// <returns>The damage after applying armor resistance.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the damage received is negative.</exception>
     private static int GetArmorResistance(TypeOfArmor armor, TypeDamage typeOfAttack ,int damageReceived)
     {
         if (damageReceived < 0)
@@ -223,8 +343,16 @@ public abstract class Character
         return (int)(damageReceived * reductionFactor);
     }
 
+    /// <summary>
+    /// Abstract method for selecting an action for the character.
+    /// </summary>
+    /// <returns>The selected action.</returns>
     public abstract void ChoiceAction();
 
+    /// <summary>
+    /// Returns a string representation of the character, including key attributes such as name, health points, attack power, and armor.
+    /// </summary>
+    /// <returns>A formatted string with the character's details.</returns>
     public override string ToString()
     {
         try
@@ -251,6 +379,10 @@ public abstract class Character
         }
     }
     
+    /// <summary>
+    /// Reduces the cooldown of all skills the character possesses.
+    /// This method iterates through each skill and attempts to reduce its cooldown.
+    /// </summary>
     public void ReduceCooldowns()
     {
         foreach (var skill in Skills)
@@ -266,6 +398,13 @@ public abstract class Character
         }
     }
 
+    /// <summary>
+    /// Uses a specified amount of mana for a skill. 
+    /// Throws an exception if the character does not have enough mana.
+    /// </summary>
+    /// <param name="skillCost">The amount of mana required to use the skill.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the skill cost is negative.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when there is not enough mana to use the skill.</exception>
     public void UseMana(int skillCost)
     {
         if (skillCost < 0)
