@@ -106,8 +106,10 @@ public static class Menu
         Utils.StartGame();
     }
     
-    private static void DisplayCharacterStats(List<Character> characters, string playerName)
+    private static void DisplayCharacterStats(List<Character>? characters, string playerName)
     {
+        if (characters == null) return;
+        
         foreach (var character in characters)
         {
             Console.WriteLine($"{playerName}: {character.Name} ({character.GetType().Name})");
