@@ -7,7 +7,8 @@ using Models;
 
 public static class Utils
 {
-    private static HashSet<string> UsedNames { get; } = new();
+    public static HashSet<string> UsedNames { get; } = new();
+    public static int TeamSize { get; set; } = 3;
     
     public static int PromptChoice(List<string> options, string titled)
     {
@@ -67,10 +68,10 @@ public static class Utils
     public static List<Character> PromptTeam(string titled)
     {
         var result = new List<Character>();
-        List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief\n" };
+        List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief", "Priest\n" };
 
         Console.WriteLine(titled);
-        for (var i = 1; i < 2; i++)
+        for (var i = 1; i <= TeamSize; i++)
         {
             var choiceCharacterName = PromptName($"\nEnter the character name n°{i} :");
             Console.Write($"\nChoose a class for the player {i}: \n");
@@ -81,7 +82,7 @@ public static class Utils
         return result;
     }
     
-    public static Character PromptTarget(string titled)
+    public static Character PromptTarget(string titled, Team team, Character actor)
     {
         int result;
         bool isPromptValid;
@@ -89,31 +90,106 @@ public static class Utils
         do
         {
             Console.WriteLine(titled);
-            for (var i = 1; i < Menu.TeamThatDefends.Members.Count+1; i++)
+            for (var i = 1; i <= team.Members.Count; i++)
             {
-                Console.Write($"{i} - {Menu.TeamThatDefends.Members[i-1].Name}\n");
+                if (!team.Members[i - 1].IsDead && team.Members[i - 1] != actor)
+                {
+                    Console.Write($"{i} - {team.Members[i - 1].Name}\n");
+                }
             }
 
             Console.Write("Choose: ");
-            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result < Menu.TeamThatDefends.Members.Count+1;
+            isPromptValid = int.TryParse(Console.ReadLine(), out result) && result >= 1 && result <= team.Members.Count && !team.Members[result - 1].IsDead && team.Members[result - 1] != actor;
 
             if (!isPromptValid)
             {
-                Console.WriteLine("Invalid entry, please try again");
+                Console.WriteLine("Invalid entry or the selected character is not alive. Please try again.");
             }
         } while (!isPromptValid);
 
-        return Menu.TeamThatDefends.Members[result-1]; 
+        return team.Members[result-1]; 
     }
     
     private static Character CreatePlayer(string chosenName, int chosenClass)
     {
         switch (chosenClass)
         {
-            case 1: return new Warrior(chosenName);
-            case 2: return new Mage(chosenName, 100);
-            case 3: return new Paladin(chosenName, 60);
-            case 4: return new Thief(chosenName);
+            case 1:
+                var warriorConfig = ClassConfigLoader.GetConfig("Warrior");
+                return new Warrior(
+                    chosenName,
+                    warriorConfig.MaxHitPoints,
+                    warriorConfig.PhysicalAttackPower,
+                    warriorConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(warriorConfig.Armor),
+                    warriorConfig.DodgeChance,
+                    warriorConfig.ParadeChance,
+                    warriorConfig.ChanceSpellResistance,
+                    warriorConfig.Speed
+                );
+            
+            case 2:
+                var mageConfig = ClassConfigLoader.GetConfig("Mage");
+                return new Mage(
+                    chosenName,
+                    mageConfig.MaxHitPoints,
+                    mageConfig.PhysicalAttackPower,
+                    mageConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(mageConfig.Armor),
+                    mageConfig.DodgeChance,
+                    mageConfig.ParadeChance,
+                    mageConfig.ChanceSpellResistance,
+                    mageConfig.Speed,
+                    mageConfig.HasMana,
+                    mageConfig.ManaPoints
+                );
+            
+            case 3:
+                var paladinConfig = ClassConfigLoader.GetConfig("Paladin");
+                return new Paladin(
+                    chosenName,
+                    paladinConfig.MaxHitPoints,
+                    paladinConfig.PhysicalAttackPower,
+                    paladinConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(paladinConfig.Armor),
+                    paladinConfig.DodgeChance,
+                    paladinConfig.ParadeChance,
+                    paladinConfig.ChanceSpellResistance,
+                    paladinConfig.Speed,
+                    paladinConfig.HasMana,
+                    paladinConfig.ManaPoints
+                );
+            
+            case 4:
+                var thiefConfig = ClassConfigLoader.GetConfig("Thief");
+                return new Thief(
+                    chosenName,
+                    thiefConfig.MaxHitPoints,
+                    thiefConfig.PhysicalAttackPower,
+                    thiefConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(thiefConfig.Armor),
+                    thiefConfig.DodgeChance,
+                    thiefConfig.ParadeChance,
+                    thiefConfig.ChanceSpellResistance,
+                    thiefConfig.Speed
+                );
+            
+            case 5:
+                var priestConfig = ClassConfigLoader.GetConfig("Priest");
+                return new Priest(
+                    chosenName,
+                    priestConfig.MaxHitPoints,
+                    priestConfig.PhysicalAttackPower,
+                    priestConfig.MagicAttackPower,
+                    Enum.Parse<TypeOfArmor>(priestConfig.Armor),
+                    priestConfig.DodgeChance,
+                    priestConfig.ParadeChance,
+                    priestConfig.ChanceSpellResistance,
+                    priestConfig.Speed,
+                    priestConfig.HasMana,
+                    priestConfig.ManaPoints
+                );
+            
             default: throw new ArgumentException("Invalid class choice");
         }
     }
@@ -125,9 +201,19 @@ public static class Utils
             ChoiceActions();
             ExecutionOfAttacks();
             Menu.SkillsTourCurrent = new List<SkillUsage>();
-        }
 
-        Menu.EndGame();
+            if (Menu.Teams[0].NumberPeopleAlive() == 0)
+            {
+                Menu.EndGame("Player 2 wins!");
+                break;
+            }
+
+            if (Menu.Teams[1].NumberPeopleAlive() == 0)
+            {
+                Menu.EndGame("Player 1 wins!");
+                break;
+            }
+        }
     }
 
     private static void ChoiceActions()
@@ -162,6 +248,10 @@ public static class Utils
             if (skill != null)
             {
                 skill.UseSkill(player, skillUsage.Target);   
+                if (player.UsesMana && player.CurrentMana < skill.ManaCost) 
+                {
+                    Console.WriteLine($"{player.Name} failed to cast {skill.Name} due to insufficient mana and passes their turn!");
+                }
             }
             else
             {
