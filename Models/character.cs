@@ -13,14 +13,14 @@ public abstract class Character
     public int DodgeChance { get; set; }
     protected int ParadeChance { get; private set; }
     public int ChanceSpellResistance { get; set; }
-    public int Speed { get; protected set; }
+    public int Speed { get; private set; }
     public bool IsDead { get; private set; }
     protected List<Skill> Skills { get; set; } = new List<Skill>();
     public bool UsesMana { get; private set; }
     public int CurrentMana { get; set; }
     public int MaxMana { get; private set; }
     
-    private Random Rand { get; set; } = new Random();
+    private Random _rand { get; set; } = new Random();
     
     protected Character(string name, int maxHitPoints, int physicalAttackPower,
                         int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana = false, int maxMana = 0)
@@ -133,7 +133,7 @@ public abstract class Character
 
     protected bool LuckTest(int percentage)
     {
-        var toFind = Rand.Next(1, 100);
+        var toFind = _rand.Next(1, 100);
         var test1 = new int[100];
         for (var i = 1; i < test1.Length; i++)
         {
@@ -156,7 +156,7 @@ public abstract class Character
     private int[] Shuffle(int[] values)
     {
         for (var i = values.Length - 1; i > 0; i--) {
-            var k = Rand.Next(i + 1);
+            var k = _rand.Next(i + 1);
             (values[k], values[i]) = (values[i], values[k]);
         }
 

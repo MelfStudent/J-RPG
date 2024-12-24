@@ -5,7 +5,7 @@ using Services;
 public class Mage : Character
 {
     public int AttackReductionNumber { get; set; }
-    private bool IsSpellReturned = false;
+    private bool _isSpellReturned = false;
     
     public Mage(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     {
@@ -71,7 +71,7 @@ public class Mage : Character
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
-        if (IsSpellReturned && typeOfAttack == TypeDamage.Magic)
+        if (_isSpellReturned && typeOfAttack == TypeDamage.Magic)
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"{Name} returns the magic attack to {attacker.Name} !");
@@ -80,7 +80,7 @@ public class Mage : Character
             var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
             Tackle(damageAttack);
 
-            IsSpellReturned = false;
+            _isSpellReturned = false;
             return result;
         } 
         if (AttackReductionNumber > 0)

@@ -7,13 +7,13 @@ public class Skill
     public string Name { get; set; }
     public string Description { get; set; }
     public int Cooldown { get; private set; }
-    public int CurrentCooldown { get; set; }
+    public int CurrentCooldown { get; private set; }
     public TargetType Target { get; private set; }
     public int ManaCost { get; private set; }
-    private ActionType SkillAction { get; set; }
+    private ActionType _skillAction { get; set; }
     public int EffectPower { get; private set; }
     public TypeDamage TypeOfDamage { get; private set; }
-    private AffectedStat TargetStat { get; set; }
+    private AffectedStat _targetStat { get; set; }
 
     public Skill(string name, string description, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
     {
@@ -23,10 +23,10 @@ public class Skill
         CurrentCooldown = 0;
         Target = target;
         ManaCost = manaCost;
-        SkillAction = actionType;
+        _skillAction = actionType;
         EffectPower = effectPower;
         TypeOfDamage = typeOfDamage;
-        TargetStat = targetStat;
+        _targetStat = targetStat;
     }
 
     public void UseSkill(Character user, Character target = null)
@@ -74,7 +74,7 @@ public class Skill
 
     private void ExecuteEffect(Character user, Character target)
     {
-        switch (SkillAction)
+        switch (_skillAction)
         {
             case ActionType.Damage:
                     var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
@@ -138,7 +138,7 @@ public class Skill
                 }
                 else
                 {
-                    switch (TargetStat)
+                    switch (_targetStat)
                     {
                         case AffectedStat.PhysicalAttack:
                             Console.WriteLine($"{target.Name}'s physical attack increases by {EffectPower} due to {Name}!");
@@ -191,6 +191,6 @@ public class Skill
 
     public override string ToString()
     {
-        return $"{Name} (Cost: {ManaCost} Mana, Cooldown: {Cooldown} turns, Effect: {SkillAction}, Power: {EffectPower})";
+        return $"{Name} (Cost: {ManaCost} Mana, Cooldown: {Cooldown} turns, Effect: {_skillAction}, Power: {EffectPower})";
     }
 }
