@@ -108,7 +108,7 @@ public class Skill
                         Console.WriteLine("- Physical damage reduced by 60%");
                         Console.WriteLine("- Magical damage reduced by 50%");
                         Console.ResetColor();
-                        mage.AttackReductionNumber = 2;
+                        mage.RemainingDamageReductions = 2;
                         Console.WriteLine("===================================\n");
                     }
                 } else if (Name == "Escape")

@@ -5,12 +5,12 @@ using Enums;
 
 public class Mage : Character
 {
-    public int AttackReductionNumber { get; set; }
-    private bool _isSpellReturned = false;
+    public int RemainingDamageReductions { get; set; }
+    private bool _isSpellBeingReturned = false;
     
     public Mage(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     {
-        AttackReductionNumber = 0;
+        RemainingDamageReductions = 0;
 
         Skills.Add(new Skill(
             "Frost bolt",
@@ -72,7 +72,7 @@ public class Mage : Character
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
-        if (_isSpellReturned && typeOfAttack == TypeDamage.Magic)
+        if (_isSpellBeingReturned && typeOfAttack == TypeDamage.Magic)
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"{Name} returns the magic attack to {attacker.Name} !");
@@ -81,10 +81,10 @@ public class Mage : Character
             var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
             Tackle(damageAttack);
 
-            _isSpellReturned = false;
+            _isSpellBeingReturned = false;
             return result;
         } 
-        if (AttackReductionNumber > 0)
+        if (RemainingDamageReductions > 0)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{Name} is protected by FROST BARRIER!");
@@ -97,7 +97,7 @@ public class Mage : Character
                 _ => attackPower
             };
 
-            AttackReductionNumber--;
+            RemainingDamageReductions--;
         }
         
         base.Defend(attacker, typeOfAttack, attackPower);
