@@ -9,10 +9,27 @@ public static class ClassConfigLoader
 
     static ClassConfigLoader()
     {
-        var basePath = AppDomain.CurrentDomain.BaseDirectory;
-        var filePath = Path.Combine(basePath, "Resources", "classes.json");
-        var json = File.ReadAllText(filePath);
-        _classConfigs = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json)!;
+        try
+        {
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
+            var filePath = Path.Combine(basePath, "Resources", "classes.json");
+            
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Configuration file not found at path: {filePath}");
+            }
+            
+            var json = File.ReadAllText(filePath);
+            _classConfigs = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json)
+                            ?? throw new InvalidDataException("Failed to deserialize class configurations. The JSON may be malformed or empty.");
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Error during ClassConfigLoader initialization: {ex.Message}");
+            Console.ResetColor();
+            throw;
+        }
     }
 
     public static ClassConfig GetConfig(string className)
@@ -21,6 +38,7 @@ public static class ClassConfigLoader
         {
             return config;
         }
+        
         throw new Exception($"Class configuration for {className} not found.");
     }
 }

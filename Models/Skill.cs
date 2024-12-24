@@ -49,28 +49,50 @@ public class Skill
             user.UseMana(ManaCost);
         }
 
-        if (Target == TargetType.Self)
+        try
         {
-            ExecuteEffect(user, user);
-        }
-        else if (Target == TargetType.Enemy || Target == TargetType.Ally)
-        {
-            ExecuteEffect(user, target);
-        } else if (Target == TargetType.AllEnemies)
-        {
-            foreach (var _target in Menu.TeamThatDefends!.Members)
+            switch (Target)
             {
-                ExecuteEffect(user, _target);
+                case TargetType.Self:
+                    ExecuteEffect(user, user);
+                    break;
+
+                case TargetType.Enemy:
+                case TargetType.Ally:
+                    if (target == null)
+                    {
+                        throw new ArgumentNullException(nameof(target), $"Target cannot be null for skill {Name}.");
+                    }
+                    ExecuteEffect(user, target);
+                    break;
+
+                case TargetType.AllEnemies:
+                    foreach (var enemy in Menu.TeamThatDefends!.Members)
+                    {
+                        ExecuteEffect(user, enemy);
+                    }
+                    break;
+
+                case TargetType.AllAllies:
+                    foreach (var ally in Menu.TeamThatAttacks!.Members)
+                    {
+                        ExecuteEffect(user, ally);
+                    }
+                    break;
+
+                default:
+                    Console.WriteLine($"Skill {Name} has an unhandled target type.");
+                    break;
             }
-            
-        } else if (Target == TargetType.AllAllies)
-        {
-            foreach (var _target in Menu.TeamThatAttacks!.Members)
-            {
-                ExecuteEffect(user, _target);
-            }
+
+            CurrentCooldown = Cooldown;
         }
-        CurrentCooldown = Cooldown;
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"An error occurred while using skill {Name}: {ex.Message}");
+            Console.ResetColor();
+        }
     }
 
     private void ExecuteEffect(Character user, Character target)
