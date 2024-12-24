@@ -72,35 +72,44 @@ public class Mage : Character
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
-        if (_isSpellBeingReturned && typeOfAttack == TypeDamage.Magic)
+        try
         {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine($"{Name} returns the magic attack to {attacker.Name} !");
-            Console.ResetColor();
-
-            var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
-            Tackle(damageAttack);
-
-            _isSpellBeingReturned = false;
-            return result;
-        } 
-        if (RemainingDamageReductions > 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"{Name} is protected by FROST BARRIER!");
-            Console.ResetColor();
-            
-            attackPower = typeOfAttack switch
+            if (_isSpellBeingReturned && typeOfAttack == TypeDamage.Magic)
             {
-                TypeDamage.Physical => (int)(attackPower * 0.40),
-                TypeDamage.Magic => (int)(attackPower * 0.50),
-                _ => attackPower
-            };
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine($"{Name} returns the magic attack to {attacker.Name} !");
+                Console.ResetColor();
 
-            RemainingDamageReductions--;
+                var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
+                Tackle(damageAttack);
+
+                _isSpellBeingReturned = false;
+                return result;
+            } 
+            if (RemainingDamageReductions > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"{Name} is protected by FROST BARRIER!");
+                Console.ResetColor();
+                
+                attackPower = typeOfAttack switch
+                {
+                    TypeDamage.Physical => (int)(attackPower * 0.40),
+                    TypeDamage.Magic => (int)(attackPower * 0.50),
+                    _ => attackPower
+                };
+
+                RemainingDamageReductions--;
+            }
+            
+            base.Defend(attacker, typeOfAttack, attackPower);
         }
-        
-        base.Defend(attacker, typeOfAttack, attackPower);
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"An error occurred during the defense phase: {ex.Message}");
+            Console.ResetColor();
+        }
 
         return result;
     }
@@ -126,42 +135,64 @@ public class Mage : Character
 
         while (true)
         {
-            var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
-
-            if (skillChoice == skillDetails.Count)
+            try
             {
-                Console.WriteLine("You decided to skip the turn.");
+                var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
+
+                if (skillChoice == skillDetails.Count)
+                {
+                    Console.WriteLine("You decided to skip the turn.");
+                    break;
+                }
+                
+                skill = Skills[skillChoice - 1]; 
+                
+                if (skill.CurrentCooldown != 0)
+                {
+                    Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
+                    continue;
+                }
+                
+                if (skill.Target == TargetType.Enemy)
+                {
+                    target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
+                }
                 break;
             }
-            
-            skill = Skills[skillChoice - 1]; 
-            
-            if (skill.CurrentCooldown != 0)
+            catch (Exception ex)
             {
-                Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
-                continue;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"An error occurred during action selection: {ex.Message}");
+                Console.ResetColor();
             }
-            
-            if (skill.Target == TargetType.Enemy)
-            {
-                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
-            }
-            break;
         }
         
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
+        if (skill != null)
+        {
+            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
+        }
     }
     
     public override string ToString()
     {
-        return $"HP: {CurrentHitPoints}/{MaxHitPoints} | " +
-               $"Physical Attack: {PhysicalAttackPower} | " +
-               $"Magic Attack: {MagicAttackPower} | " +
-               $"Armor: {Armor} | " +
-               $"Dodge: {DodgeChance}% | " +
-               $"Parade: {ParadeChance}% | " +
-               $"Spell Resistance: {ChanceSpellResistance}% | " +
-               $"Speed: {Speed} | " +
-               $"Mana: {CurrentMana}/{MaxMana}\n";
+        try
+        {
+            return $"HP: {CurrentHitPoints}/{MaxHitPoints} | " +
+                   $"Physical Attack: {PhysicalAttackPower} | " +
+                   $"Magic Attack: {MagicAttackPower} | " +
+                   $"Armor: {Armor} | " +
+                   $"Dodge: {DodgeChance}% | " +
+                   $"Parade: {ParadeChance}% | " +
+                   $"Spell Resistance: {ChanceSpellResistance}% | " +
+                   $"Speed: {Speed} | " +
+                   $"Mana: {CurrentMana}/{MaxMana}\n";
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"An error occurred while generating the character summary: {ex.Message}");
+            Console.ResetColor();
+            return string.Empty;
+        }
     }
 }
