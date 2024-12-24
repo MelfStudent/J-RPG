@@ -3,8 +3,25 @@
 using Services;
 using Enums;
 
+/// <summary>
+/// Represents a Thief character in the game. The Thief is a special type of character with unique skills such as "Low Blow" and "Escape".
+/// It inherits from the <see cref="Character"/> class and overrides some methods for specialized behavior.
+/// </summary>
 public class Thief : Character
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Thief"/> class with specified attributes.
+    /// The Thief starts with unique skills such as "Low Blow" and "Escape".
+    /// </summary>
+    /// <param name="name">The name of the Thief.</param>
+    /// <param name="maxHitPoints">The maximum hit points of the Thief.</param>
+    /// <param name="physicalAttackPower">The physical attack power of the Thief.</param>
+    /// <param name="magicAttackPower">The magic attack power of the Thief.</param>
+    /// <param name="armor">The armor type of the Thief.</param>
+    /// <param name="dodgeChance">The dodge chance of the Thief.</param>
+    /// <param name="paradeChance">The parade chance of the Thief.</param>
+    /// <param name="chanceSpellResistance">The spell resistance chance of the Thief.</param>
+    /// <param name="speed">The speed of the Thief.</param>
     public Thief(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed)
     {
         Skills.Add(new Skill(
@@ -30,6 +47,13 @@ public class Thief : Character
         ));
     }
     
+    /// <summary>
+    /// Handles the defense phase for the Thief. If the Thief dodges an attack, it performs a counterattack.
+    /// </summary>
+    /// <param name="attacker">The character attacking the Thief.</param>
+    /// <param name="typeOfAttack">The type of attack being made (physical, magical, etc.).</param>
+    /// <param name="attackPower">The power of the attack being made.</param>
+    /// <returns>A <see cref="DefenseResult"/> containing the outcome of the defense.</returns>
     protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         var result = new DefenseResult();
@@ -57,6 +81,10 @@ public class Thief : Character
         return result;
     }
 
+    /// <summary>
+    /// Prompts the user to choose an action for the Thief during the player's turn.
+    /// Displays available skills, handles cooldowns, and allows the selection of a target.
+    /// </summary>
     public override void ChoiceAction()
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
@@ -113,6 +141,10 @@ public class Thief : Character
         Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
     }
     
+    /// <summary>
+    /// Returns a string representation of the Thief, displaying its current stats.
+    /// </summary>
+    /// <returns>A string representing the Thief's current stats, including health, attack power, armor, and more.</returns>
     public override string ToString()
     {
         try
