@@ -6,15 +6,45 @@ using System.IO;
 using Models;
 using Enums;
 
+/// <summary>
+/// A static class responsible for handling various game menu interactions, such as displaying the main menu, 
+/// character creation, and editing character configurations. This class also manages teams and game flow.
+/// </summary>
 public static class Menu
 {
+    /// <summary>
+    /// List of characters for Player 1.
+    /// </summary>
     public static List<Character>? Player1 { get; private set; }
+
+    /// <summary>
+    /// List of characters for Player 2.
+    /// </summary>
     public static List<Character>? Player2 { get; private set; }
+
+    /// <summary>
+    /// List of skills used during the current turn.
+    /// </summary>
     public static List<SkillUsage> SkillsTourCurrent { get; set; } = new List<SkillUsage>();
+
+    /// <summary>
+    /// The team that is currently attacking.
+    /// </summary>
     public static Team? TeamThatAttacks { get; set; }
+
+    /// <summary>
+    /// The team that is currently defending.
+    /// </summary>
     public static Team? TeamThatDefends { get; set; }
+
+    /// <summary>
+    /// List of teams in the game.
+    /// </summary>
     public static List<Team> Teams { get; set; } = new List<Team>();
-    
+
+    /// <summary>
+    /// Prints the game's launch screen with an ASCII art.
+    /// </summary>
     public static void PrintGameLaunch()
     {
         Console.Clear();
@@ -39,6 +69,9 @@ public static class Menu
         Console.ResetColor();
     }
 
+    /// <summary>
+    /// Displays the main navigation menu and prompts the user to choose an option.
+    /// </summary>
     public static void PrintNavigationMenu()
     {
         while (true)
@@ -65,6 +98,9 @@ public static class Menu
         }
     }
     
+    /// <summary>
+    /// Displays the character creation menu, allowing players to choose characters for their teams.
+    /// </summary>
     private static void PrintClassChoiceMenu()
     {
         Console.WriteLine("\n========== CHARACTER CREATION ==========");
@@ -106,6 +142,9 @@ public static class Menu
         Utils.StartGame();
     }
     
+    /// <summary>
+    /// Displays the stats of the characters in a given team.
+    /// </summary>
     private static void DisplayCharacterStats(List<Character>? characters, string playerName)
     {
         if (characters == null) return;
@@ -117,6 +156,9 @@ public static class Menu
         }
     }
     
+    /// <summary>
+    /// Returns the armor resistance percentage based on the type of armor.
+    /// </summary>
     public static string GetArmorPercentage(TypeOfArmor armor)
     {
         return armor switch
@@ -129,6 +171,9 @@ public static class Menu
         };
     }
     
+    /// <summary>
+    /// Resets the game state (e.g., clearing players, teams, skills).
+    /// </summary>
     private static void ResetGame()
     {
         Player1 = null;
@@ -140,6 +185,9 @@ public static class Menu
         Utils.UsedNames.Clear();
     }
 
+    /// <summary>
+    /// Ends the game and displays a game-over message. After a delay, the main menu is displayed again.
+    /// </summary>
     public static void EndGame(string message)
     {
         Console.WriteLine("\n========== GAME OVER ==========");
@@ -172,6 +220,10 @@ public static class Menu
         PrintNavigationMenu();
     }
     
+    /// <summary>
+    /// Allows the player to edit the configuration of characters by modifying attributes such as hit points, armor, etc.
+    /// The changes are saved back to the `classes.json` file.
+    /// </summary>
     private static void EditConfig()
     {
         var basePath = AppDomain.CurrentDomain.BaseDirectory;
