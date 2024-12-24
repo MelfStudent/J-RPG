@@ -133,18 +133,18 @@ public abstract class Character
 
     protected bool LuckTest(int percentage)
     {
-        var toFind = _rand.Next(1, 100);
-        var test1 = new int[100];
-        for (var i = 1; i < test1.Length; i++)
+        var targetNumber = _rand.Next(1, 100);
+        var shuffledNumbers = new int[100];
+        for (var i = 1; i < shuffledNumbers.Length; i++)
         {
-            test1[i-1] = i;
+            shuffledNumbers[i-1] = i;
         }
 
-        test1 = Shuffle(test1);
+        shuffledNumbers = Shuffle(shuffledNumbers);
             
         for (var j = 0; j < percentage; j++)
         {
-            if (test1[j] == toFind)
+            if (shuffledNumbers[j] == targetNumber)
             {
                 return true;
             }
