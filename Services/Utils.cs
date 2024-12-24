@@ -13,7 +13,7 @@ public static class Utils
     private static int _teamSize { get; set; } = 3;
     
     public static int PromptChoice(List<string> options, string titled)
-    {
+    {   
         int result;
         bool isPromptValid;
 
@@ -114,86 +114,19 @@ public static class Utils
     
     private static Character CreatePlayer(string chosenName, int chosenClass)
     {
-        switch (chosenClass)
+        var classNames = new[] { "Warrior", "Mage", "Paladin", "Thief", "Priest" };
+        var className = classNames[chosenClass - 1];
+        var config = ClassConfigLoader.GetConfig(className);
+
+        return chosenClass switch
         {
-            case 1:
-                var warriorConfig = ClassConfigLoader.GetConfig("Warrior");
-                return new Warrior(
-                    chosenName,
-                    warriorConfig.MaxHitPoints,
-                    warriorConfig.PhysicalAttackPower,
-                    warriorConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(warriorConfig.Armor!),
-                    warriorConfig.DodgeChance,
-                    warriorConfig.ParadeChance,
-                    warriorConfig.ChanceSpellResistance,
-                    warriorConfig.Speed
-                );
-            
-            case 2:
-                var mageConfig = ClassConfigLoader.GetConfig("Mage");
-                return new Mage(
-                    chosenName,
-                    mageConfig.MaxHitPoints,
-                    mageConfig.PhysicalAttackPower,
-                    mageConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(mageConfig.Armor!),
-                    mageConfig.DodgeChance,
-                    mageConfig.ParadeChance,
-                    mageConfig.ChanceSpellResistance,
-                    mageConfig.Speed,
-                    mageConfig.HasMana,
-                    mageConfig.ManaPoints
-                );
-            
-            case 3:
-                var paladinConfig = ClassConfigLoader.GetConfig("Paladin");
-                return new Paladin(
-                    chosenName,
-                    paladinConfig.MaxHitPoints,
-                    paladinConfig.PhysicalAttackPower,
-                    paladinConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(paladinConfig.Armor!),
-                    paladinConfig.DodgeChance,
-                    paladinConfig.ParadeChance,
-                    paladinConfig.ChanceSpellResistance,
-                    paladinConfig.Speed,
-                    paladinConfig.HasMana,
-                    paladinConfig.ManaPoints
-                );
-            
-            case 4:
-                var thiefConfig = ClassConfigLoader.GetConfig("Thief");
-                return new Thief(
-                    chosenName,
-                    thiefConfig.MaxHitPoints,
-                    thiefConfig.PhysicalAttackPower,
-                    thiefConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(thiefConfig.Armor!),
-                    thiefConfig.DodgeChance,
-                    thiefConfig.ParadeChance,
-                    thiefConfig.ChanceSpellResistance,
-                    thiefConfig.Speed
-                );
-            
-            case 5:
-                var priestConfig = ClassConfigLoader.GetConfig("Priest");
-                return new Priest(
-                    chosenName,
-                    priestConfig.MaxHitPoints,
-                    priestConfig.PhysicalAttackPower,
-                    priestConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(priestConfig.Armor!),
-                    priestConfig.DodgeChance,
-                    priestConfig.ParadeChance,
-                    priestConfig.ChanceSpellResistance,
-                    priestConfig.Speed,
-                    priestConfig.HasMana,
-                    priestConfig.ManaPoints
-                );
-            
-            default: throw new ArgumentException("Invalid class choice");
-        }
+            1 => new Warrior(chosenName, config.MaxHitPoints, config.PhysicalAttackPower, config.MagicAttackPower,Enum.Parse<TypeOfArmor>(config.Armor!), config.DodgeChance, config.ParadeChance, config.ChanceSpellResistance, config.Speed),
+            2 => new Mage(chosenName, config.MaxHitPoints, config.PhysicalAttackPower, config.MagicAttackPower,Enum.Parse<TypeOfArmor>(config.Armor!), config.DodgeChance, config.ParadeChance, config.ChanceSpellResistance, config.Speed, config.HasMana, config.ManaPoints),
+            3 => new Paladin(chosenName, config.MaxHitPoints, config.PhysicalAttackPower, config.MagicAttackPower,Enum.Parse<TypeOfArmor>(config.Armor!), config.DodgeChance, config.ParadeChance, config.ChanceSpellResistance, config.Speed, config.HasMana, config.ManaPoints),
+            4 => new Thief(chosenName, config.MaxHitPoints, config.PhysicalAttackPower, config.MagicAttackPower,Enum.Parse<TypeOfArmor>(config.Armor!), config.DodgeChance, config.ParadeChance, config.ChanceSpellResistance, config.Speed),
+            5 => new Priest(chosenName, config.MaxHitPoints, config.PhysicalAttackPower, config.MagicAttackPower,Enum.Parse<TypeOfArmor>(config.Armor!), config.DodgeChance, config.ParadeChance, config.ChanceSpellResistance, config.Speed, config.HasMana, config.ManaPoints),
+            _ => throw new ArgumentException("Invalid class choice"),
+        };
     }
     
     public static void StartGame()
@@ -247,12 +180,16 @@ public static class Utils
         {
             var skillUsage = Menu.SkillsTourCurrent.FirstOrDefault(su => su.User == player);
             var skill = skillUsage!.ChosenSkill;
+            
             if (skill != null!)
             {
-                skill.UseSkill(player, skillUsage.Target);   
                 if (player.UsesMana && player.CurrentMana < skill.ManaCost) 
                 {
                     Console.WriteLine($"{player.Name} failed to cast {skill.Name} due to insufficient mana and passes their turn!");
+                }
+                else
+                {
+                    skill.UseSkill(player, skillUsage.Target); 
                 }
             }
             else

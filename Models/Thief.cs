@@ -36,12 +36,22 @@ public class Thief : Character
         
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
-        var defendResult = base.Defend(attacker, typeOfAttack, attackPower);
-
-        if (defendResult.IsDodged)
+        
+        try
         {
-            var attack = new Attack("Stab in the back", this, attacker, 15, TypeDamage.Physical);
-            Tackle(attack);   
+            var defendResult = base.Defend(attacker, typeOfAttack, attackPower);
+
+            if (defendResult.IsDodged)
+            {
+                var attack = new Attack("Stab in the back", this, attacker, 15, TypeDamage.Physical);
+                Tackle(attack);   
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"An error occurred during the defense phase: {ex.Message}");
+            Console.ResetColor();
         }
         
         return result;
@@ -68,27 +78,36 @@ public class Thief : Character
 
         while (true)
         {
-            var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
-
-            if (skillChoice == skillDetails.Count)
+            try
             {
-                Console.WriteLine("You decided to skip the turn.");
+                var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
+
+                if (skillChoice == skillDetails.Count)
+                {
+                    Console.WriteLine("You decided to skip the turn.");
+                    break;
+                }
+                
+                skill = Skills[skillChoice - 1]; 
+                
+                if (skill.CurrentCooldown != 0)
+                {
+                    Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
+                    continue;
+                }
+                
+                if (skill.Target == TargetType.Enemy)
+                {
+                    target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
+                }
                 break;
             }
-            
-            skill = Skills[skillChoice - 1]; 
-            
-            if (skill.CurrentCooldown != 0)
+            catch (Exception ex)
             {
-                Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
-                continue;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"An error occurred during action selection: {ex.Message}");
+                Console.ResetColor();
             }
-            
-            if (skill.Target == TargetType.Enemy)
-            {
-                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
-            }
-            break;
         }
         
         Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
@@ -96,13 +115,23 @@ public class Thief : Character
     
     public override string ToString()
     {
-        return $"HP: {CurrentHitPoints}/{MaxHitPoints} | " +
-               $"Physical Attack: {PhysicalAttackPower} | " +
-               $"Magic Attack: {MagicAttackPower} | " +
-               $"Armor: {Armor} | " +
-               $"Dodge: {DodgeChance}% | " +
-               $"Parade: {ParadeChance}% | " +
-               $"Spell Resistance: {ChanceSpellResistance}% | " +
-               $"Speed: {Speed}\n";
+        try
+        {
+            return $"HP: {CurrentHitPoints}/{MaxHitPoints} | " +
+                   $"Physical Attack: {PhysicalAttackPower} | " +
+                   $"Magic Attack: {MagicAttackPower} | " +
+                   $"Armor: {Armor} | " +
+                   $"Dodge: {DodgeChance}% | " +
+                   $"Parade: {ParadeChance}% | " +
+                   $"Spell Resistance: {ChanceSpellResistance}% | " +
+                   $"Speed: {Speed}\n";
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"An error occurred while generating the character summary: {ex.Message}");
+            Console.ResetColor();
+            return string.Empty;
+        }
     }
 }
