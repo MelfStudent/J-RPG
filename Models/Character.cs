@@ -91,7 +91,6 @@ public abstract class Character
         {
             if (PerformLuckTest(ChanceSpellResistance))
             {
-                result.IsResisted = true;
                 Console.WriteLine($"{Name} resisted the magic attack!");
                 return result;
             }

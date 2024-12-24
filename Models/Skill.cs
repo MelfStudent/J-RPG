@@ -30,7 +30,7 @@ public class Skill
         _targetStat = targetStat;
     }
 
-    public void UseSkill(Character user, Character target = null)
+    public void UseSkill(Character user, Character target = null!)
     {
         if (CurrentCooldown != 0)
         {
@@ -58,14 +58,14 @@ public class Skill
             ExecuteEffect(user, target);
         } else if (Target == TargetType.AllEnemies)
         {
-            foreach (var _target in Menu.TeamThatDefends.Members)
+            foreach (var _target in Menu.TeamThatDefends!.Members)
             {
                 ExecuteEffect(user, _target);
             }
             
         } else if (Target == TargetType.AllAllies)
         {
-            foreach (var _target in Menu.TeamThatAttacks.Members)
+            foreach (var _target in Menu.TeamThatAttacks!.Members)
             {
                 ExecuteEffect(user, _target);
             }

@@ -123,7 +123,7 @@ public static class Utils
                     warriorConfig.MaxHitPoints,
                     warriorConfig.PhysicalAttackPower,
                     warriorConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(warriorConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(warriorConfig.Armor!),
                     warriorConfig.DodgeChance,
                     warriorConfig.ParadeChance,
                     warriorConfig.ChanceSpellResistance,
@@ -137,7 +137,7 @@ public static class Utils
                     mageConfig.MaxHitPoints,
                     mageConfig.PhysicalAttackPower,
                     mageConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(mageConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(mageConfig.Armor!),
                     mageConfig.DodgeChance,
                     mageConfig.ParadeChance,
                     mageConfig.ChanceSpellResistance,
@@ -153,7 +153,7 @@ public static class Utils
                     paladinConfig.MaxHitPoints,
                     paladinConfig.PhysicalAttackPower,
                     paladinConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(paladinConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(paladinConfig.Armor!),
                     paladinConfig.DodgeChance,
                     paladinConfig.ParadeChance,
                     paladinConfig.ChanceSpellResistance,
@@ -169,7 +169,7 @@ public static class Utils
                     thiefConfig.MaxHitPoints,
                     thiefConfig.PhysicalAttackPower,
                     thiefConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(thiefConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(thiefConfig.Armor!),
                     thiefConfig.DodgeChance,
                     thiefConfig.ParadeChance,
                     thiefConfig.ChanceSpellResistance,
@@ -183,7 +183,7 @@ public static class Utils
                     priestConfig.MaxHitPoints,
                     priestConfig.PhysicalAttackPower,
                     priestConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(priestConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(priestConfig.Armor!),
                     priestConfig.DodgeChance,
                     priestConfig.ParadeChance,
                     priestConfig.ChanceSpellResistance,
@@ -220,7 +220,7 @@ public static class Utils
 
     private static void ChoiceActions()
     {
-        foreach (var player in Menu.TeamThatAttacks.Members)
+        foreach (var player in Menu.TeamThatAttacks!.Members)
         {
             if (!player.IsDead)
             {
@@ -240,14 +240,14 @@ public static class Utils
 
     private static void ExecutionOfAttacks()
     {
-        var combinedTeam = Menu.Player1.Concat(Menu.Player2).ToList();
+        var combinedTeam = Menu.Player1!.Concat(Menu.Player2!).ToList();
         var attackOrder = ExecutionSpeedCalculation(combinedTeam);
         
         foreach (var player in attackOrder)
         {
             var skillUsage = Menu.SkillsTourCurrent.FirstOrDefault(su => su.User == player);
-            var skill = skillUsage.ChosenSkill;
-            if (skill != null)
+            var skill = skillUsage!.ChosenSkill;
+            if (skill != null!)
             {
                 skill.UseSkill(player, skillUsage.Target);   
                 if (player.UsesMana && player.CurrentMana < skill.ManaCost) 

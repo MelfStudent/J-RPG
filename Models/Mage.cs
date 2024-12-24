@@ -6,7 +6,7 @@ using Enums;
 public class Mage : Character
 {
     public int RemainingDamageReductions { get; set; }
-    private bool _isSpellBeingReturned = false;
+    private bool _isSpellBeingReturned;
     
     public Mage(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     {
@@ -121,8 +121,8 @@ public class Mage : Character
         ).ToList();
         skillDetails.Add("Skip the turn");
 
-        Skill skill = null;
-        Character target = null;
+        Skill? skill = null;
+        Character? target = null;
 
         while (true)
         {
@@ -144,12 +144,12 @@ public class Mage : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
             }
             break;
         }
         
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
     }
     
     public override string ToString()

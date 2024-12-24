@@ -12,7 +12,7 @@ public static class ClassConfigLoader
         var basePath = AppDomain.CurrentDomain.BaseDirectory;
         var filePath = Path.Combine(basePath, "Resources", "classes.json");
         var json = File.ReadAllText(filePath);
-        _classConfigs = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json);
+        _classConfigs = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json)!;
     }
 
     public static ClassConfig GetConfig(string className)
@@ -30,7 +30,7 @@ public class ClassConfig
     public int MaxHitPoints { get; set; }
     public int PhysicalAttackPower { get; set; }
     public int MagicAttackPower { get; set; }
-    public string Armor { get; set; }
+    public string? Armor { get; set; }
     public int DodgeChance { get; set; }
     public int ParadeChance { get; set; }
     public int ChanceSpellResistance { get; set; }
