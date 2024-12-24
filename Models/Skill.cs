@@ -3,19 +3,91 @@
 using Services;
 using Enums;
 
+/// <summary>
+/// Represents a skill that a character can use in combat.
+/// Each skill has a name, description, cooldown, target type, effect power, and mana cost.
+/// Skills can perform different actions such as damage, healing, buffs, and debuffs.
+/// </summary>
 public class Skill
 {
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public int Cooldown { get; private set; }
-    public int CurrentCooldown { get; private set; }
-    public TargetType Target { get; private set; }
-    public int ManaCost { get; private set; }
-    private ActionType _skillAction { get; set; }
-    public int EffectPower { get; private set; }
-    public TypeDamage TypeOfDamage { get; private set; }
-    private AffectedStat _targetStat { get; set; }
+   /// <summary>
+        /// Gets or sets the name of the skill.
+        /// </summary>
+        /// <value>The name of the skill.</value>
+        public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the description of the skill.
+        /// This provides details about the skill's effect and usage.
+        /// </summary>
+        /// <value>The description of the skill.</value>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Gets the cooldown period of the skill in turns.
+        /// </summary>
+        /// <value>The number of turns the skill must wait before it can be used again.</value>
+        public int Cooldown { get; private set; }
+
+        /// <summary>
+        /// Gets the current cooldown of the skill.
+        /// This is the number of turns left before the skill can be used again.
+        /// </summary>
+        /// <value>The remaining number of turns before the skill is ready to use again.</value>
+        public int CurrentCooldown { get; private set; }
+
+        /// <summary>
+        /// Gets the target type of the skill, which indicates who or what the skill affects.
+        /// Possible values include self, enemy, ally, all enemies, all allies.
+        /// </summary>
+        /// <value>The target type (e.g., Self, Enemy, Ally, etc.).</value>
+        public TargetType Target { get; private set; }
+
+        /// <summary>
+        /// Gets the mana cost required to use the skill.
+        /// </summary>
+        /// <value>The amount of mana required to use the skill.</value>
+        public int ManaCost { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the action type that determines the skill's effect (e.g., damage, healing, buff, debuff).
+        /// </summary>
+        /// <value>The type of action performed by the skill (e.g., Damage, Heal, Buff, etc.).</value>
+        private ActionType _skillAction { get; set; }
+
+        /// <summary>
+        /// Gets the effect power of the skill.
+        /// This determines the strength of the skill's effect, such as damage dealt, healing amount, or buff strength.
+        /// </summary>
+        /// <value>The power of the skill's effect (e.g., damage, healing amount, etc.).</value>
+        public int EffectPower { get; private set; }
+
+        /// <summary>
+        /// Gets the type of damage dealt by the skill, if applicable.
+        /// This defines the damage type (e.g., physical, magical, etc.).
+        /// </summary>
+        /// <value>The type of damage (e.g., physical, magical) or a null type if not applicable.</value>
+        public TypeDamage TypeOfDamage { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the stat that is affected by the skill (e.g., physical attack, magic attack).
+        /// This is only relevant for buff or debuff skills.
+        /// </summary>
+        /// <value>The stat affected by the skill (e.g., PhysicalAttack, MagicAttack).</value>
+        private AffectedStat _targetStat { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Skill"/> class.
+    /// </summary>
+    /// <param name="name">The name of the skill.</param>
+    /// <param name="description">A description of the skill.</param>
+    /// <param name="cooldown">The number of turns the skill needs to recharge.</param>
+    /// <param name="target">The target type (Self, Enemy, Ally, etc.).</param>
+    /// <param name="manaCost">The mana cost for using the skill.</param>
+    /// <param name="actionType">The type of action the skill performs (e.g., damage, heal, buff).</param>
+    /// <param name="effectPower">The strength of the effect (e.g., damage dealt, healing amount, buff strength).</param>
+    /// <param name="typeOfDamage">The type of damage (if applicable) for the skill.</param>
+    /// <param name="targetStat">The stat that the skill affects (if applicable, e.g., physical attack).</param>
     public Skill(string name, string description, int cooldown, TargetType target, int manaCost, ActionType actionType, int effectPower, TypeDamage typeOfDamage = TypeDamage.Null, AffectedStat targetStat = AffectedStat.Null)
     {
         Name = name;
@@ -30,6 +102,11 @@ public class Skill
         _targetStat = targetStat;
     }
 
+    /// <summary>
+    /// Uses the skill on a target. The skill effect is based on its action type.
+    /// </summary>
+    /// <param name="user">The character using the skill.</param>
+    /// <param name="target">The target character (if applicable).</param>
     public void UseSkill(Character user, Character target = null!)
     {
         if (CurrentCooldown != 0)
@@ -95,6 +172,12 @@ public class Skill
         }
     }
 
+    /// <summary>
+    /// Executes the effect of the skill on the target.
+    /// The effect depends on the action type (e.g., damage, healing, buff, debuff).
+    /// </summary>
+    /// <param name="user">The character using the skill.</param>
+    /// <param name="target">The target character of the skill's effect.</param>
     private void ExecuteEffect(Character user, Character target)
     {
         switch (_skillAction)
@@ -206,12 +289,19 @@ public class Skill
         }
     }
 
+    /// <summary>
+    /// Reduces the cooldown of the skill by 1 turn.
+    /// </summary>
     public void ReduceCooldown()
     {
         if (CurrentCooldown > 0)
             CurrentCooldown--;
     }
 
+    /// <summary>
+    /// Returns a string representation of the skill.
+    /// </summary>
+    /// <returns>A string with the skill's name, mana cost, cooldown, effect, and power.</returns>
     public override string ToString()
     {
         return $"{Name} (Cost: {ManaCost} Mana, Cooldown: {Cooldown} turns, Effect: {_skillAction}, Power: {EffectPower})";
