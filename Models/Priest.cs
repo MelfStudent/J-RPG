@@ -1,6 +1,7 @@
 ﻿namespace J_RPG.Models;
 
 using Services;
+using Enums;
 
 public class Priest : Character
 {

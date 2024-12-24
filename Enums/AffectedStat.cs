@@ -1,4 +1,4 @@
-﻿namespace J_RPG.Models;
+﻿namespace J_RPG.Enums;
 
 public enum AffectedStat
 {

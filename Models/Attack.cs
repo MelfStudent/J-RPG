@@ -1,5 +1,7 @@
 ﻿namespace J_RPG.Models;
 
+using Enums;
+
 public class Attack
 {
     public string Name { get; set; }
