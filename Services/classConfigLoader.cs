@@ -9,7 +9,9 @@ public static class ClassConfigLoader
 
     static ClassConfigLoader()
     {
-        var json = File.ReadAllText("classes.json");
+        var basePath = AppDomain.CurrentDomain.BaseDirectory;
+        var filePath = Path.Combine(basePath, "Resources", "classes.json");
+        var json = File.ReadAllText(filePath);
         classConfigs = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json);
     }
 

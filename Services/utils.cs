@@ -8,6 +8,7 @@ using Models;
 public static class Utils
 {
     public static HashSet<string> UsedNames { get; } = new();
+    public static int TeamSize { get; set; } = 3;
     
     public static int PromptChoice(List<string> options, string titled)
     {
@@ -70,7 +71,7 @@ public static class Utils
         List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief", "Priest\n" };
 
         Console.WriteLine(titled);
-        for (var i = 1; i < 2; i++)
+        for (var i = 1; i <= TeamSize; i++)
         {
             var choiceCharacterName = PromptName($"\nEnter the character name n°{i} :");
             Console.Write($"\nChoose a class for the player {i}: \n");
