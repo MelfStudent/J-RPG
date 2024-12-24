@@ -1,15 +1,12 @@
 ﻿namespace J_RPG.Models;
 
 using Services;
+using Enums;
 
 public class Thief : Character
 {
-    private int AttackReductionNumber { get; set; }
-    
     public Thief(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed)
     {
-        AttackReductionNumber = 0;
-        
         Skills.Add(new Skill(
             "Low blow",
             "Physical attack that deals 100% of physical attack power to the target, or 150% if the target has less than half of his life points",
@@ -66,8 +63,8 @@ public class Thief : Character
         ).ToList();
         skillDetails.Add("Skip the turn");
 
-        Skill skill = null;
-        Character target = null;
+        Skill? skill = null;
+        Character? target = null;
 
         while (true)
         {
@@ -89,12 +86,12 @@ public class Thief : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
             }
             break;
         }
         
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
     }
     
     public override string ToString()

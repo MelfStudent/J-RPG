@@ -1,6 +1,7 @@
 ﻿namespace J_RPG.Models;
 
 using Services;
+using Enums;
 
 public class Priest : Character
 {
@@ -56,8 +57,8 @@ public class Priest : Character
         ).ToList();
         skillDetails.Add("Skip the turn");
 
-        Skill skill = null;
-        Character target = null;
+        Skill? skill = null;
+        Character? target = null;
 
         while (true)
         {
@@ -79,12 +80,12 @@ public class Priest : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
             }
             break;
         }
         
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
     }
     
     public override string ToString()

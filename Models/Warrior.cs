@@ -1,6 +1,7 @@
 ﻿namespace J_RPG.Models;
 
 using Services;
+using Enums;
 
 public class Warrior : Character
 {
@@ -52,7 +53,7 @@ public class Warrior : Character
 
         if (typeOfAttack == TypeDamage.Physical)
         {
-            if (defenseResult.IsParried || LuckTest(25))
+            if (defenseResult.IsParried || PerformLuckTest(25))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
@@ -86,8 +87,8 @@ public class Warrior : Character
         ).ToList();
         skillDetails.Add("Skip the turn");
 
-        Skill skill = null;
-        Character target = null;
+        Skill? skill = null;
+        Character? target = null;
 
         while (true)
         {
@@ -109,12 +110,12 @@ public class Warrior : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
             }
             break;
         }
         
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
     }
     
     public override string ToString()

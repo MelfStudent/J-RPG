@@ -1,6 +1,7 @@
 ﻿namespace J_RPG.Models;
 
 using Services;
+using Enums;
 
 public abstract class Character
 {
@@ -13,14 +14,14 @@ public abstract class Character
     public int DodgeChance { get; set; }
     protected int ParadeChance { get; private set; }
     public int ChanceSpellResistance { get; set; }
-    public int Speed { get; protected set; }
+    public int Speed { get; private set; }
     public bool IsDead { get; private set; }
     protected List<Skill> Skills { get; set; } = new List<Skill>();
     public bool UsesMana { get; private set; }
     public int CurrentMana { get; set; }
     public int MaxMana { get; private set; }
     
-    private Random Rand { get; set; } = new Random();
+    private Random _rand { get; set; } = new Random();
     
     protected Character(string name, int maxHitPoints, int physicalAttackPower,
                         int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana = false, int maxMana = 0)
@@ -74,13 +75,13 @@ public abstract class Character
         
         if (typeOfAttack == TypeDamage.Physical)
         {
-            if (LuckTest(DodgeChance))
+            if (PerformLuckTest(DodgeChance))
             {
                 result.IsDodged = true;
                 Console.WriteLine($"{Name} dodged the attack!");
                 return result;
             }
-            if (LuckTest(ParadeChance))
+            if (PerformLuckTest(ParadeChance))
             {
                 result.IsParried = true;
                 damage = attackPower / 2;
@@ -88,9 +89,8 @@ public abstract class Character
             }
         } else if (typeOfAttack == TypeDamage.Magic)
         {
-            if (LuckTest(ChanceSpellResistance))
+            if (PerformLuckTest(ChanceSpellResistance))
             {
-                result.IsResisted = true;
                 Console.WriteLine($"{Name} resisted the magic attack!");
                 return result;
             }
@@ -102,7 +102,7 @@ public abstract class Character
 
         if (attacker is Paladin paladin)
         {
-            paladin.Heal(damage / 2);
+            paladin.RestoreHealth(damage / 2);
         }
         
         if ((CurrentHitPoints -= damage) <= 0)
@@ -118,7 +118,7 @@ public abstract class Character
         return result;
     }
 
-    public void Heal(int extraLife)
+    public void RestoreHealth(int extraLife)
     {
        if (CurrentHitPoints + extraLife <= MaxHitPoints)
        {
@@ -131,20 +131,20 @@ public abstract class Character
        Console.WriteLine($"{Name} has regenerated life. It now has {CurrentHitPoints} hp");
     }
 
-    protected bool LuckTest(int percentage)
+    protected bool PerformLuckTest(int successProbabilityPercentage)
     {
-        var toFind = Rand.Next(1, 100);
-        var test1 = new int[100];
-        for (var i = 1; i < test1.Length; i++)
+        var targetNumber = _rand.Next(1, 100);
+        var shuffledNumbers = new int[100];
+        for (var i = 1; i < shuffledNumbers.Length; i++)
         {
-            test1[i-1] = i;
+            shuffledNumbers[i-1] = i;
         }
 
-        test1 = Shuffle(test1);
+        shuffledNumbers = Shuffle(shuffledNumbers);
             
-        for (var j = 0; j < percentage; j++)
+        for (var j = 0; j < successProbabilityPercentage; j++)
         {
-            if (test1[j] == toFind)
+            if (shuffledNumbers[j] == targetNumber)
             {
                 return true;
             }
@@ -156,7 +156,7 @@ public abstract class Character
     private int[] Shuffle(int[] values)
     {
         for (var i = values.Length - 1; i > 0; i--) {
-            var k = Rand.Next(i + 1);
+            var k = _rand.Next(i + 1);
             (values[k], values[i]) = (values[i], values[k]);
         }
 
@@ -216,7 +216,7 @@ public abstract class Character
         }
     }
     
-    public void ConsumeMana(int skillCost)
+    public void UseMana(int skillCost)
     {
         if (skillCost <= CurrentMana)
         {

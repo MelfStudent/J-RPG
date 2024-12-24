@@ -1,15 +1,16 @@
 ﻿namespace J_RPG.Models;
 
 using Services;
+using Enums;
 
 public class Mage : Character
 {
-    public int AttackReductionNumber { get; set; }
-    private bool IsSpellReturned = false;
+    public int RemainingDamageReductions { get; set; }
+    private bool _isSpellBeingReturned;
     
     public Mage(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     {
-        AttackReductionNumber = 0;
+        RemainingDamageReductions = 0;
 
         Skills.Add(new Skill(
             "Frost bolt",
@@ -71,7 +72,7 @@ public class Mage : Character
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
-        if (IsSpellReturned && typeOfAttack == TypeDamage.Magic)
+        if (_isSpellBeingReturned && typeOfAttack == TypeDamage.Magic)
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"{Name} returns the magic attack to {attacker.Name} !");
@@ -80,10 +81,10 @@ public class Mage : Character
             var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
             Tackle(damageAttack);
 
-            IsSpellReturned = false;
+            _isSpellBeingReturned = false;
             return result;
         } 
-        if (AttackReductionNumber > 0)
+        if (RemainingDamageReductions > 0)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{Name} is protected by FROST BARRIER!");
@@ -96,7 +97,7 @@ public class Mage : Character
                 _ => attackPower
             };
 
-            AttackReductionNumber--;
+            RemainingDamageReductions--;
         }
         
         base.Defend(attacker, typeOfAttack, attackPower);
@@ -120,8 +121,8 @@ public class Mage : Character
         ).ToList();
         skillDetails.Add("Skip the turn");
 
-        Skill skill = null;
-        Character target = null;
+        Skill? skill = null;
+        Character? target = null;
 
         while (true)
         {
@@ -143,12 +144,12 @@ public class Mage : Character
             
             if (skill.Target == TargetType.Enemy)
             {
-                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends, this);
+                target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
             }
             break;
         }
         
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
     }
     
     public override string ToString()

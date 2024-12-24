@@ -6,7 +6,7 @@ public class SkillUsage
     public Skill ChosenSkill { get; set; }
     public Character Target { get; set; }
 
-    public SkillUsage(Character user, Skill skill, Character target = null)
+    public SkillUsage(Character user, Skill skill, Character target = null!)
     {
         User = user;
         ChosenSkill = skill;

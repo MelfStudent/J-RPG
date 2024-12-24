@@ -1,14 +1,16 @@
 ﻿namespace J_RPG.Services;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Models;
+using Enums;
 
 public static class Utils
 {
     public static HashSet<string> UsedNames { get; } = new();
-    public static int TeamSize { get; set; } = 3;
+    private static int _teamSize { get; set; } = 3;
     
     public static int PromptChoice(List<string> options, string titled)
     {
@@ -71,7 +73,7 @@ public static class Utils
         List<string> existingCharacterClass = new() { "Warrior", "Mage", "Paladin", "Thief", "Priest\n" };
 
         Console.WriteLine(titled);
-        for (var i = 1; i <= TeamSize; i++)
+        for (var i = 1; i <= _teamSize; i++)
         {
             var choiceCharacterName = PromptName($"\nEnter the character name n°{i} :");
             Console.Write($"\nChoose a class for the player {i}: \n");
@@ -121,7 +123,7 @@ public static class Utils
                     warriorConfig.MaxHitPoints,
                     warriorConfig.PhysicalAttackPower,
                     warriorConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(warriorConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(warriorConfig.Armor!),
                     warriorConfig.DodgeChance,
                     warriorConfig.ParadeChance,
                     warriorConfig.ChanceSpellResistance,
@@ -135,7 +137,7 @@ public static class Utils
                     mageConfig.MaxHitPoints,
                     mageConfig.PhysicalAttackPower,
                     mageConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(mageConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(mageConfig.Armor!),
                     mageConfig.DodgeChance,
                     mageConfig.ParadeChance,
                     mageConfig.ChanceSpellResistance,
@@ -151,7 +153,7 @@ public static class Utils
                     paladinConfig.MaxHitPoints,
                     paladinConfig.PhysicalAttackPower,
                     paladinConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(paladinConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(paladinConfig.Armor!),
                     paladinConfig.DodgeChance,
                     paladinConfig.ParadeChance,
                     paladinConfig.ChanceSpellResistance,
@@ -167,7 +169,7 @@ public static class Utils
                     thiefConfig.MaxHitPoints,
                     thiefConfig.PhysicalAttackPower,
                     thiefConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(thiefConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(thiefConfig.Armor!),
                     thiefConfig.DodgeChance,
                     thiefConfig.ParadeChance,
                     thiefConfig.ChanceSpellResistance,
@@ -181,7 +183,7 @@ public static class Utils
                     priestConfig.MaxHitPoints,
                     priestConfig.PhysicalAttackPower,
                     priestConfig.MagicAttackPower,
-                    Enum.Parse<TypeOfArmor>(priestConfig.Armor),
+                    Enum.Parse<TypeOfArmor>(priestConfig.Armor!),
                     priestConfig.DodgeChance,
                     priestConfig.ParadeChance,
                     priestConfig.ChanceSpellResistance,
@@ -218,7 +220,7 @@ public static class Utils
 
     private static void ChoiceActions()
     {
-        foreach (var player in Menu.TeamThatAttacks.Members)
+        foreach (var player in Menu.TeamThatAttacks!.Members)
         {
             if (!player.IsDead)
             {
@@ -238,14 +240,14 @@ public static class Utils
 
     private static void ExecutionOfAttacks()
     {
-        var combinedTeam = Menu.Player1.Concat(Menu.Player2).ToList();
+        var combinedTeam = Menu.Player1!.Concat(Menu.Player2!).ToList();
         var attackOrder = ExecutionSpeedCalculation(combinedTeam);
         
         foreach (var player in attackOrder)
         {
             var skillUsage = Menu.SkillsTourCurrent.FirstOrDefault(su => su.User == player);
-            var skill = skillUsage.ChosenSkill;
-            if (skill != null)
+            var skill = skillUsage!.ChosenSkill;
+            if (skill != null!)
             {
                 skill.UseSkill(player, skillUsage.Target);   
                 if (player.UsesMana && player.CurrentMana < skill.ManaCost) 
