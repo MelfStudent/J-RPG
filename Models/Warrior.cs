@@ -53,7 +53,7 @@ public class Warrior : Character
 
         if (typeOfAttack == TypeDamage.Physical)
         {
-            if (defenseResult.IsParried || LuckTest(25))
+            if (defenseResult.IsParried || PerformLuckTest(25))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");

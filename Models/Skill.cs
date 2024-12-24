@@ -46,7 +46,7 @@ public class Skill
 
         if (user.UsesMana)
         {
-            user.ConsumeMana(ManaCost);
+            user.UseMana(ManaCost);
         }
 
         if (Target == TargetType.Self)
@@ -87,7 +87,7 @@ public class Skill
                 break;
 
             case ActionType.Heal:
-                    target.Heal(EffectPower);
+                    target.RestoreHealth(EffectPower);
                     Console.WriteLine($"{target.Name} recover {EffectPower} PV thanks to {Name} !");
                 break;
 

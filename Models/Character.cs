@@ -75,13 +75,13 @@ public abstract class Character
         
         if (typeOfAttack == TypeDamage.Physical)
         {
-            if (LuckTest(DodgeChance))
+            if (PerformLuckTest(DodgeChance))
             {
                 result.IsDodged = true;
                 Console.WriteLine($"{Name} dodged the attack!");
                 return result;
             }
-            if (LuckTest(ParadeChance))
+            if (PerformLuckTest(ParadeChance))
             {
                 result.IsParried = true;
                 damage = attackPower / 2;
@@ -89,7 +89,7 @@ public abstract class Character
             }
         } else if (typeOfAttack == TypeDamage.Magic)
         {
-            if (LuckTest(ChanceSpellResistance))
+            if (PerformLuckTest(ChanceSpellResistance))
             {
                 result.IsResisted = true;
                 Console.WriteLine($"{Name} resisted the magic attack!");
@@ -103,7 +103,7 @@ public abstract class Character
 
         if (attacker is Paladin paladin)
         {
-            paladin.Heal(damage / 2);
+            paladin.RestoreHealth(damage / 2);
         }
         
         if ((CurrentHitPoints -= damage) <= 0)
@@ -119,7 +119,7 @@ public abstract class Character
         return result;
     }
 
-    public void Heal(int extraLife)
+    public void RestoreHealth(int extraLife)
     {
        if (CurrentHitPoints + extraLife <= MaxHitPoints)
        {
@@ -132,7 +132,7 @@ public abstract class Character
        Console.WriteLine($"{Name} has regenerated life. It now has {CurrentHitPoints} hp");
     }
 
-    protected bool LuckTest(int percentage)
+    protected bool PerformLuckTest(int successProbabilityPercentage)
     {
         var targetNumber = _rand.Next(1, 100);
         var shuffledNumbers = new int[100];
@@ -143,7 +143,7 @@ public abstract class Character
 
         shuffledNumbers = Shuffle(shuffledNumbers);
             
-        for (var j = 0; j < percentage; j++)
+        for (var j = 0; j < successProbabilityPercentage; j++)
         {
             if (shuffledNumbers[j] == targetNumber)
             {
@@ -217,7 +217,7 @@ public abstract class Character
         }
     }
     
-    public void ConsumeMana(int skillCost)
+    public void UseMana(int skillCost)
     {
         if (skillCost <= CurrentMana)
         {
