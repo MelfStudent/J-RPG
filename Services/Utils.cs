@@ -156,7 +156,7 @@ public static class Utils
     {
         var classNames = new[] { "Warrior", "Mage", "Paladin", "Thief", "Priest" };
         var className = classNames[chosenClass - 1];
-        var config = ClassConfigLoader.GetConfig(className);
+        var config = ConfigLoader.GetConfig(className);
 
         return chosenClass switch
         {
