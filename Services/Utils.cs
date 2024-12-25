@@ -7,11 +7,28 @@ using System.Linq;
 using Models;
 using Enums;
 
+/// <summary>
+/// A static utility class responsible for various game-related helper functions, such as user input prompts, team management,
+/// character creation, game flow control, and skill execution.
+/// </summary>
 public static class Utils
 {
+    /// <summary>
+    /// A set to track the names of all used characters.
+    /// </summary>
     public static HashSet<string> UsedNames { get; } = new();
+
+    /// <summary>
+    /// The size of each team in the game.
+    /// </summary>
     private static int _teamSize { get; set; } = 3;
-    
+
+    /// <summary>
+    /// Prompts the user to choose an option from a list of strings and returns the chosen index (1-based).
+    /// </summary>
+    /// <param name="options">The list of available options for the user to choose from.</param>
+    /// <param name="titled">The title or message to display above the options list.</param>
+    /// <returns>The index of the selected option.</returns>
     public static int PromptChoice(List<string> options, string titled)
     {   
         int result;
@@ -37,6 +54,11 @@ public static class Utils
         return result; 
     }
     
+    /// <summary>
+    /// Prompts the user to input a valid character name, ensuring it is unique.
+    /// </summary>
+    /// <param name="titled">The title or message to display when asking for the name.</param>
+    /// <returns>The valid character name entered by the user.</returns>
     private static string PromptName(string titled)
     {
         string? result;
@@ -67,6 +89,11 @@ public static class Utils
         return result!; 
     }
     
+    /// <summary>
+    /// Prompts the user to create a team by selecting character names and classes.
+    /// </summary>
+    /// <param name="titled">The title or message to display when asking for team creation details.</param>
+    /// <returns>A list of created characters for the team.</returns>
     public static List<Character> PromptTeam(string titled)
     {
         var result = new List<Character>();
@@ -84,6 +111,13 @@ public static class Utils
         return result;
     }
     
+    /// <summary>
+    /// Prompts the user to choose a target from a team, ensuring the actor does not target themselves or dead characters.
+    /// </summary>
+    /// <param name="titled">The title or message to display when asking for target selection.</param>
+    /// <param name="team">The team from which the target is to be chosen.</param>
+    /// <param name="actor">The character performing the action (cannot target themselves).</param>
+    /// <returns>The selected target character.</returns>
     public static Character PromptTarget(string titled, Team team, Character actor)
     {
         int result;
@@ -112,6 +146,12 @@ public static class Utils
         return team.Members[result-1]; 
     }
     
+    /// <summary>
+    /// Creates a player character based on the chosen name and class index.
+    /// </summary>
+    /// <param name="chosenName">The name of the character.</param>
+    /// <param name="chosenClass">The class index chosen for the character (1-5).</param>
+    /// <returns>The newly created character of the selected class.</returns>
     private static Character CreatePlayer(string chosenName, int chosenClass)
     {
         var classNames = new[] { "Warrior", "Mage", "Paladin", "Thief", "Priest" };
@@ -129,6 +169,9 @@ public static class Utils
         };
     }
     
+    /// <summary>
+    /// Starts the game loop, where actions are chosen and executed in turn-based gameplay.
+    /// </summary>
     public static void StartGame()
     {
         while (true)
@@ -151,6 +194,9 @@ public static class Utils
         }
     }
 
+    /// <summary>
+    /// Prompts each player in the attacking team to choose an action.
+    /// </summary>
     private static void ChoiceActions()
     {
         foreach (var player in Menu.TeamThatAttacks!.Members)
@@ -171,6 +217,9 @@ public static class Utils
         }
     }
 
+    /// <summary>
+    /// Executes attacks for each player in the turn order, considering mana and skill usage.
+    /// </summary>
     private static void ExecutionOfAttacks()
     {
         var combinedTeam = Menu.Player1!.Concat(Menu.Player2!).ToList();
@@ -204,6 +253,9 @@ public static class Utils
         CooldownReductionAllTeams();
     }
 
+    /// <summary>
+    /// Calculates the order of characters' actions based on their speed.
+    /// </summary>
     private static List<Character> ExecutionSpeedCalculation(List<Character> characters)
     {
         var random = new Random();
@@ -213,6 +265,9 @@ public static class Utils
         return sortedCharacters;
     }
 
+    /// <summary>
+    /// Reduces the cooldowns for all characters in all teams.
+    /// </summary>
     private static void CooldownReductionAllTeams()
     {
         foreach (var team in Menu.Teams)

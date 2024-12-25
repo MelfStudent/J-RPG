@@ -3,11 +3,36 @@
 using Services;
 using Enums;
 
+/// <summary>
+/// Represents a Mage character in the game.
+/// The Mage is a ranged spellcaster who uses magic attacks and has abilities for both offense and defense.
+/// </summary>
 public class Mage : Character
 {
+    /// <summary>
+    /// Number of remaining damage reductions from the Frost Barrier skill.
+    /// </summary>
     public int RemainingDamageReductions { get; set; }
+
+    /// <summary>
+    /// Indicates whether the Mage is currently returning a spell with the Spell Return ability.
+    /// </summary>
     private bool _isSpellBeingReturned;
-    
+
+    /// <summary>
+    /// Constructs a new Mage character with the given parameters.
+    /// </summary>
+    /// <param name="name">The name of the Mage character.</param>
+    /// <param name="maxHitPoints">The maximum hit points of the Mage.</param>
+    /// <param name="physicalAttackPower">The physical attack power of the Mage.</param>
+    /// <param name="magicAttackPower">The magic attack power of the Mage.</param>
+    /// <param name="armor">The armor type the Mage wears.</param>
+    /// <param name="dodgeChance">The chance to dodge an attack.</param>
+    /// <param name="paradeChance">The chance to parry an attack.</param>
+    /// <param name="chanceSpellResistance">The chance the Mage has to resist magic spells.</param>
+    /// <param name="speed">The speed of the Mage.</param>
+    /// <param name="usesMana">Indicates whether the Mage uses mana.</param>
+    /// <param name="maxMana">The maximum mana the Mage can have.</param>
     public Mage(string name, int maxHitPoints, int physicalAttackPower, int magicAttackPower, TypeOfArmor armor, int dodgeChance, int paradeChance, int chanceSpellResistance, int speed, bool usesMana, int maxMana) : base(name, maxHitPoints, physicalAttackPower, magicAttackPower, armor, dodgeChance, paradeChance, chanceSpellResistance, speed, usesMana, maxMana)
     {
         RemainingDamageReductions = 0;
@@ -65,6 +90,13 @@ public class Mage : Character
         ));
     }
     
+    /// <summary>
+    /// Defends the Mage against an attack. Handles the use of magical defense abilities like Spell Return and Frost Barrier.
+    /// </summary>
+    /// <param name="attacker">The character attacking the Mage.</param>
+    /// <param name="typeOfAttack">The type of attack (Physical, Magic).</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <returns>A DefenseResult object indicating the outcome of the defense attempt.</returns>
     protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         var result = new DefenseResult();
@@ -114,6 +146,9 @@ public class Mage : Character
         return result;
     }
 
+    /// <summary>
+    /// Allows the Mage to choose an action during their turn, including using skills or skipping the turn.
+    /// </summary>
     public override void ChoiceAction()
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
@@ -173,6 +208,10 @@ public class Mage : Character
         }
     }
     
+    /// <summary>
+    /// Returns a string representation of the Mage character, including their stats.
+    /// </summary>
+    /// <returns>A string containing the Mage's health, attack power, armor, and other stats.</returns>
     public override string ToString()
     {
         try
