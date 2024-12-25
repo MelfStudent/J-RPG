@@ -236,7 +236,7 @@ public static class Menu
         }
 
         var json = File.ReadAllText(filePath);
-        var characters = JsonSerializer.Deserialize<Dictionary<string, ClassConfig>>(json);
+        var characters = JsonSerializer.Deserialize<Dictionary<string, Config>>(json);
 
         if (characters == null || characters.Count == 0)
         {
@@ -273,7 +273,7 @@ public static class Menu
             while (true)
             {
                 Console.WriteLine($"\nEditing: {selectedCharacter}");
-                var properties = typeof(ClassConfig).GetProperties();
+                var properties = typeof(Config).GetProperties();
                 for (var i = 0; i < properties.Length; i++)
                 {
                     var value = properties[i].GetValue(characterConfig);
