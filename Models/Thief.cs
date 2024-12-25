@@ -63,12 +63,14 @@ public class Thief : Character
         
         try
         {
+            // Call the base class defense logic
             var defendResult = base.Defend(attacker, typeOfAttack, attackPower);
 
+            // If the Thief dodges the attack, it counterattacks
             if (defendResult.IsDodged)
             {
                 var attack = new Attack("Stab in the back", this, attacker, 15, TypeDamage.Physical);
-                Tackle(attack);   
+                Tackle(attack);   // Perform the counterattack using the Tackle method (from Character).
             }
         }
         catch (Exception ex)
@@ -91,6 +93,7 @@ public class Thief : Character
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: THIEF)");
         Console.WriteLine(ToString());
         
+        // Displays the Thief's skills and their descriptions
         var skillDetails = Skills.Select(s => 
             $"{s.Name} - {s.Description}\n" +
             $"  Cooldown: {s.CurrentCooldown}/{s.Cooldown}\n" +
@@ -108,6 +111,7 @@ public class Thief : Character
         {
             try
             {
+                // Prompt for the user's action choice
                 var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
 
                 if (skillChoice == skillDetails.Count)
@@ -118,12 +122,14 @@ public class Thief : Character
                 
                 skill = Skills[skillChoice - 1]; 
                 
+                // Check if the skill is ready to be used (i.e., not on cooldown)
                 if (skill.CurrentCooldown != 0)
                 {
                     Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
                     continue;
                 }
                 
+                // Select the target for enemy-targeting skills
                 if (skill.Target == TargetType.Enemy)
                 {
                     target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
@@ -138,7 +144,11 @@ public class Thief : Character
             }
         }
         
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill!, target!));
+        // Add the skill usage to the current skills tour
+        if (skill != null)
+        {
+            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
+        }
     }
     
     /// <summary>

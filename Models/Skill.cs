@@ -109,18 +109,21 @@ public class Skill
     /// <param name="target">The target character (if applicable).</param>
     public void UseSkill(Character user, Character target = null!)
     {
+        // Check if the skill is on cooldown
         if (CurrentCooldown != 0)
         {
             Console.WriteLine($"{Name} is not ready (recharging) !");
             return;
         }
 
+        // Check if the user has enough mana to cast the skill
         if (user.UsesMana && user.CurrentMana < ManaCost)
         {
             Console.WriteLine($"{user.Name} doesn't have enough mana to cast {Name}!");
             return;
         }
 
+        // Use mana if applicable
         if (user.UsesMana)
         {
             user.UseMana(ManaCost);
@@ -128,6 +131,7 @@ public class Skill
 
         try
         {
+            // Execute the skill effect based on the target type
             switch (Target)
             {
                 case TargetType.Self:
@@ -162,6 +166,7 @@ public class Skill
                     break;
             }
 
+            // Apply cooldown after the skill is used
             CurrentCooldown = Cooldown;
         }
         catch (Exception ex)
@@ -180,6 +185,7 @@ public class Skill
     /// <param name="target">The target character of the skill's effect.</param>
     private void ExecuteEffect(Character user, Character target)
     {
+        // Determine what action to perform based on the skill's action type
         switch (_skillAction)
         {
             case ActionType.Damage:
@@ -197,6 +203,7 @@ public class Skill
                 break;
 
             case ActionType.Buff:
+                // Handle specific buffs like "Drink", "Frost Barrier", and "Escape"
                 if (Name == "Drink")
                 {
                     var manaRecovered = Math.Min(EffectPower, user.MaxMana - user.CurrentMana);
@@ -226,6 +233,7 @@ public class Skill
                         var newDodgeChance = 50;
                         var newChanceSpellResistance = 50;
                         
+                        // Adjust dodge chance and spell resistance for "Escape"
                         if (thief.DodgeChance + 20 <= 50)
                         {
                             newDodgeChance += thief.DodgeChance + 20;
@@ -244,6 +252,7 @@ public class Skill
                 }
                 else
                 {
+                    // Handle general buffs for attributes
                     switch (_targetStat)
                     {
                         case AffectedStat.PhysicalAttack:
@@ -264,6 +273,7 @@ public class Skill
                 break;
 
             case ActionType.Debuff:
+                // Handle debuffs like "Mana Burn"
                 if (Name == "Mana Burn")
                 {
                     Console.WriteLine("\n========== ACTION PHASE ==========");

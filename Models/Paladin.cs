@@ -75,6 +75,7 @@ public class Paladin : Character
 
         try
         {
+            // Base defense handling (from the Character class).
             base.Defend(attacker, typeOfAttack, attackPower);
         }
         catch (Exception ex)
@@ -113,6 +114,7 @@ public class Paladin : Character
         {
             try
             {
+                // Prompt the user to select a skill or skip the turn.
                 var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
 
                 if (skillChoice == skillDetails.Count)
@@ -129,6 +131,7 @@ public class Paladin : Character
                     continue;
                 }
 
+                // Prompt for target selection based on the skill's target type.
                 if (skill.Target == TargetType.Enemy)
                 {
                     target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
@@ -148,6 +151,7 @@ public class Paladin : Character
             }
         }
 
+        // If a valid skill was chosen, add it to the current skill usage.
         if (skill != null)
         {
             Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
