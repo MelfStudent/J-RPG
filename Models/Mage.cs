@@ -100,44 +100,13 @@ public class Mage : Character
     protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         var result = new DefenseResult();
-        
         Console.WriteLine("\n========== DEFENSE PHASE ==========");
         Console.WriteLine($"[{Name.ToUpper()}] is under attack!");
 
         try
         {
-            // Handling the "Spell Return" defense mechanism.
-            if (_isSpellBeingReturned && typeOfAttack == TypeDamage.Magic)
-            {
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine($"{Name} returns the magic attack to {attacker.Name} !");
-                Console.ResetColor();
-
-                var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
-                Tackle(damageAttack);
-
-                _isSpellBeingReturned = false;
-                return result;
-            } 
-            
-            // Handling damage reduction from Frost Barrier.
-            if (RemainingDamageReductions > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"{Name} is protected by FROST BARRIER!");
-                Console.ResetColor();
-                
-                attackPower = typeOfAttack switch
-                {
-                    TypeDamage.Physical => (int)(attackPower * 0.40),
-                    TypeDamage.Magic => (int)(attackPower * 0.50),
-                    _ => attackPower
-                };
-
-                RemainingDamageReductions--;
-            }
-            
-            // Default defense handling (from the Character class).
+            if (HandleSpellReturn(attacker, typeOfAttack, attackPower)) return result;
+            attackPower = ApplyFrostBarrier(attackPower, typeOfAttack);
             base.Defend(attacker, typeOfAttack, attackPower);
         }
         catch (Exception ex)
@@ -148,6 +117,40 @@ public class Mage : Character
         return result;
     }
 
+    private bool HandleSpellReturn(Character attacker, TypeDamage typeOfAttack, int attackPower)
+    {
+        if (!_isSpellBeingReturned || typeOfAttack != TypeDamage.Magic) return false;
+
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine($"{Name} returns the magic attack to {attacker.Name}!");
+        Console.ResetColor();
+
+        var damageAttack = new Attack("Spell Return", this, attacker, attackPower, typeOfAttack);
+        Tackle(damageAttack);
+
+        _isSpellBeingReturned = false;
+        return true;
+    }
+
+    private int ApplyFrostBarrier(int attackPower, TypeDamage typeOfAttack)
+    {
+        if (RemainingDamageReductions <= 0) return attackPower;
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine($"{Name} is protected by FROST BARRIER!");
+        Console.ResetColor();
+
+        attackPower = typeOfAttack switch
+        {
+            TypeDamage.Physical => (int)(attackPower * 0.40),
+            TypeDamage.Magic => (int)(attackPower * 0.50),
+            _ => attackPower
+        };
+
+        RemainingDamageReductions--;
+        return attackPower;
+    }
+
     /// <summary>
     /// Allows the Mage to choose an action during their turn, including using skills or skipping the turn.
     /// </summary>
@@ -156,59 +159,59 @@ public class Mage : Character
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: MAGE)");
         Console.WriteLine(ToString());
-        
-        var skillDetails = Skills.Select(s => 
-            $"{s.Name} - {s.Description}\n" +
-            $"  Cooldown: {s.CurrentCooldown}/{s.Cooldown}\n" +
-            $"  Mana Cost: {s.ManaCost}\n" +
-            $"  Damage: {s.EffectPower}\n" +
-            $"  Type: {s.TypeOfDamage}\n" +
-            $"  Target: {s.Target}\n"
-        ).ToList();
+
+        var skillDetails = Skills.Select(s => FormatSkillDetails(s)).ToList();
         skillDetails.Add("Skip the turn");
 
-        Skill? skill = null;
-        Character? target = null;
+        var skill = PromptSkillChoice(skillDetails);
+        if (skill == null) return;
 
+        Character? target = skill.Target == TargetType.Enemy ? PromptTargetSelection() : null;
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
+    }
+
+    private string FormatSkillDetails(Skill skill)
+    {
+        return $"{skill.Name} - {skill.Description}\n" +
+               $"  Cooldown: {skill.CurrentCooldown}/{skill.Cooldown}\n" +
+               $"  Mana Cost: {skill.ManaCost}\n" +
+               $"  Damage: {skill.EffectPower}\n" +
+               $"  Type: {skill.TypeOfDamage}\n" +
+               $"  Target: {skill.Target}\n";
+    }
+
+    private Skill? PromptSkillChoice(List<string> skillDetails)
+    {
         while (true)
         {
             try
             {
-                // Prompt the user to select a skill or skip the turn.
-                var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
-
-                if (skillChoice == skillDetails.Count)
+                var choice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
+                if (choice == skillDetails.Count)
                 {
                     Console.WriteLine("You decided to skip the turn.");
-                    break;
+                    return null;
                 }
-                
-                skill = Skills[skillChoice - 1]; 
-                
+
+                var skill = Skills[choice - 1];
                 if (skill.CurrentCooldown != 0)
                 {
                     Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
                     continue;
                 }
-                
-                // Prompt the user to select a target if the skill targets an enemy.
-                if (skill.Target == TargetType.Enemy)
-                {
-                    target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
-                }
-                break;
+
+                return skill;
             }
             catch (Exception ex)
             {
                 Utils.LogError($"An error occurred during action selection: {ex.Message}");
             }
         }
-        
-        // If a valid skill was chosen, add it to the current skill usage.
-        if (skill != null)
-        {
-            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
-        }
+    }
+
+    private Character? PromptTargetSelection()
+    {
+        return Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
     }
     
     /// <summary>
