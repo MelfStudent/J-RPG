@@ -103,199 +103,293 @@ public class Skill
     }
 
     /// <summary>
-    /// Uses the skill on a target. The skill effect is based on its action type.
+    /// Uses the skill, applying its effect to the target(s) if applicable.
+    /// Checks for cooldown, mana cost, and target validity before applying the effect.
     /// </summary>
     /// <param name="user">The character using the skill.</param>
-    /// <param name="target">The target character (if applicable).</param>
+    /// <param name="target">The target of the skill, if required.</param>
     public void UseSkill(Character user, Character target = null!)
     {
-        // Check if the skill is on cooldown
-        if (CurrentCooldown != 0)
-        {
-            Console.WriteLine($"{Name} is not ready (recharging) !");
-            return;
-        }
-
-        // Check if the user has enough mana to cast the skill
-        if (user.UsesMana && user.CurrentMana < ManaCost)
-        {
-            Console.WriteLine($"{user.Name} doesn't have enough mana to cast {Name}!");
-            return;
-        }
-
-        // Use mana if applicable
-        if (user.UsesMana)
-        {
-            user.UseMana(ManaCost);
-        }
+        if (IsSkillOnCooldown()) return;
+        if (!HasSufficientMana(user)) return;
+        ConsumeManaIfApplicable(user);
 
         try
         {
-            // Execute the skill effect based on the target type
-            switch (Target)
-            {
-                case TargetType.Self:
-                    ExecuteEffect(user, user);
-                    break;
-
-                case TargetType.Enemy:
-                case TargetType.Ally:
-                    if (target == null)
-                    {
-                        throw new ArgumentNullException(nameof(target), $"Target cannot be null for skill {Name}.");
-                    }
-                    ExecuteEffect(user, target);
-                    break;
-
-                case TargetType.AllEnemies:
-                    foreach (var enemy in Menu.TeamThatDefends!.Members)
-                    {
-                        ExecuteEffect(user, enemy);
-                    }
-                    break;
-
-                case TargetType.AllAllies:
-                    foreach (var ally in Menu.TeamThatAttacks!.Members)
-                    {
-                        ExecuteEffect(user, ally);
-                    }
-                    break;
-
-                default:
-                    Console.WriteLine($"Skill {Name} has an unhandled target type.");
-                    break;
-            }
-
-            // Apply cooldown after the skill is used
-            CurrentCooldown = Cooldown;
+            ExecuteSkillBasedOnTarget(user, target);
+            ApplyCooldown();
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred while using skill {Name}: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred while using skill {Name}: {ex.Message}");
         }
     }
 
     /// <summary>
-    /// Executes the effect of the skill on the target.
-    /// The effect depends on the action type (e.g., damage, healing, buff, debuff).
+    /// Checks if the skill is on cooldown.
+    /// </summary>
+    /// <returns>True if the skill is on cooldown, otherwise false.</returns>
+    private bool IsSkillOnCooldown()
+    {
+        if (CurrentCooldown != 0)
+        {
+            Console.WriteLine($"{Name} is not ready (recharging)!");
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the user has sufficient mana to use the skill.
+    /// </summary>
+    /// <param name="user">The character attempting to use the skill.</param>
+    /// <returns>True if the user has enough mana, otherwise false.</returns>
+    private bool HasSufficientMana(Character user)
+    {
+        if (user.UsesMana && user.CurrentMana < ManaCost)
+        {
+            Console.WriteLine($"{user.Name} doesn't have enough mana to cast {Name}!");
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Consumes mana from the user if the skill has a mana cost.
     /// </summary>
     /// <param name="user">The character using the skill.</param>
-    /// <param name="target">The target character of the skill's effect.</param>
+    private void ConsumeManaIfApplicable(Character user)
+    {
+        if (user.UsesMana)
+        {
+            user.UseMana(ManaCost);
+        }
+    }
+
+    /// <summary>
+    /// Executes the skill's effect based on its target type.
+    /// </summary>
+    /// <param name="user">The character using the skill.</param>
+    /// <param name="target">The target of the skill.</param>
+    private void ExecuteSkillBasedOnTarget(Character user, Character target)
+    {
+        switch (Target)
+        {
+            case TargetType.Self:
+                ExecuteEffect(user, user);
+                break;
+
+            case TargetType.Enemy:
+            case TargetType.Ally:
+                EnsureTargetIsNotNull(target);
+                ExecuteEffect(user, target);
+                break;
+
+            case TargetType.AllEnemies:
+                ApplyEffectToAll(Menu.TeamThatDefends!.Members, user);
+                break;
+
+            case TargetType.AllAllies:
+                ApplyEffectToAll(Menu.TeamThatAttacks!.Members, user);
+                break;
+
+            default:
+                Console.WriteLine($"Skill {Name} has an unhandled target type.");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Ensures that the target is not null when required by the skill.
+    /// </summary>
+    /// <param name="target">The target to check.</param>
+    /// <exception cref="ArgumentNullException">Thrown if the target is null.</exception>
+    private void EnsureTargetIsNotNull(Character target)
+    {
+        if (target == null)
+        {
+            throw new ArgumentNullException(nameof(target), $"Target cannot be null for skill {Name}.");
+        }
+    }
+
+    /// <summary>
+    /// Applies the skill's effect to all characters in the target group.
+    /// </summary>
+    /// <param name="targets">The group of characters to target.</param>
+    /// <param name="user">The character using the skill.</param>
+    private void ApplyEffectToAll(IEnumerable<Character> targets, Character user)
+    {
+        foreach (var target in targets)
+        {
+            ExecuteEffect(user, target);
+        }
+    }
+
+    /// <summary>
+    /// Applies the skill's cooldown.
+    /// </summary>
+    private void ApplyCooldown()
+    {
+        CurrentCooldown = Cooldown;
+    }
+
+    /// <summary>
+    /// Executes the skill's primary effect (e.g., damage, healing, buff, debuff).
+    /// </summary>
+    /// <param name="user">The character using the skill.</param>
+    /// <param name="target">The target of the skill.</param>
     private void ExecuteEffect(Character user, Character target)
     {
-        // Determine what action to perform based on the skill's action type
         switch (_skillAction)
         {
             case ActionType.Damage:
-                    var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
-                    if (Name == "Low blow" && target.CurrentHitPoints < target.MaxHitPoints)
-                    {
-                        damageAttack.Damage = (int)(damageAttack.Damage * 1.50);
-                    }
-                    Character.Tackle(damageAttack);   
+                ApplyDamage(user, target);
                 break;
 
             case ActionType.Heal:
-                    target.RestoreHealth(EffectPower);
-                    Console.WriteLine($"{target.Name} recover {EffectPower} PV thanks to {Name} !");
+                ApplyHealing(target);
                 break;
 
             case ActionType.Buff:
-                // Handle specific buffs like "Drink", "Frost Barrier", and "Escape"
-                if (Name == "Drink")
-                {
-                    var manaRecovered = Math.Min(EffectPower, user.MaxMana - user.CurrentMana);
-                    user.CurrentMana += manaRecovered;
-                    Console.WriteLine($"{user.Name} drinks a potion and recovers {manaRecovered} mana points. Current Mana: {user.CurrentMana}/{user.MaxMana}");
-                } else if (Name == "Frost Barrier")
-                {
-                    if (user is Mage mage)
-                    {
-                        Console.WriteLine("\n========== ACTION PHASE ==========");
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"{user.Name} activates Frost Barrier!");
-                        Console.WriteLine("The next two attacks will be reduced:");
-                        Console.WriteLine("- Physical damage reduced by 60%");
-                        Console.WriteLine("- Magical damage reduced by 50%");
-                        Console.ResetColor();
-                        mage.RemainingDamageReductions = 2;
-                        Console.WriteLine("===================================\n");
-                    }
-                } else if (Name == "Escape")
-                {
-                    if (user is Thief thief)
-                    {
-                        Console.WriteLine("\n========== ACTION PHASE ==========");
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"{user.Name} uses Escape!");
-                        var newDodgeChance = 50;
-                        var newChanceSpellResistance = 50;
-                        
-                        // Adjust dodge chance and spell resistance for "Escape"
-                        if (thief.DodgeChance + 20 <= 50)
-                        {
-                            newDodgeChance += thief.DodgeChance + 20;
-                        } else if (thief.ChanceSpellResistance + 20 <= 50)
-                        {
-                            newChanceSpellResistance += thief.ChanceSpellResistance + 20;
-                        }
-                        thief.DodgeChance = newDodgeChance;
-                        thief.ChanceSpellResistance = newChanceSpellResistance;
-                        
-                        Console.WriteLine($"New Dodge Chance: {thief.DodgeChance}%");
-                        Console.WriteLine($"New Resistance Chance: {thief.ChanceSpellResistance}%");
-                        Console.ResetColor();
-                        Console.WriteLine("===================================\n");
-                    }
-                }
-                else
-                {
-                    // Handle general buffs for attributes
-                    switch (_targetStat)
-                    {
-                        case AffectedStat.PhysicalAttack:
-                            Console.WriteLine($"{target.Name}'s physical attack increases by {EffectPower} due to {Name}!");
-                            target.PhysicalAttackPower += EffectPower;
-                            break;
-
-                        case AffectedStat.MagicAttack:
-                            Console.WriteLine($"{target.Name}'s magic attack increases by {EffectPower} due to {Name}!");
-                            target.MagicAttackPower += EffectPower;
-                            break;
-
-                        default:
-                            Console.WriteLine($"{target.Name} receives a generic buff with {Name}.");
-                            break;
-                    }   
-                }
+                ApplyBuff(user, target);
                 break;
 
             case ActionType.Debuff:
-                // Handle debuffs like "Mana Burn"
-                if (Name == "Mana Burn")
-                {
-                    Console.WriteLine("\n========== ACTION PHASE ==========");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{user.Name} uses Mana Burn on {target.Name}!");
-                    
-                    if (target.CurrentMana / 2 >= 40)
-                    {
-                        var previousMana = target.CurrentMana;
-                        target.CurrentMana /= 2;
-                        Console.WriteLine($"{target.Name}'s mana is reduced by half from {previousMana} to {target.CurrentMana}!");
-                    }
-                    else
-                    {
-                        var previousMana = target.CurrentMana;
-                        target.CurrentMana -= 40;
-                        Console.WriteLine($"{target.Name}'s mana is reduced by 40 from {previousMana} to {target.CurrentMana}!");
-                    }
-                    Console.ResetColor();
-                    Console.WriteLine("===================================\n");
-                }
+                ApplyDebuff(user, target);
                 break;
+        }
+    }
+
+    /// <summary>
+    /// Applies damage to the target based on the skill's power and type.
+    /// </summary>
+    /// <param name="user">The character using the skill.</param>
+    /// <param name="target">The target receiving the damage.</param>
+    private void ApplyDamage(Character user, Character target)
+    {
+        var damageAttack = new Attack(Name, user, target, EffectPower, TypeOfDamage);
+        if (Name == "Low blow" && target.CurrentHitPoints < target.MaxHitPoints)
+        {
+            damageAttack.Damage = (int)(damageAttack.Damage * 1.50);
+        }
+        Character.Tackle(damageAttack);
+    }
+
+    /// <summary>
+    /// Heals the target by the skill's effect power.
+    /// </summary>
+    /// <param name="target">The character to heal.</param>
+    private void ApplyHealing(Character target)
+    {
+        target.RestoreHealth(EffectPower);
+        Console.WriteLine($"{target.Name} recovers {EffectPower} HP thanks to {Name}!");
+    }
+
+    /// <summary>
+    /// Applies a buff to the target, modifying stats or triggering special effects.
+    /// </summary>
+    /// <param name="user">The character applying the buff.</param>
+    /// <param name="target">The character receiving the buff.</param>
+    private void ApplyBuff(Character user, Character target)
+    {
+        switch (Name)
+        {
+            case "Drink":
+                RecoverMana(user);
+                break;
+
+            case "Frost Barrier":
+                ActivateFrostBarrier(user);
+                break;
+
+            case "Escape":
+                ActivateEscape(user);
+                break;
+
+            default:
+                ApplyGenericBuff(target);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Recovers mana for the user based on the skill's effect power.
+    /// Ensures that the recovered mana does not exceed the user's maximum mana.
+    /// </summary>
+    /// <param name="user">The character recovering mana.</param>
+    private void RecoverMana(Character user)
+    {
+        var manaRecovered = Math.Min(EffectPower, user.MaxMana - user.CurrentMana);
+        user.CurrentMana += manaRecovered;
+        Console.WriteLine($"{user.Name} drinks a potion and recovers {manaRecovered} mana points. Current Mana: {user.CurrentMana}/{user.MaxMana}");
+    }
+
+    /// <summary>
+    /// Activates the Frost Barrier buff for the user, granting damage reduction for a limited number of attacks.
+    /// Only applicable to characters of the Mage class.
+    /// </summary>
+    /// <param name="user">The Mage activating Frost Barrier.</param>
+    private static void ActivateFrostBarrier(Character user)
+    {
+        if (user is Mage mage)
+        {
+            Console.WriteLine($"{user.Name} activates Frost Barrier!");
+            mage.RemainingDamageReductions = 2;
+        }
+    }
+
+    /// <summary>
+    /// Activates the Escape buff for the user, increasing dodge and spell resistance chances.
+    /// Only applicable to characters of the Thief class.
+    /// </summary>
+    /// <param name="user">The Thief activating Escape.</param>
+    private static void ActivateEscape(Character user)
+    {
+        if (user is Thief thief)
+        {
+            Console.WriteLine($"{user.Name} uses Escape!");
+            thief.DodgeChance = Math.Min(thief.DodgeChance + 20, 50);
+            thief.ChanceSpellResistance = Math.Min(thief.ChanceSpellResistance + 20, 50);
+        }
+    }
+
+    /// <summary>
+    /// Applies a generic buff to the target, modifying stats such as physical or magic attack power.
+    /// The type of stat affected is determined by the skill's configuration.
+    /// </summary>
+    /// <param name="target">The character receiving the buff.</param>
+    private void ApplyGenericBuff(Character target)
+    {
+        switch (_targetStat)
+        {
+            case AffectedStat.PhysicalAttack:
+                target.PhysicalAttackPower += EffectPower;
+                Console.WriteLine($"{target.Name}'s physical attack increases by {EffectPower} due to {Name}!");
+                break;
+
+            case AffectedStat.MagicAttack:
+                target.MagicAttackPower += EffectPower;
+                Console.WriteLine($"{target.Name}'s magic attack increases by {EffectPower} due to {Name}!");
+                break;
+
+            default:
+                Console.WriteLine($"{target.Name} receives a generic buff with {Name}.");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Applies a debuff to the target, reducing stats or triggering negative effects.
+    /// </summary>
+    /// <param name="user">The character applying the debuff.</param>
+    /// <param name="target">The character receiving the debuff.</param>
+    private void ApplyDebuff(Character user, Character target)
+    {
+        if (Name == "Mana Burn")
+        {
+            Console.WriteLine($"{user.Name} uses Mana Burn on {target.Name}!");
+            target.CurrentMana = Math.Max(target.CurrentMana / 2, target.CurrentMana - 40);
+            Console.WriteLine($"{target.Name}'s mana is reduced to {target.CurrentMana}!");
         }
     }
 

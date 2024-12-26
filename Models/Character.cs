@@ -161,9 +161,7 @@ public abstract class Character
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred during the attack: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred during the attack: {ex.Message}");
         }
     }
 
@@ -178,69 +176,119 @@ public abstract class Character
     /// <exception cref="ArgumentOutOfRangeException">Thrown if the attack power is negative.</exception>
     protected virtual DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
+        ValidateDefenseInputs(attacker, attackPower);
+
+        var result = new DefenseResult();
+        try
+        {
+            if (HandleEvasionAndParry(typeOfAttack, attackPower, ref result))
+                return result;
+
+            var damage = CalculateDamageAfterResistance(attacker, typeOfAttack, attackPower, ref result);
+
+            ApplyDamageAndCheckDeath(damage, result);
+        }
+        catch (Exception ex)
+        {
+            Utils.LogError($"Error during defense: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Validates the inputs for the defense process.
+    /// </summary>
+    /// <param name="attacker">The character initiating the attack.</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <exception cref="ArgumentNullException">Thrown if the attacker is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the attack power is negative.</exception>
+
+    private static void ValidateDefenseInputs(Character attacker, int attackPower)
+    {
         if (attacker == null)
             throw new ArgumentNullException(nameof(attacker), "Attacker cannot be null.");
         if (attackPower < 0)
             throw new ArgumentOutOfRangeException(nameof(attackPower), "Attack power must be non-negative.");
+    }
 
-        var result = new DefenseResult();
+    /// <summary>
+    /// Handles the evasion and parry mechanics during a defense attempt.
+    /// </summary>
+    /// <param name="typeOfAttack">The type of the attack (physical or magical).</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <param name="result">The defense result object to update.</param>
+    /// <returns>True if the attack was evaded or parried; otherwise, false.</returns>
+    private bool HandleEvasionAndParry(TypeDamage typeOfAttack, int attackPower, ref DefenseResult result)
+    {
+        if (typeOfAttack == TypeDamage.Physical)
+        {
+            if (PerformLuckTest(DodgeChance))
+            {
+                result.IsDodged = true;
+                Console.WriteLine($"{Name} dodged the attack!");
+                return true;
+            }
+            if (PerformLuckTest(ParadeChance))
+            {
+                result.IsParried = true;
+                result.DamageTaken = attackPower / 2;
+                Console.WriteLine($"{Name} parried the attack and reduced damage to {result.DamageTaken}!");
+                return true;
+            }
+        }
+        else if (typeOfAttack == TypeDamage.Magic && PerformLuckTest(ChanceSpellResistance))
+        {
+            Console.WriteLine($"{Name} resisted the magic attack!");
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Calculates the damage after applying armor resistance and special effects.
+    /// </summary>
+    /// <param name="attacker">The character attacking.</param>
+    /// <param name="typeOfAttack">The type of the attack (physical or magical).</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <param name="result">The defense result object to update.</param>
+    /// <returns>The damage after applying all resistances and effects.</returns>
+    private int CalculateDamageAfterResistance(Character attacker, TypeDamage typeOfAttack, int attackPower, ref DefenseResult result)
+    {
         var damage = attackPower;
-        
-        try
-        {
-            if (typeOfAttack == TypeDamage.Physical)
-            {
-                if (PerformLuckTest(DodgeChance))
-                {
-                    result.IsDodged = true;
-                    Console.WriteLine($"{Name} dodged the attack!");
-                    return result;
-                }
-                if (PerformLuckTest(ParadeChance))
-                {
-                    result.IsParried = true;
-                    damage = attackPower / 2;
-                    Console.WriteLine($"{Name} parried the attack and reduced damage to {damage}!");
-                }
-            } else if (typeOfAttack == TypeDamage.Magic)
-            {
-                if (PerformLuckTest(ChanceSpellResistance))
-                {
-                    Console.WriteLine($"{Name} resisted the magic attack!");
-                    return result;
-                }
-                Speed = (int)(Speed * 0.85);
-            }
-            
-            // Apply armor resistance
-            damage = GetArmorResistance(Armor, typeOfAttack, damage);
-            result.DamageTaken = damage;
 
-            // Special case for Paladin class to restore health
-            if (attacker is Paladin paladin)
-            {
-                paladin.RestoreHealth(damage / 2);
-            }
-            
-            // Update the character's health after the attack
-            if ((CurrentHitPoints -= damage) <= 0)
-            {
-                CurrentHitPoints = 0;
-                IsDead = true;
-                Console.WriteLine($"{Name} has died.");
-                return result;
-            }
-            
-            Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
-        }
-        catch (Exception ex)
+        // Reduce speed for magic attacks
+        if (typeOfAttack == TypeDamage.Magic)
+            Speed = (int)(Speed * 0.85);
+
+        damage = GetArmorResistance(Armor, typeOfAttack, damage);
+        result.DamageTaken = damage;
+
+        // Special case for Paladin to restore health
+        if (attacker is Paladin paladin)
+            paladin.RestoreHealth(damage / 2);
+
+        return damage;
+    }
+
+    /// <summary>
+    /// Applies the calculated damage to the character and checks if the character has died.
+    /// </summary>
+    /// <param name="damage">The amount of damage to apply.</param>
+    /// <param name="result">The defense result object to update.</param>
+    private void ApplyDamageAndCheckDeath(int damage, DefenseResult result)
+    {
+        CurrentHitPoints -= damage;
+
+        if (CurrentHitPoints <= 0)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error during defense: {ex.Message}");
-            Console.ResetColor();
+            CurrentHitPoints = 0;
+            IsDead = true;
+            Console.WriteLine($"{Name} has died.");
+            return;
         }
-        
-        return result;
+
+        Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
     /// <summary>
