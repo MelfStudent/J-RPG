@@ -1,0 +1,62 @@
+{
+  "Warrior": {
+    "MaxHitPoints": 100,
+    "PhysicalAttackPower": 50,
+    "MagicAttackPower": 0,
+    "Armor": "Plates",
+    "DodgeChance": 5,
+    "ParadeChance": 25,
+    "ChanceSpellResistance": 10,
+    "Speed": 50,
+    "HasMana": false,
+    "ManaPoints": 0
+  },
+  "Mage": {
+    "MaxHitPoints": 60,
+    "PhysicalAttackPower": 0,
+    "MagicAttackPower": 75,
+    "Armor": "Fabric",
+    "DodgeChance": 5,
+    "ParadeChance": 5,
+    "ChanceSpellResistance": 25,
+    "Speed": 75,
+    "HasMana": true,
+    "ManaPoints": 100
+  },
+  "Paladin": {
+    "MaxHitPoints": 95,
+    "PhysicalAttackPower": 40,
+    "MagicAttackPower": 40,
+    "Armor": "Mesh",
+    "DodgeChance": 5,
+    "ParadeChance": 10,
+    "ChanceSpellResistance": 20,
+    "Speed": 75,
+    "HasMana": true,
+    "ManaPoints": 60
+  },
+  "Thief": {
+    "MaxHitPoints": 80,
+    "PhysicalAttackPower": 55,
+    "MagicAttackPower": 0,
+    "Armor": "Leather",
+    "DodgeChance": 15,
+    "ParadeChance": 25,
+    "ChanceSpellResistance": 25,
+    "Speed": 100,
+    "HasMana": false,
+    "ManaPoints": 0
+  },
+  "Priest": {
+    "MaxHitPoints": 70,
+    "PhysicalAttackPower": 0,
+    "MagicAttackPower": 65,
+    "Armor": "Fabric",
+    "DodgeChance": 10,
+    "ParadeChance": 0,
+    "ChanceSpellResistance": 20,
+    "Speed": 70,
+    "HasMana": true,
+    "ManaPoints": 100
+  }
+}
