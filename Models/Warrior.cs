@@ -109,24 +109,14 @@ public class Warrior : Character
 
     /// <summary>
     /// Prompts the user to choose an action for the Warrior during the player's turn.
-    /// Displays available skills, handles cooldowns, and allows the selection of a target.
     /// </summary>
     public override void ChoiceAction()
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: WARRIOR)");
         Console.WriteLine(ToString());
-        
-        var skillDetails = Skills.Select(s => 
-        $"{s.Name} - {s.Description}\n" +
-        $"  Cooldown: {s.CurrentCooldown}/{s.Cooldown}\n" +
-        $"  Mana Cost: {s.ManaCost}\n" +
-        $"  Damage: {s.EffectPower}\n" +
-        $"  Type: {s.TypeOfDamage}\n" +
-        $"  Target: {s.Target}\n"
-        ).ToList();
-        skillDetails.Add("Skip the turn");
 
+        var skillDetails = GenerateSkillDetails();
         Skill? skill = null;
         Character? target = null;
 
@@ -134,29 +124,16 @@ public class Warrior : Character
         {
             try
             {
-                // Prompt the user to select a skill or skip the turn.
-                var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
-
-                if (skillChoice == skillDetails.Count)
+                // Let the user choose an action.
+                skill = ChooseSkill(skillDetails);
+                if (skill == null)
                 {
                     Console.WriteLine("You decided to skip the turn.");
                     break;
                 }
-                
-                skill = Skills[skillChoice - 1]; 
-                
-                // If the selected skill is on cooldown, ask the player to choose another action.
-                if (skill.CurrentCooldown != 0)
-                {
-                    Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
-                    continue;
-                }
-                
-                // If the skill targets an enemy, prompt for target selection.
-                if (skill.Target == TargetType.Enemy)
-                {
-                    target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
-                }
+
+                // Handle skill target selection if necessary.
+                target = HandleTargetSelection(skill);
                 break;
             }
             catch (Exception ex)
@@ -164,12 +141,68 @@ public class Warrior : Character
                 Utils.LogError($"An error occurred during action selection: {ex.Message}");
             }
         }
-        
+
         // Add the selected skill usage to the current turn.
         if (skill != null)
         {
-            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
+            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
         }
+    }
+
+    /// <summary>
+    /// Generates the list of skill details to display to the player.
+    /// </summary>
+    /// <returns>A list of formatted skill descriptions.</returns>
+    private List<string> GenerateSkillDetails()
+    {
+        var skillDetails = Skills.Select(s =>
+            $"{s.Name} - {s.Description}\n" +
+            $"  Cooldown: {s.CurrentCooldown}/{s.Cooldown}\n" +
+            $"  Mana Cost: {s.ManaCost}\n" +
+            $"  Damage: {s.EffectPower}\n" +
+            $"  Type: {s.TypeOfDamage}\n" +
+            $"  Target: {s.Target}\n"
+        ).ToList();
+        skillDetails.Add("Skip the turn");
+        return skillDetails;
+    }
+
+    /// <summary>
+    /// Allows the user to choose a skill from the available options.
+    /// </summary>
+    /// <param name="skillDetails">A list of skill details to display.</param>
+    /// <returns>The chosen skill, or null if the user skips the turn.</returns>
+    private Skill? ChooseSkill(List<string> skillDetails)
+    {
+        var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
+        if (skillChoice == skillDetails.Count)
+        {
+            return null; // Skip the turn.
+        }
+
+        var selectedSkill = Skills[skillChoice - 1];
+        if (selectedSkill.CurrentCooldown != 0)
+        {
+            Console.WriteLine($"{selectedSkill.Name} skill is recharging, cannot be used. Please choose another action.");
+            throw new InvalidOperationException("Skill on cooldown.");
+        }
+
+        return selectedSkill;
+    }
+
+    /// <summary>
+    /// Handles target selection if the chosen skill requires a target.
+    /// </summary>
+    /// <param name="skill">The selected skill.</param>
+    /// <returns>The chosen target, or null if no target is required.</returns>
+    private Character? HandleTargetSelection(Skill skill)
+    {
+        if (skill.Target == TargetType.Enemy)
+        {
+            return Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
+        }
+
+        return null; // No target needed for self or team-wide skills.
     }
     
     /// <summary>
