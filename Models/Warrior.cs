@@ -145,7 +145,7 @@ public class Warrior : Character
         // Add the selected skill usage to the current turn.
         if (skill != null)
         {
-            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target));
+            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
         }
     }
 
