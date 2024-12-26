@@ -21,7 +21,12 @@ public static class Utils
     /// <summary>
     /// The size of each team in the game.
     /// </summary>
-    private static int _teamSize { get; set; } = 3;
+    private static int _teamSize { get; set; } = 1;
+    
+    /// <summary>
+    /// If the game is over.
+    /// </summary>
+    public static bool IsGameOver { get; set; } = false;
 
     /// <summary>
     /// Prompts the user to choose an option from a list of strings and returns the chosen index (1-based).
@@ -174,23 +179,13 @@ public static class Utils
     /// </summary>
     public static void StartGame()
     {
-        while (true)
+        IsGameOver = false; // Reset indicator
+
+        while (!IsGameOver)
         {
             ChoiceActions();
             ExecutionOfAttacks();
             Menu.SkillsTourCurrent = new List<SkillUsage>();
-
-            if (Menu.Teams[0].NumberPeopleAlive() == 0)
-            {
-                Menu.EndGame("Player 2 wins!");
-                break;
-            }
-
-            if (Menu.Teams[1].NumberPeopleAlive() == 0)
-            {
-                Menu.EndGame("Player 1 wins!");
-                break;
-            }
         }
     }
 
@@ -201,18 +196,20 @@ public static class Utils
     {
         foreach (var player in Menu.TeamThatAttacks!.Members)
         {
+            if (IsGameOver) return; // Stop immediately if the game is over
             if (!player.IsDead)
             {
-                player.ChoiceAction();   
+                player.ChoiceAction();
             }
         }
 
         Team.SwitchPlayers();
         foreach (var player in Menu.TeamThatAttacks.Members)
         {
+            if (IsGameOver) return; // Stop immediately if the game is over
             if (!player.IsDead)
             {
-                player.ChoiceAction();   
+                player.ChoiceAction();
             }
         }
     }
@@ -221,37 +218,79 @@ public static class Utils
     /// Executes attacks for each player in the turn order, considering mana and skill usage.
     /// </summary>
     private static void ExecutionOfAttacks()
+{
+    var combinedTeam = Menu.Player1!.Concat(Menu.Player2!).ToList();
+    var attackOrder = ExecutionSpeedCalculation(combinedTeam);
+
+    foreach (var player in attackOrder)
     {
-        var combinedTeam = Menu.Player1!.Concat(Menu.Player2!).ToList();
-        var attackOrder = ExecutionSpeedCalculation(combinedTeam);
-        
-        foreach (var player in attackOrder)
+        // Check if the game is finished
+        if (Menu.Teams[0].NumberPeopleAlive() == 0 && Menu.Teams[1].NumberPeopleAlive() == 0)
         {
-            var skillUsage = Menu.SkillsTourCurrent.FirstOrDefault(su => su.User == player);
-            var skill = skillUsage!.ChosenSkill;
-            
-            if (skill != null!)
+            Menu.EndGame("It's a draw!");
+            IsGameOver = true;
+            return; // Stop the method immediately
+        }
+        if (Menu.Teams[0].NumberPeopleAlive() == 0)
+        {
+            Menu.EndGame("Player 2 wins!");
+            IsGameOver = true;
+            return; // Stop the method immediately
+        }
+        if (Menu.Teams[1].NumberPeopleAlive() == 0)
+        {
+            Menu.EndGame("Player 1 wins!");
+            IsGameOver = true;
+            return; // Stop the method immediately
+        }
+
+        var skillUsage = Menu.SkillsTourCurrent.FirstOrDefault(su => su.User == player);
+        var skill = skillUsage!.ChosenSkill;
+
+        if (skill != null!)
+        {
+            if (player.UsesMana && player.CurrentMana < skill.ManaCost)
             {
-                if (player.UsesMana && player.CurrentMana < skill.ManaCost) 
-                {
-                    Console.WriteLine($"{player.Name} failed to cast {skill.Name} due to insufficient mana and passes their turn!");
-                }
-                else
-                {
-                    skill.UseSkill(player, skillUsage.Target); 
-                }
+                Console.WriteLine($"{player.Name} failed to cast {skill.Name} due to insufficient mana and passes their turn!");
             }
             else
             {
-                Console.WriteLine("\n========== ATTACK PHASE ==========");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"{player.Name} has passed his turn");
-                Console.ResetColor();
-                Console.WriteLine("===================================\n");
+                skill.UseSkill(player, skillUsage.Target);
             }
         }
-        CooldownReductionAllTeams();
+        else
+        {
+            Console.WriteLine("\n========== ATTACK PHASE ==========");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{player.Name} has passed their turn");
+            Console.ResetColor();
+            Console.WriteLine("===================================\n");
+        }
+
+        // Additional check after each attack
+        if (Menu.Teams[0].NumberPeopleAlive() == 0 && Menu.Teams[1].NumberPeopleAlive() == 0)
+        {
+            Menu.EndGame("It's a draw!");
+            IsGameOver = true;
+            return;
+        }
+        if (Menu.Teams[0].NumberPeopleAlive() == 0)
+        {
+            Menu.EndGame("Player 2 wins!");
+            IsGameOver = true;
+            return;
+        }
+        if (Menu.Teams[1].NumberPeopleAlive() == 0)
+        {
+            Menu.EndGame("Player 1 wins!");
+            IsGameOver = true;
+            return;
+        }
     }
+
+    CooldownReductionAllTeams();
+}
+
 
     /// <summary>
     /// Calculates the order of characters' actions based on their speed.
