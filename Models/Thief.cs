@@ -82,70 +82,59 @@ public class Thief : Character
     }
 
     /// <summary>
-    /// Prompts the user to choose an action for the Thief during their turn.
-    /// Displays available skills, handles cooldowns, and allows the selection of a target.
+    /// Allows the Priest to choose an action during their turn, including using skills or skipping the turn.
     /// </summary>
     public override void ChoiceAction()
     {
         Console.WriteLine("\n========== ACTION SELECTION ==========");
-        Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: THIEF)");
+        Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: PRIEST)");
         Console.WriteLine(ToString());
 
-        var skillDetails = PrepareSkillDetails();
-        Skill? selectedSkill = PromptSkillChoice(skillDetails);
-
-        if (selectedSkill == null)
-        {
-            Console.WriteLine("You decided to skip the turn.");
-            return;
-        }
-
-        Character? target = SelectTargetForSkill(selectedSkill);
-
-        if (selectedSkill != null && target != null)
-        {
-            RegisterSkillUsage(selectedSkill, target);
-        }
-    }
-
-    /// <summary>
-    /// Prepares a list of skill details for display during the action selection phase.
-    /// </summary>
-    /// <returns>A list of strings representing each skill's details.</returns>
-    private List<string> PrepareSkillDetails()
-    {
-        var skillDetails = Skills.Select(s => 
-            $"{s.Name} - {s.Description}\n" +
-            $"  Cooldown: {s.CurrentCooldown}/{s.Cooldown}\n" +
-            $"  Mana Cost: {s.ManaCost}\n" +
-            $"  Damage: {s.EffectPower}\n" +
-            $"  Type: {s.TypeOfDamage}\n" +
-            $"  Target: {s.Target}\n"
-        ).ToList();
-
+        var skillDetails = Skills.Select(s => FormatSkillDetails(s)).ToList();
         skillDetails.Add("Skip the turn");
-        return skillDetails;
+
+        var skill = PromptSkillChoice(skillDetails);
+        if (skill == null) return;
+
+        Character? target = skill.Target == TargetType.Enemy ? PromptTargetSelection() : null;
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
+    }
+
+   /// <summary>
+    /// Formats the details of a skill for display in the action selection menu.
+    /// </summary>
+    /// <param name="skill">The skill to format.</param>
+    /// <returns>A string containing formatted details of the skill, including cooldown, mana cost, damage, type, and target.</returns>
+    private static string FormatSkillDetails(Skill skill)
+    {
+        return $"{skill.Name} - {skill.Description}\n" +
+               $"  Cooldown: {skill.CurrentCooldown}/{skill.Cooldown}\n" +
+               $"  Mana Cost: {skill.ManaCost}\n" +
+               $"  Damage: {skill.EffectPower}\n" +
+               $"  Type: {skill.TypeOfDamage}\n" +
+               $"  Target: {skill.Target}\n";
     }
 
     /// <summary>
-    /// Prompts the user to select a skill or skip the turn.
+    /// Prompts the player to choose a skill from the available options.
     /// </summary>
-    /// <param name="skillDetails">A list of strings representing skill options.</param>
-    /// <returns>The selected skill, or null if the user skips the turn.</returns>
+    /// <param name="skillDetails">A list of formatted skill descriptions to display.</param>
+    /// <returns>The chosen <see cref="Skill"/> object, or null if the player decides to skip the turn.</returns>
+    /// <exception cref="Exception">Handles errors during the skill selection process.</exception>
     private Skill? PromptSkillChoice(List<string> skillDetails)
     {
         while (true)
         {
             try
             {
-                var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
-
-                if (skillChoice == skillDetails.Count)
+                var choice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
+                if (choice == skillDetails.Count)
                 {
-                    return null; // Skip the turn
+                    Console.WriteLine("You decided to skip the turn.");
+                    return null;
                 }
 
-                var skill = Skills[skillChoice - 1];
+                var skill = Skills[choice - 1];
                 if (skill.CurrentCooldown != 0)
                 {
                     Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
@@ -156,46 +145,19 @@ public class Thief : Character
             }
             catch (Exception ex)
             {
-                Utils.LogError($"An error occurred during skill selection: {ex.Message}");
+                Utils.LogError($"An error occurred during action selection: {ex.Message}");
             }
         }
     }
 
     /// <summary>
-    /// Selects a target for the given skill based on its target type.
+    /// Prompts the player to select a target for their action.
     /// </summary>
-    /// <param name="skill">The skill for which a target needs to be selected.</param>
-    /// <returns>The selected target, or null if no valid target is chosen.</returns>
-    private Character? SelectTargetForSkill(Skill skill)
+    /// <returns>The selected <see cref="Character"/> as the target, or null if no target is selected.</returns>
+    /// <exception cref="Exception">Handles errors during target selection.</exception>
+    private Character? PromptTargetSelection()
     {
-        try
-        {
-            if (skill.Target == TargetType.Enemy)
-            {
-                return Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
-            }
-            if (skill.Target == TargetType.AllAllies || skill.Target == TargetType.Self)
-            {
-                // For self-target or ally-target skills, return null (no explicit target needed).
-                return null;
-            }
-        }
-        catch (Exception ex)
-        {
-            Utils.LogError($"An error occurred during target selection: {ex.Message}");
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Registers the usage of a skill by adding it to the current skill usage list.
-    /// </summary>
-    /// <param name="skill">The skill being used.</param>
-    /// <param name="target">The target of the skill.</param>
-    private void RegisterSkillUsage(Skill skill, Character? target)
-    {
-        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
+        return Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
     }
     
     /// <summary>
