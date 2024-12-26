@@ -91,12 +91,13 @@ public class Mage : Character
     }
     
     /// <summary>
-    /// Defends the Mage against an attack. Handles the use of magical defense abilities like Spell Return and Frost Barrier.
+    /// Handles the Mage's defense against an attack.
     /// </summary>
-    /// <param name="attacker">The character attacking the Mage.</param>
-    /// <param name="typeOfAttack">The type of attack (Physical, Magic).</param>
+    /// <param name="attacker">The attacking character.</param>
+    /// <param name="typeOfAttack">The type of the attack (physical or magical).</param>
     /// <param name="attackPower">The power of the attack.</param>
-    /// <returns>A DefenseResult object indicating the outcome of the defense attempt.</returns>
+    /// <returns>A <see cref="DefenseResult"/> object representing the outcome of the defense.</returns>
+    /// <exception cref="Exception">Handles any unexpected errors during the defense process.</exception>
     protected override DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         var result = new DefenseResult();
@@ -117,6 +118,13 @@ public class Mage : Character
         return result;
     }
 
+    /// <summary>
+    /// Handles the Spell Return ability, reflecting the magic attack back to the attacker.
+    /// </summary>
+    /// <param name="attacker">The character who initiated the attack.</param>
+    /// <param name="typeOfAttack">The type of attack (must be magical for this ability).</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <returns>True if the Spell Return ability was triggered and handled; otherwise, false.</returns>
     private bool HandleSpellReturn(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
         if (!_isSpellBeingReturned || typeOfAttack != TypeDamage.Magic) return false;
@@ -132,6 +140,12 @@ public class Mage : Character
         return true;
     }
 
+    /// <summary>
+    /// Applies the Frost Barrier effect, reducing the damage from the next few attacks.
+    /// </summary>
+    /// <param name="attackPower">The original power of the attack.</param>
+    /// <param name="typeOfAttack">The type of attack (physical or magical).</param>
+    /// <returns>The reduced attack power after applying the Frost Barrier effect.</returns>
     private int ApplyFrostBarrier(int attackPower, TypeDamage typeOfAttack)
     {
         if (RemainingDamageReductions <= 0) return attackPower;
@@ -170,7 +184,12 @@ public class Mage : Character
         Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
     }
 
-    private string FormatSkillDetails(Skill skill)
+    /// <summary>
+    /// Formats the details of a skill for display in the action selection menu.
+    /// </summary>
+    /// <param name="skill">The skill to format.</param>
+    /// <returns>A string containing formatted details of the skill, including cooldown, mana cost, damage, type, and target.</returns>
+    private static string FormatSkillDetails(Skill skill)
     {
         return $"{skill.Name} - {skill.Description}\n" +
                $"  Cooldown: {skill.CurrentCooldown}/{skill.Cooldown}\n" +
@@ -180,6 +199,12 @@ public class Mage : Character
                $"  Target: {skill.Target}\n";
     }
 
+    /// <summary>
+    /// Prompts the player to choose a skill from the available options.
+    /// </summary>
+    /// <param name="skillDetails">A list of formatted skill descriptions to display.</param>
+    /// <returns>The chosen <see cref="Skill"/> object, or null if the player decides to skip the turn.</returns>
+    /// <exception cref="Exception">Handles errors during the skill selection process.</exception>
     private Skill? PromptSkillChoice(List<string> skillDetails)
     {
         while (true)
@@ -209,6 +234,11 @@ public class Mage : Character
         }
     }
 
+    /// <summary>
+    /// Prompts the player to select a target for their action.
+    /// </summary>
+    /// <returns>The selected <see cref="Character"/> as the target, or null if no target is selected.</returns>
+    /// <exception cref="Exception">Handles errors during target selection.</exception>
     private Character? PromptTargetSelection()
     {
         return Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);

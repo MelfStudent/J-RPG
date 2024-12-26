@@ -196,7 +196,15 @@ public abstract class Character
         return result;
     }
 
-    private void ValidateDefenseInputs(Character attacker, int attackPower)
+    /// <summary>
+    /// Validates the inputs for the defense process.
+    /// </summary>
+    /// <param name="attacker">The character initiating the attack.</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <exception cref="ArgumentNullException">Thrown if the attacker is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the attack power is negative.</exception>
+
+    private static void ValidateDefenseInputs(Character attacker, int attackPower)
     {
         if (attacker == null)
             throw new ArgumentNullException(nameof(attacker), "Attacker cannot be null.");
@@ -204,6 +212,13 @@ public abstract class Character
             throw new ArgumentOutOfRangeException(nameof(attackPower), "Attack power must be non-negative.");
     }
 
+    /// <summary>
+    /// Handles the evasion and parry mechanics during a defense attempt.
+    /// </summary>
+    /// <param name="typeOfAttack">The type of the attack (physical or magical).</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <param name="result">The defense result object to update.</param>
+    /// <returns>True if the attack was evaded or parried; otherwise, false.</returns>
     private bool HandleEvasionAndParry(TypeDamage typeOfAttack, int attackPower, ref DefenseResult result)
     {
         if (typeOfAttack == TypeDamage.Physical)
@@ -230,6 +245,14 @@ public abstract class Character
         return false;
     }
 
+    /// <summary>
+    /// Calculates the damage after applying armor resistance and special effects.
+    /// </summary>
+    /// <param name="attacker">The character attacking.</param>
+    /// <param name="typeOfAttack">The type of the attack (physical or magical).</param>
+    /// <param name="attackPower">The power of the attack.</param>
+    /// <param name="result">The defense result object to update.</param>
+    /// <returns>The damage after applying all resistances and effects.</returns>
     private int CalculateDamageAfterResistance(Character attacker, TypeDamage typeOfAttack, int attackPower, ref DefenseResult result)
     {
         var damage = attackPower;
@@ -248,6 +271,11 @@ public abstract class Character
         return damage;
     }
 
+    /// <summary>
+    /// Applies the calculated damage to the character and checks if the character has died.
+    /// </summary>
+    /// <param name="damage">The amount of damage to apply.</param>
+    /// <param name="result">The defense result object to update.</param>
     private void ApplyDamageAndCheckDeath(int damage, DefenseResult result)
     {
         CurrentHitPoints -= damage;
