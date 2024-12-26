@@ -161,9 +161,7 @@ public abstract class Character
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred during the attack: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred during the attack: {ex.Message}");
         }
     }
 
@@ -235,9 +233,7 @@ public abstract class Character
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error during defense: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"Error during defense: {ex.Message}");
         }
         
         return result;

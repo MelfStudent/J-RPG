@@ -171,9 +171,7 @@ public class Skill
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred while using skill {Name}: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred while using skill {Name}: {ex.Message}");
         }
     }
 

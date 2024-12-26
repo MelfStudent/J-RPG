@@ -68,9 +68,7 @@ public class Priest : Character
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred during the defense phase: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred during the defense phase: {ex.Message}");
         }
 
         return result;
@@ -128,9 +126,7 @@ public class Priest : Character
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"An error occurred during action selection: {ex.Message}");
-                Console.ResetColor();
+                Utils.LogError($"An error occurred during action selection: {ex.Message}");
             }
         }
         
@@ -161,9 +157,7 @@ public class Priest : Character
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred while generating the character summary: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred while generating the character summary: {ex.Message}");
             return string.Empty;
         }
     }

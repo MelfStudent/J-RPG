@@ -41,9 +41,7 @@ public static class ConfigLoader
         catch (Exception ex)
         {
             // Handle any exceptions that occur during initialization
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error during ConfigLoader initialization: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"Error during ConfigLoader initialization: {ex.Message}");
             throw;
         }
     }
