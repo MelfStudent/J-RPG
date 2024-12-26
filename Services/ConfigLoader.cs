@@ -21,20 +21,26 @@ public static class ConfigLoader
     {
         try
         {
+            // Define the base path of the application and the path to the configuration file
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var filePath = Path.Combine(basePath, "Resources", "classes.json");
             
+            // Check if the configuration file exists
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Configuration file not found at path: {filePath}");
             }
             
+            // Read the JSON data from the file
             var json = File.ReadAllText(filePath);
+            
+            // Deserialize the JSON into a dictionary of ClassConfig objects
             _classConfigs = JsonSerializer.Deserialize<Dictionary<string, Config>>(json)
                             ?? throw new InvalidDataException("Failed to deserialize class configurations. The JSON may be malformed or empty.");
         }
         catch (Exception ex)
         {
+            // Handle any exceptions that occur during initialization
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Error during ConfigLoader initialization: {ex.Message}");
             Console.ResetColor();

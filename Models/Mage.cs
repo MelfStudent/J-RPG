@@ -106,6 +106,7 @@ public class Mage : Character
 
         try
         {
+            // Handling the "Spell Return" defense mechanism.
             if (_isSpellBeingReturned && typeOfAttack == TypeDamage.Magic)
             {
                 Console.ForegroundColor = ConsoleColor.Magenta;
@@ -118,6 +119,8 @@ public class Mage : Character
                 _isSpellBeingReturned = false;
                 return result;
             } 
+            
+            // Handling damage reduction from Frost Barrier.
             if (RemainingDamageReductions > 0)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
@@ -134,6 +137,7 @@ public class Mage : Character
                 RemainingDamageReductions--;
             }
             
+            // Default defense handling (from the Character class).
             base.Defend(attacker, typeOfAttack, attackPower);
         }
         catch (Exception ex)
@@ -172,6 +176,7 @@ public class Mage : Character
         {
             try
             {
+                // Prompt the user to select a skill or skip the turn.
                 var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
 
                 if (skillChoice == skillDetails.Count)
@@ -188,6 +193,7 @@ public class Mage : Character
                     continue;
                 }
                 
+                // Prompt the user to select a target if the skill targets an enemy.
                 if (skill.Target == TargetType.Enemy)
                 {
                     target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
@@ -202,6 +208,7 @@ public class Mage : Character
             }
         }
         
+        // If a valid skill was chosen, add it to the current skill usage.
         if (skill != null)
         {
             Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));

@@ -77,8 +77,10 @@ public class Warrior : Character
         
         try
         {
+            // Base defense handling (from the Character class).
             var defenseResult = base.Defend(attacker, typeOfAttack, attackPower);
 
+            // If the attack is physical and the Warrior successfully parries or gets lucky, a counterattack occurs.
             if (typeOfAttack == TypeDamage.Physical)
             {
                 if (defenseResult.IsParried || PerformLuckTest(25))
@@ -87,12 +89,13 @@ public class Warrior : Character
                     Console.WriteLine($"[{Name.ToUpper()}] successfully counterattacked!");
                     Console.ResetColor();
                     
+                    // Counterattack damage calculation based on whether it was a parry or luck-based.
                     var counterAttackPower = defenseResult.IsParried
-                        ? (int)(defenseResult.DamageTaken * 1.50)
-                        : defenseResult.DamageTaken / 2;
+                        ? (int)(defenseResult.DamageTaken * 1.50) // 50% more damage if parried.
+                        : defenseResult.DamageTaken / 2; // Halve the damage if luck-based.
                 
                     var counterAttack = new Attack("Counterattack", this, attacker, counterAttackPower, TypeDamage.Physical );
-                    Tackle(counterAttack);
+                    Tackle(counterAttack); // Perform the counterattack using the Tackle method (from Character).
                 }
             }
         }
@@ -133,6 +136,7 @@ public class Warrior : Character
         {
             try
             {
+                // Prompt the user to select a skill or skip the turn.
                 var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
 
                 if (skillChoice == skillDetails.Count)
@@ -143,12 +147,14 @@ public class Warrior : Character
                 
                 skill = Skills[skillChoice - 1]; 
                 
+                // If the selected skill is on cooldown, ask the player to choose another action.
                 if (skill.CurrentCooldown != 0)
                 {
                     Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
                     continue;
                 }
                 
+                // If the skill targets an enemy, prompt for target selection.
                 if (skill.Target == TargetType.Enemy)
                 {
                     target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
@@ -163,6 +169,7 @@ public class Warrior : Character
             }
         }
         
+        // Add the selected skill usage to the current turn.
         if (skill != null)
         {
             Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));

@@ -212,14 +212,17 @@ public abstract class Character
                 Speed = (int)(Speed * 0.85);
             }
             
+            // Apply armor resistance
             damage = GetArmorResistance(Armor, typeOfAttack, damage);
             result.DamageTaken = damage;
 
+            // Special case for Paladin class to restore health
             if (attacker is Paladin paladin)
             {
                 paladin.RestoreHealth(damage / 2);
             }
             
+            // Update the character's health after the attack
             if ((CurrentHitPoints -= damage) <= 0)
             {
                 CurrentHitPoints = 0;
