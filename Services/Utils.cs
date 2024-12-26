@@ -278,4 +278,11 @@ public static class Utils
             }
         }
     }
+
+    public static void LogError(string text)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(text);
+        Console.ResetColor();
+    }
 }

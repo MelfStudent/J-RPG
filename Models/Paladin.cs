@@ -80,9 +80,7 @@ public class Paladin : Character
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred during the defense phase: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred during the defense phase: {ex.Message}");
         }
 
         return result;
@@ -96,66 +94,80 @@ public class Paladin : Character
         Console.WriteLine("\n========== ACTION SELECTION ==========");
         Console.WriteLine($"Player: {Name.ToUpper()} (CLASS: PALADIN)");
         Console.WriteLine(ToString());
-        
-        var skillDetails = Skills.Select(s => 
-            $"{s.Name} - {s.Description}\n" +
-            $"  Cooldown: {s.CurrentCooldown}/{s.Cooldown}\n" +
-            $"  Mana Cost: {s.ManaCost}\n" +
-            $"  Damage: {s.EffectPower}\n" +
-            $"  Type: {s.TypeOfDamage}\n" +
-            $"  Target: {s.Target}\n"
-        ).ToList();
+
+        var skillDetails = Skills.Select(s => FormatSkillDetails(s)).ToList();
         skillDetails.Add("Skip the turn");
 
-        Skill? skill = null;
-        Character? target = null;
+        var skill = PromptSkillChoice(skillDetails);
+        if (skill == null) return;
 
+        Character? target = skill.Target switch
+        {
+            TargetType.Enemy => PromptTargetSelection(Menu.TeamThatDefends!),
+            TargetType.Ally => PromptTargetSelection(Menu.TeamThatAttacks!),
+            _ => null
+        };
+
+        Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
+    }
+
+    /// <summary>
+    /// Formats the details of a skill for display.
+    /// </summary>
+    /// <param name="skill">The skill to format.</param>
+    /// <returns>A formatted string with the skill details.</returns>
+    private string FormatSkillDetails(Skill skill)
+    {
+        return $"{skill.Name} - {skill.Description}\n" +
+               $"  Cooldown: {skill.CurrentCooldown}/{skill.Cooldown}\n" +
+               $"  Mana Cost: {skill.ManaCost}\n" +
+               $"  Damage: {skill.EffectPower}\n" +
+               $"  Type: {skill.TypeOfDamage}\n" +
+               $"  Target: {skill.Target}\n";
+    }
+
+    /// <summary>
+    /// Prompts the player to choose a skill or skip the turn.
+    /// </summary>
+    /// <param name="skillDetails">The list of skill details to display.</param>
+    /// <returns>The chosen skill, or null if the turn is skipped.</returns>
+    private Skill? PromptSkillChoice(List<string> skillDetails)
+    {
         while (true)
         {
             try
             {
-                // Prompt the user to select a skill or skip the turn.
-                var skillChoice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
-
-                if (skillChoice == skillDetails.Count)
+                var choice = Utils.PromptChoice(skillDetails, "Enter a number corresponding to the desired action:");
+                if (choice == skillDetails.Count)
                 {
                     Console.WriteLine("You decided to skip the turn.");
-                    break;
+                    return null;
                 }
 
-                skill = Skills[skillChoice - 1];
-
+                var skill = Skills[choice - 1];
                 if (skill.CurrentCooldown != 0)
                 {
                     Console.WriteLine($"{skill.Name} skill is recharging, cannot be used. Please choose another action.");
                     continue;
                 }
 
-                // Prompt for target selection based on the skill's target type.
-                if (skill.Target == TargetType.Enemy)
-                {
-                    target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatDefends!, this);
-                }
-                
-                if (skill.Target == TargetType.Ally)
-                {
-                    target = Utils.PromptTarget("\nChoose a target:", Menu.TeamThatAttacks!, this);
-                }
-                break;
+                return skill;
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"An error occurred during action selection: {ex.Message}");
-                Console.ResetColor();
+                Utils.LogError($"An error occurred during action selection: {ex.Message}");
             }
         }
+    }
 
-        // If a valid skill was chosen, add it to the current skill usage.
-        if (skill != null)
-        {
-            Menu.SkillsTourCurrent.Add(new SkillUsage(this, skill, target!));
-        }
+    /// <summary>
+    /// Prompts the player to select a target from the given team.
+    /// </summary>
+    /// <param name="team">The team to select a target from.</param>
+    /// <returns>The chosen target.</returns>
+    private Character? PromptTargetSelection(Team team)
+    {
+        return Utils.PromptTarget("\nChoose a target:", team, this);
     }
     
     /// <summary>
@@ -178,9 +190,7 @@ public class Paladin : Character
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"An error occurred while generating the character summary: {ex.Message}");
-            Console.ResetColor();
+            Utils.LogError($"An error occurred while generating the character summary: {ex.Message}");
             return string.Empty;
         }
     }

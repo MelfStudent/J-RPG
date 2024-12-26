@@ -220,11 +220,18 @@ public static class Menu
         PrintNavigationMenu();
     }
     
-    /// <summary>
-    /// Allows the player to edit the configuration of characters by modifying attributes such as hit points, armor, etc.
-    /// The changes are saved back to the `classes.json` file.
-    /// </summary>
     private static void EditConfig()
+    {
+        var filePath = GetConfigFilePath();
+        if (filePath == null) return;
+
+        var characters = LoadCharacterConfigurations(filePath);
+        if (characters == null) return;
+
+        EditCharactersLoop(characters, filePath);
+    }
+
+    private static string? GetConfigFilePath()
     {
         var basePath = AppDomain.CurrentDomain.BaseDirectory;
         var filePath = Path.Combine(basePath, "Resources", "classes.json");
@@ -232,115 +239,147 @@ public static class Menu
         if (!File.Exists(filePath))
         {
             Console.WriteLine($"Configuration file not found: {filePath}");
-            return;
+            return null;
         }
+        return filePath;
+    }
 
+    private static Dictionary<string, Config>? LoadCharacterConfigurations(string filePath)
+    {
         var json = File.ReadAllText(filePath);
         var characters = JsonSerializer.Deserialize<Dictionary<string, Config>>(json);
 
         if (characters == null || characters.Count == 0)
         {
             Console.WriteLine("No characters found in the configuration.");
-            return;
+            return null;
         }
+        return characters;
+    }
 
+    private static void EditCharactersLoop(Dictionary<string, Config> characters, string filePath)
+    {
         while (true)
         {
-            Console.WriteLine("\n========== EDIT CHARACTER CONFIG ==========");
             var characterNames = characters.Keys.ToList();
-            for (var i = 0; i < characterNames.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}. {characterNames[i]}");
-            }
-            Console.WriteLine($"{characterNames.Count + 1}. Return to main menu");
+            DisplayCharacterMenu(characterNames);
 
-            Console.Write("Choose a character to edit: ");
-            if (!int.TryParse(Console.ReadLine(), out var charChoice) || charChoice < 1 || charChoice > characterNames.Count + 1)
-            {
-                Console.WriteLine("Invalid choice. Please try again.");
-                continue;
-            }
+            var charChoice = GetUserChoice(characterNames.Count + 1);
+            if (charChoice == null || charChoice == characterNames.Count + 1) break;
 
-            if (charChoice == characterNames.Count + 1)
+            var selectedCharacter = characterNames[charChoice.Value - 1];
+            EditCharacterPropertiesLoop(selectedCharacter, characters[selectedCharacter], filePath);
+        }
+    }
+
+    private static void DisplayCharacterMenu(List<string> characterNames)
+    {
+        Console.WriteLine("\n========== EDIT CHARACTER CONFIG ==========");
+        for (var i = 0; i < characterNames.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {characterNames[i]}");
+        }
+        Console.WriteLine($"{characterNames.Count + 1}. Return to main menu");
+    }
+
+    private static int? GetUserChoice(int maxChoice)
+    {
+        Console.Write("Choose an option: ");
+        if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > maxChoice)
+        {
+            Console.WriteLine("Invalid choice. Please try again.");
+            return null;
+        }
+        return choice;
+    }
+
+    private static void EditCharacterPropertiesLoop(string characterName, Config characterConfig, string filePath)
+    {
+        while (true)
+        {
+            var properties = typeof(Config).GetProperties();
+            DisplayPropertyMenu(characterName, characterConfig, properties);
+
+            var propChoice = GetUserChoice(properties.Length + 1);
+            if (propChoice == null || propChoice == properties.Length + 1) break;
+
+            var selectedProperty = properties[propChoice.Value - 1];
+            EditProperty(selectedProperty, characterConfig);
+            SaveConfiguration(characterName, characterConfig, filePath);
+        }
+    }
+
+    private static void DisplayPropertyMenu(string characterName, Config characterConfig, System.Reflection.PropertyInfo[] properties)
+    {
+        Console.WriteLine($"\nEditing: {characterName}");
+        for (var i = 0; i < properties.Length; i++)
+        {
+            var value = properties[i].GetValue(characterConfig);
+            Console.WriteLine($"{i + 1}. {properties[i].Name}: {value}");
+        }
+        Console.WriteLine($"{properties.Length + 1}. Back to character selection");
+    }
+
+    private static void EditProperty(System.Reflection.PropertyInfo property, Config characterConfig)
+    {
+        Console.WriteLine($"\nEditing property: {property.Name}");
+
+        if (property.PropertyType == typeof(TypeOfArmor))
+        {
+            Console.WriteLine("Choose an armor type (Fabric, Leather, Mesh, Plates): ");
+            EditArmorProperty(property, characterConfig);
+        }
+        else if (property.PropertyType == typeof(int) || property.PropertyType == typeof(float))
+        {
+            Console.Write($"Enter a new non-negative value for {property.Name}: ");
+            EditNumericProperty(property, characterConfig);
+        }
+        else
+        {
+            Console.Write($"Enter new value for {property.Name}: ");
+            var newValue = Console.ReadLine();
+            property.SetValue(characterConfig, newValue);
+            Console.WriteLine($"{property.Name} updated to {newValue}.");
+        }
+    }
+
+    private static void EditArmorProperty(System.Reflection.PropertyInfo property, Config characterConfig)
+    {
+        while (true)
+        {
+            var input = Console.ReadLine();
+            if (Enum.TryParse(input, true, out TypeOfArmor armor) &&
+                Enum.IsDefined(typeof(TypeOfArmor), armor))
             {
-                Console.WriteLine("Returning to main menu...");
+                property.SetValue(characterConfig, armor);
+                Console.WriteLine($"{property.Name} updated to {armor}.");
                 break;
             }
-
-            var selectedCharacter = characterNames[charChoice - 1];
-            var characterConfig = characters[selectedCharacter];
-
-            while (true)
-            {
-                Console.WriteLine($"\nEditing: {selectedCharacter}");
-                var properties = typeof(Config).GetProperties();
-                for (var i = 0; i < properties.Length; i++)
-                {
-                    var value = properties[i].GetValue(characterConfig);
-                    Console.WriteLine($"{i + 1}. {properties[i].Name}: {value}");
-                }
-                Console.WriteLine($"{properties.Length + 1}. Back to character selection");
-
-                Console.Write("Choose a property to edit: ");
-                if (!int.TryParse(Console.ReadLine(), out var propChoice) || propChoice < 1 || propChoice > properties.Length + 1)
-                {
-                    Console.WriteLine("Invalid choice. Please try again.");
-                    continue;
-                }
-
-                if (propChoice == properties.Length + 1)
-                {
-                    Console.WriteLine("Returning to character selection...");
-                    break;
-                }
-
-                var selectedProperty = properties[propChoice - 1];
-
-                Console.WriteLine(selectedProperty.PropertyType.Name);
-                if (selectedProperty.Name == "Armor")
-                {
-                    Console.WriteLine("Choose an armor type (Fabric, Leather, Mesh, Plates): ");
-                    while (true)
-                    {
-                        var input = Console.ReadLine();
-                        if (Enum.TryParse(input, true, out TypeOfArmor armor) &&
-                            Enum.IsDefined(typeof(TypeOfArmor), armor))
-                        {
-                            selectedProperty.SetValue(characterConfig, armor.ToString());
-                            Console.WriteLine($"{selectedProperty.Name} updated to {armor}.");
-                            break;
-                        }
-                        Console.WriteLine("Invalid armor type. Please choose between Fabric, Leather, Mesh, Plates:");
-                    }
-                }
-                else if (selectedProperty.PropertyType == typeof(int) || selectedProperty.PropertyType == typeof(float))
-                {
-                    Console.Write($"Enter a new non-negative value for {selectedProperty.Name}: ");
-                    while (true)
-                    {
-                        var input = Console.ReadLine();
-                        if (float.TryParse(input, out var numericValue) && numericValue >= 0)
-                        {
-                            var convertedValue = Convert.ChangeType(numericValue, selectedProperty.PropertyType);
-                            selectedProperty.SetValue(characterConfig, convertedValue);
-                            Console.WriteLine($"{selectedProperty.Name} updated to {convertedValue}.");
-                            break;
-                        }
-                        Console.WriteLine("Invalid value. Please enter a non-negative number:");
-                    }
-                }
-                else
-                {
-                    Console.Write($"Enter new value for {selectedProperty.Name}: ");
-                    var newValue = Console.ReadLine();
-                    selectedProperty.SetValue(characterConfig, newValue);
-                    Console.WriteLine($"{selectedProperty.Name} updated to {newValue}.");
-                }
-
-                characters[selectedCharacter] = characterConfig;
-                File.WriteAllText(filePath, JsonSerializer.Serialize(characters, new JsonSerializerOptions { WriteIndented = true }));
-                Console.WriteLine("Changes saved successfully.");
-            }
+            Console.WriteLine("Invalid armor type. Please choose between Fabric, Leather, Mesh, Plates:");
         }
+    }
+
+    private static void EditNumericProperty(System.Reflection.PropertyInfo property, Config characterConfig)
+    {
+        while (true)
+        {
+            var input = Console.ReadLine();
+            if (float.TryParse(input, out var numericValue) && numericValue >= 0)
+            {
+                var convertedValue = Convert.ChangeType(numericValue, property.PropertyType);
+                property.SetValue(characterConfig, convertedValue);
+                Console.WriteLine($"{property.Name} updated to {convertedValue}.");
+                break;
+            }
+            Console.WriteLine("Invalid value. Please enter a non-negative number:");
+        }
+    }
+
+    private static void SaveConfiguration(string characterName, Config characterConfig, string filePath)
+    {
+        var characters = JsonSerializer.Deserialize<Dictionary<string, Config>>(File.ReadAllText(filePath))!;
+        characters[characterName] = characterConfig;
+        File.WriteAllText(filePath, JsonSerializer.Serialize(characters, new JsonSerializerOptions { WriteIndented = true }));
+        Console.WriteLine("Changes saved successfully.");
     }
 }
