@@ -176,67 +176,91 @@ public abstract class Character
     /// <exception cref="ArgumentOutOfRangeException">Thrown if the attack power is negative.</exception>
     protected virtual DefenseResult Defend(Character attacker, TypeDamage typeOfAttack, int attackPower)
     {
-        if (attacker == null)
-            throw new ArgumentNullException(nameof(attacker), "Attacker cannot be null.");
-        if (attackPower < 0)
-            throw new ArgumentOutOfRangeException(nameof(attackPower), "Attack power must be non-negative.");
+        ValidateDefenseInputs(attacker, attackPower);
 
         var result = new DefenseResult();
-        var damage = attackPower;
-        
         try
         {
-            if (typeOfAttack == TypeDamage.Physical)
-            {
-                if (PerformLuckTest(DodgeChance))
-                {
-                    result.IsDodged = true;
-                    Console.WriteLine($"{Name} dodged the attack!");
-                    return result;
-                }
-                if (PerformLuckTest(ParadeChance))
-                {
-                    result.IsParried = true;
-                    damage = attackPower / 2;
-                    Console.WriteLine($"{Name} parried the attack and reduced damage to {damage}!");
-                }
-            } else if (typeOfAttack == TypeDamage.Magic)
-            {
-                if (PerformLuckTest(ChanceSpellResistance))
-                {
-                    Console.WriteLine($"{Name} resisted the magic attack!");
-                    return result;
-                }
-                Speed = (int)(Speed * 0.85);
-            }
-            
-            // Apply armor resistance
-            damage = GetArmorResistance(Armor, typeOfAttack, damage);
-            result.DamageTaken = damage;
-
-            // Special case for Paladin class to restore health
-            if (attacker is Paladin paladin)
-            {
-                paladin.RestoreHealth(damage / 2);
-            }
-            
-            // Update the character's health after the attack
-            if ((CurrentHitPoints -= damage) <= 0)
-            {
-                CurrentHitPoints = 0;
-                IsDead = true;
-                Console.WriteLine($"{Name} has died.");
+            if (HandleEvasionAndParry(typeOfAttack, attackPower, ref result))
                 return result;
-            }
-            
-            Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
+
+            var damage = CalculateDamageAfterResistance(attacker, typeOfAttack, attackPower, ref result);
+
+            ApplyDamageAndCheckDeath(damage, result);
         }
         catch (Exception ex)
         {
             Utils.LogError($"Error during defense: {ex.Message}");
         }
-        
+
         return result;
+    }
+
+    private void ValidateDefenseInputs(Character attacker, int attackPower)
+    {
+        if (attacker == null)
+            throw new ArgumentNullException(nameof(attacker), "Attacker cannot be null.");
+        if (attackPower < 0)
+            throw new ArgumentOutOfRangeException(nameof(attackPower), "Attack power must be non-negative.");
+    }
+
+    private bool HandleEvasionAndParry(TypeDamage typeOfAttack, int attackPower, ref DefenseResult result)
+    {
+        if (typeOfAttack == TypeDamage.Physical)
+        {
+            if (PerformLuckTest(DodgeChance))
+            {
+                result.IsDodged = true;
+                Console.WriteLine($"{Name} dodged the attack!");
+                return true;
+            }
+            if (PerformLuckTest(ParadeChance))
+            {
+                result.IsParried = true;
+                result.DamageTaken = attackPower / 2;
+                Console.WriteLine($"{Name} parried the attack and reduced damage to {result.DamageTaken}!");
+                return true;
+            }
+        }
+        else if (typeOfAttack == TypeDamage.Magic && PerformLuckTest(ChanceSpellResistance))
+        {
+            Console.WriteLine($"{Name} resisted the magic attack!");
+            return true;
+        }
+        return false;
+    }
+
+    private int CalculateDamageAfterResistance(Character attacker, TypeDamage typeOfAttack, int attackPower, ref DefenseResult result)
+    {
+        var damage = attackPower;
+
+        // Reduce speed for magic attacks
+        if (typeOfAttack == TypeDamage.Magic)
+            Speed = (int)(Speed * 0.85);
+
+        damage = GetArmorResistance(Armor, typeOfAttack, damage);
+        result.DamageTaken = damage;
+
+        // Special case for Paladin to restore health
+        if (attacker is Paladin paladin)
+            paladin.RestoreHealth(damage / 2);
+
+        return damage;
+    }
+
+    private void ApplyDamageAndCheckDeath(int damage, DefenseResult result)
+    {
+        CurrentHitPoints -= damage;
+
+        if (CurrentHitPoints <= 0)
+        {
+            CurrentHitPoints = 0;
+            IsDead = true;
+            Console.WriteLine($"{Name} has died.");
+            return;
+        }
+
+        Console.WriteLine($"The {Name} character received {damage} damage. Remaining HP: {CurrentHitPoints}");
     }
 
     /// <summary>
